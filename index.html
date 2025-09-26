@@ -1118,14 +1118,29 @@
                 if (showOneMode && selectedSharkId && sharkData[selectedSharkId]) {
                     const track = sharkData[selectedSharkId];
                     const allLatLngs = track.map(point => [point.lat, point.lon]);
+					// console.log(allLatLngs)
                     const bounds = L.latLngBounds(allLatLngs);
+					// console.log(bounds)
                     map.fitBounds(bounds.pad(0.1));
                 } else {
                     // Fit to all currently visible shark layers
-                    const visibleLayers = Object.values(sharkLayers).filter(s => s.visible).map(s => s.layer);
-                    if (visibleLayers.length > 0) {
-                        const group = new L.featureGroup(visibleLayers);
-                        map.fitBounds(group.getBounds().pad(0.1));
+                    const visibleSharkLayers = Object.values(sharkLayers).filter(s => s.visible);
+					// console.log(visibleSharkLayers)
+                    if (visibleSharkLayers.length > 0) {
+                        // Collect all lat/lng bounds from visible sharks
+                        let allVisibleBounds = [];
+                        Object.keys(sharkData).forEach(sharkId => {
+                            if (sharkLayers[sharkId] && sharkLayers[sharkId].visible) {
+                                const track = sharkData[sharkId];
+                                const trackLatLngs = track.map(point => [point.lat, point.lon]);
+                                allVisibleBounds = allVisibleBounds.concat(trackLatLngs);
+                            }
+                        });
+                        
+                        if (allVisibleBounds.length > 0) {
+                            const bounds = L.latLngBounds(allVisibleBounds);
+                            map.fitBounds(bounds.pad(0.1));
+                        }
                     }
                 }
             });
