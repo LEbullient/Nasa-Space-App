@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blue Shark Tracking - Interactive Map</title>
     
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦈</text></svg>">
+    
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -755,16 +758,16 @@
                 const sharkFiles = [
                     '160424_2013_132346pnas_atn.csv',
                     '160424_2014_141195pnas_atn.csv',
-                    '160424_2015_141261pnas_atn.csv',
+                    '160424_2015_141261pnas_atn_filtered.csv',
                     '160424_2015_141264pnas_atn.csv',
                     '160424_2015_141268pnas_atn.csv',
                     '160424_2015_141270pnas_atn.csv',
-                    '160424_2016_106744pnas_atn.csv',
-                    '160424_2016_106745pnas_atn.csv',
-                    '160424_2016_106746pnas_atn.csv',
-                    '160424_2016_106747pnas_atn.csv',
+                    '160424_2016_106744pnas_atn_filtered.csv',
+                    '160424_2016_106745pnas_atn_filtered.csv',
+                    '160424_2016_106746pnas_atn_filtered.csv',
+                    '160424_2016_106747pnas_atn_filtered.csv',
                     '160424_2016_106748pnas_atn.csv',
-                    '160424_2016_141262pnas_atn.csv',
+                    '160424_2016_141262pnas_atn_filtered.csv',
                     '160424_2016_141263pnas_atn.csv',
                     '160424_2016_141265pnas_atn.csv',
                     '160424_2016_141266pnas_atn.csv',
@@ -1130,6 +1133,16 @@
             document.getElementById('toggle-points').addEventListener('click', () => {
                 showPoints = !showPoints;
                 
+                // Update button appearance and text based on state
+                const toggleButton = document.getElementById('toggle-points');
+                if (showPoints) {
+                    toggleButton.classList.add('active');
+                    toggleButton.textContent = 'Hide Points';
+                } else {
+                    toggleButton.classList.remove('active');
+                    toggleButton.textContent = 'Show Points';
+                }
+                
                 if (showOneMode && selectedSharkId) {
                     // In Show One mode, only update the current shark's visualization
                     updateSharkVisualization();
@@ -1208,6 +1221,16 @@
             bottomControls.addEventListener('mouseleave', () => {
                 map.dragging.enable();
             });
+            
+            // Initialize toggle points button state
+            const toggleButton = document.getElementById('toggle-points');
+            if (showPoints) {
+                toggleButton.classList.add('active');
+                toggleButton.textContent = 'Hide Points';
+            } else {
+                toggleButton.classList.remove('active');
+                toggleButton.textContent = 'Show Points';
+            }
         }
         
         // Helper function to disable follow mode
