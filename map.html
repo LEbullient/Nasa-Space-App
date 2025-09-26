@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Shark Tracking - Interactive Map</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦈</text></svg>">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Custom CSS -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-title {
+            flex: 1;
+        }
+
+        .header-title h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-title p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-tab:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tab.active {
+            color: white;
+            background: #3498db;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+            position: relative;
+        }
+
+        .menu-toggle {
+            position: absolute;
+            top: 10px;
+            left: 365px; /* 350px sidebar width + 15px spacing */
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: left 0.3s ease, background-color 0.2s ease;
+        }
+
+        .container.sidebar-hidden .menu-toggle {
+            left: 15px; /* 15px from left when sidebar is hidden */
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .menu-toggle svg {
+            display: block;
+        }
+
+        .sidebar {
+            width: 350px;
+            background-color: white;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .sidebar h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .controls {
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            margin-bottom: 1rem;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        .control-group button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .control-group button:hover {
+            background-color: #2980b9;
+        }
+
+        .control-group button.active {
+            background-color: #27ae60;
+        }
+
+        .shark-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 0.5rem;
+            background-color: #fafafa;
+        }
+
+        .shark-item {
+            padding: 1rem;
+            border: 1px solid #ecf0f1;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .shark-item:hover {
+            background-color: #ecf0f1;
+        }
+
+        .shark-item.selected {
+            background-color: #e8f4f8;
+            border-color: #3498db;
+        }
+
+        .shark-id {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .shark-details {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .shark-details div {
+            margin-bottom: 0.2rem;
+        }
+
+        #map {
+            flex: 1;
+            position: relative;
+            transition: margin-left 0.3s ease;
+        }
+
+        .container.sidebar-hidden #map {
+            margin-left: -350px;
+        }
+
+        .legend {
+            position: absolute;
+            top: 60px; /* Below the menu toggle button */
+            left: 15px; /* Same as menu toggle when sidebar is open */
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.75);
+            padding: 0.5rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+        }
+
+        .container.sidebar-hidden .legend {
+            left: 15px; /* 15px from left when sidebar is hidden */
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            margin-right: 0.5rem;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+        }
+
+        .stats {
+            background-color: #ecf0f1;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .stats h4 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stats-label {
+            color: #7f8c8d;
+        }
+
+        .stats-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* Bottom time control panel styles */
+        .bottom-time-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 16px 20px;
+            display: none;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .bottom-time-controls.visible {
+            display: block;
+        }
+
+		/* Removed */
+        /* .time-control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        } */
+
+        .time-control-title {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+
+        .time-control-info {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .time-control-main {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .play-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .play-button:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        .play-button.playing {
+            background: #e74c3c;
+        }
+
+        .play-button.playing:hover {
+            background: #c0392b;
+        }
+
+        .bottom-time-slider-container {
+            flex: 1;
+            margin: 0 8px;
+        }
+
+        .bottom-time-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #ecf0f1;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bottom-time-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .bottom-time-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .bottom-time-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .time-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+
+        .current-time-label {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            flex-shrink: 0;
+        }
+
+        .speed-button {
+            background: none;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            transition: all 0.2s ease;
+        }
+
+        .speed-button:hover {
+            background: #ecf0f1;
+            border-color: #95a5a6;
+        }
+
+        .speed-button.active {
+            background: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        .follow-button {
+            background: none;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            white-space: nowrap;
+            margin-left: 12px;
+        }
+
+        .follow-button:hover {
+            background: #ecf0f1;
+            border-color: #95a5a6;
+        }
+
+        .follow-button.active {
+            background: #27ae60;
+            border-color: #27ae60;
+            color: white;
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3498db;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            z-index: 10000;
+            cursor: pointer;
+            animation: slideDown 0.3s ease-out;
+            max-width: 400px;
+            text-align: center;
+            border-left: 4px solid #2980b9;
+        }
+
+        .notification:hover {
+            background: #2980b9;
+            transform: translateX(-50%) scale(1.02);
+            transition: all 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .notification.fadeOut {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>Blue Shark Tracking Project</h1>
+                <p>Interactive map showing satellite tracking data of blue sharks (Prionace glauca) in the North Atlantic</p>
+            </div>
+            <nav class="nav-tabs">
+                <a href="index.html" class="nav-tab">About</a>
+                <a href="map.html" class="nav-tab active">Map</a>
+                <a href="model.html" class="nav-tab">Design</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Menu toggle button -->
+        <button class="menu-toggle" id="menu-toggle" title="Toggle Sidebar">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+                <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/>
+            </svg>
+        </button>
+        
+        <div class="sidebar" id="sidebar">
+            <!-- <div class="stats">
+                <h4>Dataset Summary</h4>
+                <div class="stats-grid">
+                    <div class="stats-item">
+                        <span class="stats-label">Total Sharks:</span>
+                        <span class="stats-value" id="total-sharks">-</span>
+                    </div>
+                    <div class="stats-item">
+                        <span class="stats-label">Total Points:</span>
+                        <span class="stats-value" id="total-points">-</span>
+                    </div>
+                    <div class="stats-item">
+                        <span class="stats-label">Date Range:</span>
+                        <span class="stats-value" id="date-range">-</span>
+                    </div>
+                    <div class="stats-item">
+                        <span class="stats-label">Species:</span>
+                        <span class="stats-value">Blue Shark</span>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="controls">
+                <h3>Map Controls</h3>
+                <div class="control-group">
+                    <label>Track Visibility:</label>
+                    <button id="show-all" class="active">Show All</button>
+                    <button id="hide-all">Hide All</button>
+                    <button id="show-one">Show One</button>
+                </div>
+                <div class="control-group">
+                    <label>View Options:</label>
+                    <button id="fit-bounds">Fit to Data</button>
+                    <button id="toggle-points">Toggle Points</button>
+                </div>
+                <!-- <div class="control-group">
+                    <label>Filter by Year:</label>
+                    <button id="filter-all" class="active">All Years</button>
+                    <button id="filter-2013">2013</button>
+                    <button id="filter-2014">2014</button>
+                    <button id="filter-2015">2015</button>
+                    <button id="filter-2016">2016</button>
+                </div> -->
+            </div>
+
+            <h3>Tracked Sharks</h3>
+            <div id="shark-list" class="shark-list">
+                <div class="loading">
+                    <div>Loading shark data...</div>
+                    <div id="loading-progress" style="font-size: 0.9em; margin-top: 0.5rem; color: #3498db;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="map">
+            <!-- Legend overlay -->
+            <div class="legend">
+                <h4>Legend</h4>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #e74c3c;"></div>
+                    <span>Deployment Location</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #27ae60;"></div>
+                    <span>Last Known Position</span>
+                </div>
+                <!-- <div class="legend-item">
+                    <div class="legend-color" style="background-color: #3498db;"></div>
+                    <span>Swimming Track</span>
+                </div> -->
+            </div>
+            
+            <!-- Bottom time controls overlay -->
+            <div class="bottom-time-controls" id="bottom-time-controls">
+                <!-- <div class="time-control-header">
+                    <div class="time-control-title" id="bottom-control-title">Time Control</div>
+                    <div class="time-control-info" id="bottom-control-info">Select a shark in "Show One" mode</div>
+                </div> -->
+                <div class="time-control-main">
+                    <button class="play-button" id="play-button" title="Play/Pause">
+                        ▶
+                    </button>
+                    <div class="bottom-time-slider-container">
+                        <input type="range" class="bottom-time-slider" id="bottom-time-slider" min="0" max="100" value="100">
+                        <div class="time-labels">
+                            <span id="bottom-start-time">Start</span>
+                            <span class="current-time-label" id="bottom-current-time">Current</span>
+                            <span id="bottom-end-time">End</span>
+                        </div>
+                    </div>
+                    <div class="speed-control">
+                        <span>Speed:</span>
+                        <button class="speed-button" data-speed="0.5">0.5x</button>
+                        <button class="speed-button active" data-speed="1">1x</button>
+                        <button class="speed-button" data-speed="2">2x</button>
+                        <button class="speed-button" data-speed="4">4x</button>
+                        <button class="speed-button" data-speed="10">10x</button>
+                    </div>
+                    <button class="follow-button" id="follow-button" title="Toggle Follow Mode">
+                        🦈 Follow
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Papa Parse for CSV reading -->
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+
+    <script>
+        // Global variables
+        let map;
+        let sharkData = {};
+        let sharkMetadata = {};
+        let sharkLayers = {};
+        let allBounds = [];
+        let showPoints = true;
+        
+        // Show one mode variables
+        let showOneMode = false;
+        let selectedSharkId = null;
+        let currentTimeIndex = 0;
+        let timeSliderLayer = null;
+        
+        // Auto-play variables
+        let isPlaying = false;
+        let playInterval = null;
+        let playSpeed = 1; // 1x speed
+        let playStepDelay = 500; // Base delay in ms
+        let followMode = false; // Follow mode for map centering during animation (disabled by default)
+
+        // Color palette for different sharks
+        const colors = [
+            '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6',
+            '#1abc9c', '#34495e', '#e67e22', '#95a5a6', '#c0392b',
+            '#8e44ad', '#16a085', '#2c3e50', '#d35400', '#7f8c8d'
+        ];
+
+        // Calculate distance between two lat/lon points using Haversine formula
+        function calculateDistance(track) {
+            if (track.length < 2) return 0;
+            
+            let totalDistance = 0;
+            for (let i = 1; i < track.length; i++) {
+                const R = 6371; // Earth's radius in km
+                const dLat = (track[i].lat - track[i-1].lat) * Math.PI / 180;
+                const dLon = (track[i].lon - track[i-1].lon) * Math.PI / 180;
+                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(track[i-1].lat * Math.PI / 180) * Math.cos(track[i].lat * Math.PI / 180) *
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                totalDistance += R * c;
+            }
+            return totalDistance;
+        }
+
+        // Show notification function
+        function showNotification(message, duration = 5000) {
+            // Remove existing notification if any
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            
+            // Add click to dismiss functionality
+            notification.addEventListener('click', () => {
+                notification.classList.add('fadeOut');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            });
+
+            // Add to document
+            document.body.appendChild(notification);
+
+            // Auto-dismiss after duration
+            setTimeout(() => {
+                if (notification.parentNode && !notification.classList.contains('fadeOut')) {
+                    notification.classList.add('fadeOut');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, duration);
+        }
+
+        // Initialize the map
+        function initMap() {
+            map = L.map('map', {
+                zoomControl: false // Disable default zoom control
+            }).setView([40.0, -60.0], 4);
+
+            // Add base layers
+            const oceanBase = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+
+            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            });
+
+            // Layer control - add first so it appears on top
+            const baseMaps = {
+                "Ocean": oceanBase,
+                "Satellite": satellite
+            };
+
+            L.control.layers(baseMaps, null, {
+                position: 'topright'
+            }).addTo(map);
+
+            // Add zoom control on the right side - add after layer control so it appears below
+            L.control.zoom({
+                position: 'topright'
+            }).addTo(map);
+            
+            // Set up map interaction listeners for follow mode
+            setupMapInteractionListeners();
+        }
+
+        // Load and parse CSV data
+        async function loadData() {
+            try {
+                // First, load metadata
+                const metadataResponse = await fetch('data/Braun_atn_tag_deployment_metadata.csv');
+                const metadataCsv = await metadataResponse.text();
+                const metadataData = Papa.parse(metadataCsv, { header: true, skipEmptyLines: true });
+
+                // Process metadata
+                metadataData.data.forEach(row => {
+                    sharkMetadata[row['Deployment ID']] = {
+                        species: row['Species'],
+                        length: row['Animal Length_cm'],
+                        sex: row['Animal Sex'],
+                        deploymentStart: row['Deployment Start Datetime'],
+                        deploymentStop: row['Deployment Stop Datetime'],
+                        startLat: parseFloat(row['geospatial_lat_start']),
+                        startLon: parseFloat(row['geospatial_lon_start']),
+                        endLat: parseFloat(row['geospatial_lat_end']),
+                        endLon: parseFloat(row['geospatial_lon_end']),
+                        endType: row['end_type']
+                    };
+                });
+
+                // Define all shark files to load
+                const sharkFiles = [
+                    '160424_2013_132346pnas_atn.csv',
+                    '160424_2014_141195pnas_atn.csv',
+                    '160424_2015_141261pnas_atn_filtered.csv',
+                    '160424_2015_141264pnas_atn.csv',
+                    '160424_2015_141268pnas_atn.csv',
+                    '160424_2015_141270pnas_atn.csv',
+                    '160424_2016_106744pnas_atn_filtered.csv',
+                    '160424_2016_106745pnas_atn_filtered.csv',
+                    '160424_2016_106746pnas_atn_filtered.csv',
+                    '160424_2016_106747pnas_atn_filtered.csv',
+                    '160424_2016_106748pnas_atn.csv',
+                    '160424_2016_141262pnas_atn_filtered.csv',
+                    '160424_2016_141263pnas_atn.csv',
+                    '160424_2016_141265pnas_atn.csv',
+                    '160424_2016_141266pnas_atn.csv',
+                    '160424_2016_165927pnas_atn.csv',
+                    '160424_2016_165928pnas_atn.csv'
+                ];
+
+                // Load all shark tracking files
+                const sharkPromises = sharkFiles.map(async (filename, index) => {
+                    try {
+                        // Update loading progress
+                        const progressEl = document.getElementById('loading-progress');
+                        if (progressEl) {
+                            progressEl.textContent = `Loading ${filename}... (${index + 1}/${sharkFiles.length})`;
+                        }
+                        
+                        const response = await fetch(`data/${filename}`);
+                        const csvText = await response.text();
+                        const parsedData = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+                        
+                        parsedData.data.forEach(row => {
+                            const id = row.id;
+                            const lat = parseFloat(row.lat);
+                            const lon = parseFloat(row.lon);
+                            const date = new Date(row.date);
+                            
+                            if (!isNaN(lat) && !isNaN(lon) && !isNaN(date.getTime())) {
+                                if (!sharkData[id]) {
+                                    sharkData[id] = [];
+                                }
+                                sharkData[id].push({
+                                    lat: lat,
+                                    lon: lon,
+                                    date: date,
+                                    lc: row.lc
+                                });
+                                
+                                allBounds.push([lat, lon]);
+                            }
+                        });
+                        
+                        return filename;
+                    } catch (error) {
+                        console.warn(`Failed to load ${filename}:`, error);
+                        return null;
+                    }
+                });
+
+                // Wait for all shark files to load
+                const results = await Promise.all(sharkPromises);
+                const successfulLoads = results.filter(r => r !== null);
+                
+                console.log(`Successfully loaded ${successfulLoads.length} out of ${sharkFiles.length} shark files`);
+
+                // Sort tracking data by date for each shark
+                Object.keys(sharkData).forEach(id => {
+                    sharkData[id].sort((a, b) => a.date - b.date);
+                });
+
+                console.log('Loaded data:', Object.keys(sharkData).length, 'sharks');
+                console.log('Metadata:', Object.keys(sharkMetadata).length, 'entries');
+                
+                updateStats();
+                createSharkLayers();
+                populateSharkList();
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('shark-list').innerHTML = '<div style="color: red; padding: 1rem;">Error loading data. Please check that CSV files are in the data directory.</div>';
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalSharks = Object.keys(sharkData).length;
+            const totalPoints = Object.values(sharkData).reduce((sum, track) => sum + track.length, 0);
+            
+            let minDate = new Date();
+            let maxDate = new Date(0);
+            
+            Object.values(sharkData).forEach(track => {
+                track.forEach(point => {
+                    if (point.date < minDate) minDate = point.date;
+                    if (point.date > maxDate) maxDate = point.date;
+                });
+            });
+
+            // document.getElementById('total-sharks').textContent = totalSharks;
+            // document.getElementById('total-points').textContent = totalPoints.toLocaleString();
+            
+            // const dateOptions = { year: 'numeric', month: 'short' };
+            // document.getElementById('date-range').textContent = 
+            //     `${minDate.toLocaleDateString('en-US', dateOptions)} - ${maxDate.toLocaleDateString('en-US', dateOptions)}`;
+        }
+
+        // Create map layers for each shark
+        function createSharkLayers() {
+            let colorIndex = 0;
+            
+            Object.keys(sharkData).forEach(sharkId => {
+                const track = sharkData[sharkId];
+                const color = colors[colorIndex % colors.length];
+                colorIndex++;
+                
+                const layerGroup = L.layerGroup();
+                
+                // Create track polyline
+                const latlngs = track.map(point => [point.lat, point.lon]);
+                const polyline = L.polyline(latlngs, {
+                    color: color,
+                    weight: 3,
+                    opacity: 0.8
+                });
+                
+                // Add start marker (deployment)
+                const startPoint = track[0];
+                const startMarker = L.circleMarker([startPoint.lat, startPoint.lon], {
+                    radius: 8,
+                    fillColor: '#e74c3c',
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                });
+                
+                // Add end marker
+                const endPoint = track[track.length - 1];
+                const endMarker = L.circleMarker([endPoint.lat, endPoint.lon], {
+                    radius: 8,
+                    fillColor: '#27ae60',
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                });
+
+                // Create popup content
+                const metadata = sharkMetadata[sharkId] || {};
+                const year = sharkId.match(/(\d{4})/)[1];
+                const shortId = sharkId.replace('160424_', '').replace('pnas_atn', '');
+                const popupContent = `
+                    <div style="font-family: Arial, sans-serif;">
+                        <h4 style="margin: 0 0 10px 0; color: #2c3e50;">Shark ${shortId} (${year})</h4>
+                        <p><strong>Species:</strong> ${metadata.species || 'Blue Shark (Prionace glauca)'}</p>
+                        <p><strong>Length:</strong> ${metadata.length ? metadata.length + ' cm' : 'Unknown'}</p>
+                        <p><strong>Sex:</strong> ${metadata.sex || 'Unknown'}</p>
+                        <p><strong>Deployment:</strong> ${metadata.deploymentStart ? new Date(metadata.deploymentStart).toLocaleDateString() : 'Unknown'}</p>
+                        <p><strong>Track Duration:</strong> ${Math.round((endPoint.date - startPoint.date) / (1000 * 60 * 60 * 24))} days</p>
+                        <p><strong>Total Points:</strong> ${track.length.toLocaleString()}</p>
+                        <p><strong>End Status:</strong> ${metadata.endType || 'Unknown'}</p>
+                        <p><strong>Distance Traveled:</strong> ~${calculateDistance(track).toFixed(0)} km</p>
+                    </div>
+                `;
+                
+                polyline.bindPopup(popupContent);
+                startMarker.bindPopup(`<strong>Deployment Location</strong><br/>${popupContent}`);
+                endMarker.bindPopup(`<strong>Last Known Position</strong><br/>${popupContent}`);
+                
+                layerGroup.addLayer(polyline);
+                layerGroup.addLayer(startMarker);
+                layerGroup.addLayer(endMarker);
+                
+                // Add individual points if enabled
+                if (showPoints) {
+                    track.forEach(point => {
+                        const pointMarker = L.circleMarker([point.lat, point.lon], {
+                            radius: 2,
+                            fillColor: color,
+                            color: color,
+                            weight: 1,
+                            opacity: 0.6,
+                            fillOpacity: 0.6
+                        });
+                        pointMarker.bindPopup(`
+                            <strong>Shark: ${sharkId}</strong><br/>
+                            Date: ${point.date.toLocaleDateString()}<br/>
+                            Location: ${point.lat.toFixed(4)}, ${point.lon.toFixed(4)}<br/>
+                            Quality: ${point.lc}
+                        `);
+                        layerGroup.addLayer(pointMarker);
+                    });
+                }
+                
+                sharkLayers[sharkId] = {
+                    layer: layerGroup,
+                    color: color,
+                    visible: true
+                };
+                
+                layerGroup.addTo(map);
+            });
+            
+            // Fit map to show all data
+			// console.log("hi")
+            // if (allBounds.length > 0) {
+            //     const group = new L.featureGroup(Object.values(sharkLayers).map(s => s.layer));
+            //     map.fitBounds(group.getBounds().pad(0.1));
+            // }
+        }
+
+        // Populate shark list in sidebar
+        function populateSharkList() {
+            const listContainer = document.getElementById('shark-list');
+            listContainer.innerHTML = '';
+            
+            // Sort sharks by deployment year and ID
+            const sortedSharkIds = Object.keys(sharkData).sort();
+            
+            sortedSharkIds.forEach(sharkId => {
+                const track = sharkData[sharkId];
+                const metadata = sharkMetadata[sharkId] || {};
+                const sharkLayer = sharkLayers[sharkId];
+                
+                const item = document.createElement('div');
+                item.className = 'shark-item';
+                item.dataset.sharkId = sharkId;
+                
+                const duration = Math.round((track[track.length - 1].date - track[0].date) / (1000 * 60 * 60 * 24));
+                
+                // Extract year and simplified ID from shark ID
+                const year = sharkId.match(/(\d{4})/)[1];
+                const shortId = sharkId.replace('160424_', '').replace('pnas_atn', '');
+                
+                item.innerHTML = `
+                    <div class="shark-id" style="color: ${sharkLayer.color};">
+                        🦈 Shark ${shortId} (${year})
+                    </div>
+                    <div class="shark-details">
+                        <div><strong>Length:</strong> ${metadata.length ? metadata.length + ' cm' : 'Unknown'}</div>
+                        <div><strong>Duration:</strong> ${duration} days</div>
+                        <div><strong>Points:</strong> ${track.length.toLocaleString()}</div>
+                        <div><strong>Status:</strong> ${metadata.endType || 'Unknown'}</div>
+                        <div><strong>Sex:</strong> ${metadata.sex || 'Unknown'}</div>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    // Highlight selected shark
+                    document.querySelectorAll('.shark-item').forEach(el => el.classList.remove('selected'));
+                    item.classList.add('selected');
+                    
+                    if (showOneMode) {
+                        // Show One mode: Enable time slider for this shark
+                        selectedSharkId = sharkId;
+                        document.getElementById('shark-list').style.opacity = '1';
+                        
+                        // Hide all other tracks
+                        Object.values(sharkLayers).forEach(shark => {
+                            if (shark.visible) {
+                                map.removeLayer(shark.layer);
+                                shark.visible = false;
+                            }
+                        });
+                        
+                        // Show time slider and initialize visualization
+                        showTimeSlider(sharkId);
+                        updateSharkVisualization();
+                        
+                    } else {
+                        // Normal mode: Show track and zoom
+                        const bounds = L.latLngBounds(track.map(point => [point.lat, point.lon]));
+                        map.fitBounds(bounds.pad(0.2));
+                        
+                        // Open popup for the shark
+                        sharkLayer.layer.eachLayer(layer => {
+                            if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+                                layer.openPopup();
+                            }
+                        });
+                    }
+                });
+                
+                listContainer.appendChild(item);
+            });
+        }
+
+        // Event listeners for controls
+        function setupEventListeners() {
+            // Menu toggle button
+            document.getElementById('menu-toggle').addEventListener('click', () => {
+                const sidebar = document.getElementById('sidebar');
+                const container = document.querySelector('.container');
+                
+                sidebar.classList.toggle('hidden');
+                container.classList.toggle('sidebar-hidden');
+                
+                // Trigger map resize after animation completes
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 300);
+            });
+            
+            document.getElementById('show-all').addEventListener('click', () => {
+                showOneMode = false;
+                selectedSharkId = null;
+                hideTimeSlider();
+                
+                Object.values(sharkLayers).forEach(shark => {
+                    if (!shark.visible) {
+                        map.addLayer(shark.layer);
+                        shark.visible = true;
+                    }
+                });
+                document.getElementById('show-all').classList.add('active');
+                document.getElementById('hide-all').classList.remove('active');
+                document.getElementById('show-one').classList.remove('active');
+                
+                // Reset shark list opacity
+                document.getElementById('shark-list').style.opacity = '1';
+            });
+            
+            document.getElementById('hide-all').addEventListener('click', () => {
+                Object.values(sharkLayers).forEach(shark => {
+                    if (shark.visible) {
+                        map.removeLayer(shark.layer);
+                        shark.visible = false;
+                    }
+                });
+                document.getElementById('hide-all').classList.add('active');
+                document.getElementById('show-all').classList.remove('active');
+                document.getElementById('show-one').classList.remove('active');
+                showOneMode = false;
+                hideTimeSlider();
+            });
+            
+            document.getElementById('show-one').addEventListener('click', () => {
+                showOneMode = true;
+                // Hide all tracks first
+                Object.values(sharkLayers).forEach(shark => {
+                    if (shark.visible) {
+                        map.removeLayer(shark.layer);
+                        shark.visible = false;
+                    }
+                });
+                
+                // Update button states
+                document.getElementById('show-one').classList.add('active');
+                document.getElementById('show-all').classList.remove('active');
+                document.getElementById('hide-all').classList.remove('active');
+                
+                // Show instruction message
+                showNotification('Click on a shark in the list below to view its track over time!');
+            });
+            
+            // Fit to Data button
+            document.getElementById('fit-bounds').addEventListener('click', () => {
+                // If in show one mode and a shark is selected, fit to that shark's complete track
+                if (showOneMode && selectedSharkId && sharkData[selectedSharkId]) {
+                    const track = sharkData[selectedSharkId];
+                    const allLatLngs = track.map(point => [point.lat, point.lon]);
+					// console.log(allLatLngs)
+                    const bounds = L.latLngBounds(allLatLngs);
+					// console.log(bounds)
+                    map.fitBounds(bounds.pad(0.1));
+                } else {
+                    // Fit to all currently visible shark layers
+                    const visibleSharkLayers = Object.values(sharkLayers).filter(s => s.visible);
+					// console.log(visibleSharkLayers)
+                    if (visibleSharkLayers.length > 0) {
+                        // Collect all lat/lng bounds from visible sharks
+                        let allVisibleBounds = [];
+                        Object.keys(sharkData).forEach(sharkId => {
+                            if (sharkLayers[sharkId] && sharkLayers[sharkId].visible) {
+                                const track = sharkData[sharkId];
+                                const trackLatLngs = track.map(point => [point.lat, point.lon]);
+                                allVisibleBounds = allVisibleBounds.concat(trackLatLngs);
+                            }
+                        });
+                        
+                        if (allVisibleBounds.length > 0) {
+                            const bounds = L.latLngBounds(allVisibleBounds);
+                            map.fitBounds(bounds.pad(0.1));
+                        }
+                    }
+                }
+            });
+            
+            document.getElementById('toggle-points').addEventListener('click', () => {
+                showPoints = !showPoints;
+                
+                // Update button appearance and text based on state
+                const toggleButton = document.getElementById('toggle-points');
+                if (showPoints) {
+                    toggleButton.classList.add('active');
+                    toggleButton.textContent = 'Hide Points';
+                } else {
+                    toggleButton.classList.remove('active');
+                    toggleButton.textContent = 'Show Points';
+                }
+                
+                if (showOneMode && selectedSharkId) {
+                    // In Show One mode, only update the current shark's visualization
+                    updateSharkVisualization();
+                } else {
+                    // In normal mode, recreate all layers with/without points
+                    Object.values(sharkLayers).forEach(shark => {
+                        map.removeLayer(shark.layer);
+                    });
+                    sharkLayers = {};
+                    createSharkLayers();
+                }
+            });
+            
+            // Bottom time slider event listener
+            document.getElementById('bottom-time-slider').addEventListener('input', (e) => {
+                if (selectedSharkId && sharkData[selectedSharkId]) {
+                    const percentage = e.target.value / 100;
+                    const track = sharkData[selectedSharkId];
+                    currentTimeIndex = Math.floor((track.length - 1) * percentage);
+                    updateTimeSliderDisplay();
+                    updateSharkVisualization();
+                    
+                    // Pause animation when user manually changes slider
+                    if (isPlaying) {
+                        pauseAnimation();
+                    }
+                }
+            });
+            
+            // Play/Pause button
+            document.getElementById('play-button').addEventListener('click', () => {
+                if (isPlaying) {
+                    pauseAnimation();
+                } else {
+                    startAnimation();
+                }
+            });
+            
+            // Speed control buttons
+            document.querySelectorAll('.speed-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    // Update active speed button
+                    document.querySelectorAll('.speed-button').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    // Update play speed
+                    playSpeed = parseFloat(e.target.dataset.speed);
+                    
+                    // Restart animation if playing
+                    if (isPlaying) {
+                        pauseAnimation();
+                        startAnimation();
+                    }
+                });
+            });
+            
+            // Follow button
+            document.getElementById('follow-button').addEventListener('click', (e) => {
+                followMode = !followMode;
+                const button = e.target;
+                if (followMode) {
+                    button.classList.add('active');
+                    button.textContent = '🦈 Following';
+                } else {
+                    button.classList.remove('active');
+                    button.textContent = '🦈 Follow';
+                }
+            });
+            
+            // Map dragging control for bottom time controls
+            const bottomControls = document.getElementById('bottom-time-controls');
+            bottomControls.addEventListener('mouseenter', () => {
+                map.dragging.disable();
+            });
+            
+            bottomControls.addEventListener('mouseleave', () => {
+                map.dragging.enable();
+            });
+            
+            // Initialize toggle points button state
+            const toggleButton = document.getElementById('toggle-points');
+            if (showPoints) {
+                toggleButton.classList.add('active');
+                toggleButton.textContent = 'Hide Points';
+            } else {
+                toggleButton.classList.remove('active');
+                toggleButton.textContent = 'Show Points';
+            }
+        }
+        
+        // Helper function to disable follow mode
+        function disableFollowMode() {
+            if (followMode) {
+                followMode = false;
+                const followButton = document.getElementById('follow-button');
+                followButton.classList.remove('active');
+                followButton.textContent = '🦈 Follow';
+            }
+        }
+        
+        // Set up map interaction listeners (called after map initialization)
+        function setupMapInteractionListeners() {
+            map.on('dragstart', disableFollowMode);
+        }
+        
+        // Show time slider
+        function showTimeSlider(sharkId) {
+            const bottomContainer = document.getElementById('bottom-time-controls');
+            bottomContainer.classList.add('visible');
+            
+            const track = sharkData[sharkId];
+            const metadata = sharkMetadata[sharkId] || {};
+            const year = sharkId.match(/(\d{4})/)[1];
+            const shortId = sharkId.replace('160424_', '').replace('pnas_atn', '');
+            
+            // Update bottom controls (no need to check for elements since they're commented out)
+            // document.getElementById('bottom-control-title').textContent = `Shark ${shortId} (${year})`;
+            // document.getElementById('bottom-control-info').textContent = `${track.length} points • ${Math.round((track[track.length - 1].date - track[0].date) / (1000 * 60 * 60 * 24))} days`;
+            
+            // Set up time display
+            const startDate = track[0].date.toLocaleDateString();
+            const endDate = track[track.length - 1].date.toLocaleDateString();
+            
+            // Bottom time display
+            document.getElementById('bottom-start-time').textContent = startDate;
+            document.getElementById('bottom-end-time').textContent = endDate;
+            document.getElementById('bottom-current-time').textContent = endDate;
+            
+            // Set slider to end (100%)
+            document.getElementById('bottom-time-slider').value = 100;
+            currentTimeIndex = track.length - 1;
+        }
+        
+        // Hide time slider
+        function hideTimeSlider() {
+            const bottomContainer = document.getElementById('bottom-time-controls');
+            bottomContainer.classList.remove('visible');
+            
+            // Stop any playing animation
+            pauseAnimation();
+            
+            if (timeSliderLayer) {
+                map.removeLayer(timeSliderLayer);
+                timeSliderLayer = null;
+            }
+        }
+        
+        // Update time slider display
+        function updateTimeSliderDisplay() {
+            if (selectedSharkId && sharkData[selectedSharkId]) {
+                const track = sharkData[selectedSharkId];
+                const currentDate = track[currentTimeIndex].date.toLocaleDateString();
+                document.getElementById('bottom-current-time').textContent = currentDate;
+            }
+        }
+        
+        // Start animation
+        function startAnimation() {
+            if (!selectedSharkId || !sharkData[selectedSharkId] || isPlaying) return;
+            
+            const track = sharkData[selectedSharkId];
+            
+            // If we're at the end, reset to the beginning
+            if (currentTimeIndex >= track.length - 1) {
+                currentTimeIndex = 0;
+                // Update slider and display immediately
+                document.getElementById('bottom-time-slider').value = 0;
+                updateTimeSliderDisplay();
+                updateSharkVisualization();
+            }
+            
+            isPlaying = true;
+            document.getElementById('play-button').textContent = '⏸';
+            document.getElementById('play-button').classList.add('playing');
+            
+            const delay = playStepDelay / playSpeed;
+            
+            playInterval = setInterval(() => {
+                if (currentTimeIndex >= track.length - 1) {
+                    // Reached the end, stop animation
+                    pauseAnimation();
+                    return;
+                } else {
+                    currentTimeIndex++;
+                }
+                
+                // Update slider position
+                const percentage = (currentTimeIndex / (track.length - 1)) * 100;
+                document.getElementById('bottom-time-slider').value = percentage;
+                
+                // Update display and visualization
+                updateTimeSliderDisplay();
+                updateSharkVisualization();
+                
+            }, delay);
+        }
+        
+        // Pause animation
+        function pauseAnimation() {
+            if (!isPlaying) return;
+            
+            isPlaying = false;
+            document.getElementById('play-button').textContent = '▶';
+            document.getElementById('play-button').classList.remove('playing');
+            
+            if (playInterval) {
+                clearInterval(playInterval);
+                playInterval = null;
+            }
+        }
+        
+        // Update shark visualization based on time slider
+        function updateSharkVisualization() {
+            if (!selectedSharkId || !sharkData[selectedSharkId]) return;
+            
+            // Remove existing time slider layer
+            if (timeSliderLayer) {
+                map.removeLayer(timeSliderLayer);
+            }
+            
+            const track = sharkData[selectedSharkId];
+            const color = sharkLayers[selectedSharkId].color;
+            
+            timeSliderLayer = L.layerGroup();
+            
+            // Draw the complete track with two segments: past and future
+            const allLatLngs = track.map(point => [point.lat, point.lon]);
+            
+            if (track.length > 1) {
+                // Past segment (from start to current position) - full opacity
+                if (currentTimeIndex > 0) {
+                    const pastLatLngs = allLatLngs.slice(0, currentTimeIndex + 1);
+                    const pastPolyline = L.polyline(pastLatLngs, {
+                        color: color,
+                        weight: 4,
+                        opacity: 0.8
+                    });
+                    timeSliderLayer.addLayer(pastPolyline);
+                }
+                
+                // Future segment (from current position to end) - reduced opacity
+                if (currentTimeIndex < track.length - 1) {
+                    const futureLatLngs = allLatLngs.slice(currentTimeIndex);
+                    const futurePolyline = L.polyline(futureLatLngs, {
+                        color: color,
+                        weight: 4,
+                        opacity: 0.3
+                    });
+                    timeSliderLayer.addLayer(futurePolyline);
+                }
+            }
+            
+            // Add start marker (deployment location)
+            const startPoint = track[0];
+            const startMarker = L.circleMarker([startPoint.lat, startPoint.lon], {
+                radius: 10,
+                fillColor: '#e74c3c',
+                color: '#fff',
+                weight: 3,
+                opacity: 1,
+                fillOpacity: 0.9
+            });
+            startMarker.bindPopup(`<strong>Deployment Location</strong><br/>Date: ${startPoint.date.toLocaleDateString()}`);
+            timeSliderLayer.addLayer(startMarker);
+            
+            // Add end marker (final location)
+            const endPoint = track[track.length - 1];
+            const endMarker = L.circleMarker([endPoint.lat, endPoint.lon], {
+                radius: 8,
+                fillColor: '#27ae60',
+                color: '#fff',
+                weight: 2,
+                opacity: 0.6,
+                fillOpacity: 0.6
+            });
+            endMarker.bindPopup(`<strong>Final Location</strong><br/>Date: ${endPoint.date.toLocaleDateString()}`);
+            timeSliderLayer.addLayer(endMarker);
+            
+            // Add current position marker (moving circle)
+            const currentPoint = track[currentTimeIndex];
+            const currentMarker = L.circleMarker([currentPoint.lat, currentPoint.lon], {
+                radius: 12,
+                fillColor: '#f39c12',
+                color: '#fff',
+                weight: 4,
+                opacity: 1,
+                fillOpacity: 0.9
+            });
+            
+            // Calculate distance from start
+            const currentTrack = track.slice(0, currentTimeIndex + 1);
+            const distanceTraveled = calculateDistance(currentTrack);
+            
+            currentMarker.bindPopup(`
+                <strong>Current Position</strong><br/>
+                Date: ${currentPoint.date.toLocaleDateString()}<br/>
+                Day ${Math.round((currentPoint.date - startPoint.date) / (1000 * 60 * 60 * 24))} of tracking<br/>
+                Distance traveled: ~${distanceTraveled.toFixed(0)} km<br/>
+                Progress: ${Math.round((currentTimeIndex / (track.length - 1)) * 100)}%
+            `);
+            timeSliderLayer.addLayer(currentMarker);
+            
+            // Add individual points if enabled
+            if (showPoints) {
+                track.forEach((point, index) => {
+                    // Past points: full opacity, Future points: reduced opacity
+                    const isPast = index <= currentTimeIndex;
+                    const baseOpacity = isPast ? 0.7 : 0.1;
+                    const pointMarker = L.circleMarker([point.lat, point.lon], {
+                        radius: isPast ? 3 : 2,
+                        fillColor: color,
+                        color: color,
+                        weight: 1,
+                        opacity: baseOpacity,
+                        fillOpacity: baseOpacity
+                    });
+                    pointMarker.bindPopup(`
+                        Date: ${point.date.toLocaleDateString()}<br/>
+                        Location: ${point.lat.toFixed(4)}, ${point.lon.toFixed(4)}<br/>
+                        Quality: ${point.lc}<br/>
+                        Status: ${isPast ? 'Past' : 'Future'}
+                    `);
+                    timeSliderLayer.addLayer(pointMarker);
+                });
+            }
+            
+            timeSliderLayer.addTo(map);
+            
+            // Center on current position when follow mode is enabled (no zoom change)
+            if (followMode) {
+                map.setView([currentPoint.lat, currentPoint.lon]);
+            }
+        }
+
+        // Filter sharks by year
+        // function filterSharksByYear(year) {
+        //     Object.keys(sharkLayers).forEach(sharkId => {
+        //         const sharkYear = sharkId.match(/(\d{4})/)[1];
+		// 		console.log(sharkId, sharkYear, year);
+        //         const shouldShow = year === 'all' || sharkYear === year;
+                
+        //         if (shouldShow && !sharkLayers[sharkId].visible) {
+        //             map.addLayer(sharkLayers[sharkId].layer);
+        //             sharkLayers[sharkId].visible = true;
+        //         } else if (!shouldShow && sharkLayers[sharkId].visible) {
+        //             map.removeLayer(sharkLayers[sharkId].layer);
+        //             sharkLayers[sharkId].visible = false;
+        //         }
+        //     });
+            
+        //     // Update shark list visibility
+        //     document.querySelectorAll('.shark-item').forEach(item => {
+        //         const sharkId = item.dataset.sharkId;
+        //         const sharkYear = sharkId.match(/(\d{4})/)[1];
+        //         const shouldShow = year === 'all' || sharkYear === year;
+        //         item.style.display = shouldShow ? 'block' : 'none';
+        //     });
+        // }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            setupEventListeners();
+            loadData();
+        });
+    </script>
+</body>
+</html>
