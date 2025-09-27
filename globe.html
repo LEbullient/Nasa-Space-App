@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+		<title>Blue Shark Tracking - Globe Map</title>
+		<!-- Favicon -->
+		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦈</text></svg>">
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: 'Arial', sans-serif;
+				background-color: #f5f5f5;
+			}
+
+			.header {
+				background-color: #2c3e50;
+				color: white;
+				padding: 1rem 2rem;
+				box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			}
+
+			.header-content {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				max-width: 1200px;
+				margin: 0 auto;
+			}
+
+			.header-title {
+				flex: 1;
+			}
+
+			.header-title h1 {
+				font-size: 2rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.header-title p {
+				font-size: 1rem;
+				opacity: 0.9;
+			}
+
+			.nav-tabs {
+				display: flex;
+				gap: 0;
+				background: rgba(0, 0, 0, 0.2);
+				border-radius: 8px;
+				padding: 4px;
+			}
+
+			.nav-tab {
+				padding: 10px 20px;
+				text-decoration: none;
+				color: rgba(255, 255, 255, 0.7);
+				border-radius: 6px;
+				transition: all 0.3s ease;
+				font-weight: 500;
+				font-size: 0.9rem;
+			}
+
+			.nav-tab:hover {
+				color: white;
+				background: rgba(255, 255, 255, 0.1);
+			}
+
+			.nav-tab.active {
+				color: white;
+				background: #3498db;
+			}
+		</style>
+		<script src="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Cesium.js"></script>
+		<link href="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+	</head>
+	<body>
+		<div class="header">
+			<div class="header-content">
+			<div class="header-title">
+				<h1>Blue Shark Tracking Project</h1>
+				<p>Woah! A globe!</p>
+			</div>
+			<nav class="nav-tabs">
+				<a href="index.html" class="nav-tab">About</a>
+				<a href="map.html" class="nav-tab">2D Map</a>
+				<a href="globe.html" class="nav-tab active">3D Map</a>
+				<a href="model.html" class="nav-tab">Design</a>
+			</nav>
+			</div>
+		</div>
+		<div id="cesiumContainer" class="fullSize"></div>
+		<div id="toolbar"></div>
+		<script>
+			Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1ODU1MWJiOS05YjFkLTRlMzctOTdiOS1lNmVmNDhlYzRiYWEiLCJpZCI6MzQ1MTIwLCJpYXQiOjE3NTg5ODY3NzZ9.wH_jI8DjDJZ16iD_1V4j0yie550-jYNLwf1P_MEmCbA';
+			// Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+			const viewer = new Cesium.Viewer('cesiumContainer', {
+			terrain: Cesium.Terrain.fromWorldTerrain(),
+			});    
+
+			// Fly the camera to Dertian at the given longitude, latitude, and height.
+			viewer.camera.flyTo({
+			destination : Cesium.Cartesian3.fromDegrees(121.541328, 25.019414, 1000),
+			orientation : {
+				heading : Cesium.Math.toRadians(0.0),
+				pitch : Cesium.Math.toRadians(-90.0),
+			}
+			});
+		</script>
+	</body>
+</html>
