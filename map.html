@@ -796,6 +796,7 @@
         // Initialize the map
         function initMap() {
             map = L.map('map', {
+                renderer: L.canvas(), // Use canvas renderer for better performance with many points
                 zoomControl: false, // Disable default zoom control
                 scrollWheelZoom: true // Enable scroll wheel zoom by default
             }).setView([40.0, -60.0], 4);
