@@ -183,6 +183,7 @@
             margin-bottom: 1rem;
             cursor: pointer;
             transition: background-color 0.3s;
+            position: relative;
         }
 
         .shark-item:hover {
@@ -192,6 +193,43 @@
         .shark-item.selected {
             background-color: #e8f4f8;
             border-color: #3498db;
+        }
+
+        .shark-visibility-toggle {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.4rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+        }
+
+        .shark-visibility-toggle:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: #3498db;
+            transform: scale(1.05);
+        }
+
+        .shark-visibility-toggle svg {
+            width: 20px;
+            height: 20px;
+            transition: fill 0.2s ease;
+        }
+
+        .shark-visibility-toggle:hover svg {
+            fill: #3498db !important;
+        }
+
+        .shark-visibility-toggle.hidden {
+            display: none;
         }
 
         .shark-id {
@@ -573,12 +611,13 @@
                     <label>Track Visibility:</label>
                     <button id="show-all" class="active">Show All</button>
                     <button id="hide-all">Hide All</button>
-                    <button id="show-one">Show One</button>
+                    <button id="show-one">Animate</button>
                 </div>
                 <div class="control-group">
                     <label>View Options:</label>
-                    <button id="fit-bounds">Fit to Data</button>
+                    <button id="fit-bounds">Fit Map</button>
                     <button id="toggle-points">Toggle Points</button>
+                    <button id="toggle-scroll-zoom" class="active" style="display: none;">Scroll Zoom</button>
                 </div>
                 <!-- <div class="control-group">
                     <label>Filter by Year:</label>
@@ -649,6 +688,12 @@
                 </div>
             </div>
         </div>
+        <!-- Intro Section -->
+        <section id="intro" style="display: none;">
+            <h2>Welcome to the Blue Shark Tracking Project</h2>
+            <p>This interactive map visualizes satellite tracking data of blue sharks (Prionace glauca) in the North Atlantic. Use the controls to explore individual shark movements, view deployment locations, and analyze their swimming tracks over time.</p>
+            <p>Data Source: <a href="https://www.seaturtle.org/tracking/" target="_blank" rel="noopener noreferrer">SEATURTLE.ORG</a></p>
+        </section><!-- --- IGNORE --- -->
     </div>
 
     <!-- Leaflet JS -->
@@ -671,6 +716,7 @@
         let selectedSharkId = null;
         let currentTimeIndex = 0;
         let timeSliderLayer = null;
+        let currentMarker = null; // Reference to the current position marker
         
         // Auto-play variables
         let isPlaying = false;
@@ -678,6 +724,10 @@
         let playSpeed = 1; // 1x speed
         let playStepDelay = 500; // Base delay in ms
         let followMode = false; // Follow mode for map centering during animation (disabled by default)
+
+        // SVG icons for visibility toggle buttons
+        const EYE_VISIBLE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2c3e50"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg>';
+        const EYE_HIDDEN_ICON = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#95a5a6"><path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"/></svg>';
 
         // Color palette for different sharks
         const colors = [
@@ -746,7 +796,8 @@
         // Initialize the map
         function initMap() {
             map = L.map('map', {
-                zoomControl: false // Disable default zoom control
+                zoomControl: false, // Disable default zoom control
+                scrollWheelZoom: true // Enable scroll wheel zoom by default
             }).setView([40.0, -60.0], 4);
 
             // Add base layers
@@ -955,8 +1006,10 @@
 
                 // Create popup content
                 const metadata = sharkMetadata[sharkId] || {};
-                const year = sharkId.match(/(\d{4})/)[1];
-                const shortId = sharkId.replace('160424_', '').replace('pnas_atn', '');
+                // Match the year which comes after the initial 160424_ prefix
+                const yearMatch = sharkId.match(/160424_(\d{4})/);
+                const year = yearMatch ? yearMatch[1] : sharkId.match(/(\d{4})/)[1];
+                const shortId = sharkId.replace('160424_', '').replace(`${year}_`, '').replace('pnas_atn', '').replace('_filtered', '');
                 const popupContent = `
                     <div style="font-family: Arial, sans-serif;">
                         <h4 style="margin: 0 0 10px 0; color: #2c3e50;">Shark ${shortId} (${year})</h4>
@@ -1037,8 +1090,10 @@
                 const duration = Math.round((track[track.length - 1].date - track[0].date) / (1000 * 60 * 60 * 24));
                 
                 // Extract year and simplified ID from shark ID
-                const year = sharkId.match(/(\d{4})/)[1];
-                const shortId = sharkId.replace('160424_', '').replace('pnas_atn', '');
+                // Match the year which comes after the initial 160424_ prefix
+                const yearMatch = sharkId.match(/160424_(\d{4})/);
+                const year = yearMatch ? yearMatch[1] : sharkId.match(/(\d{4})/)[1];
+                const shortId = sharkId.replace('160424_', '').replace(`${year}_`, '').replace('pnas_atn', '').replace('_filtered', '');
                 
                 item.innerHTML = `
                     <div class="shark-id" style="color: ${sharkLayer.color};">
@@ -1051,9 +1106,17 @@
                         <div><strong>Status:</strong> ${metadata.endType || 'Unknown'}</div>
                         <div><strong>Sex:</strong> ${metadata.sex || 'Unknown'}</div>
                     </div>
+                    <button class="shark-visibility-toggle" data-shark-id="${sharkId}" title="Toggle visibility">
+                        ${sharkLayer.visible ? EYE_VISIBLE_ICON : EYE_HIDDEN_ICON}
+                    </button>
                 `;
                 
-                item.addEventListener('click', () => {
+                item.addEventListener('click', (e) => {
+                    // Don't trigger if clicking the toggle button
+                    if (e.target.closest('.shark-visibility-toggle')) {
+                        return;
+                    }
+                    
                     // Highlight selected shark
                     document.querySelectorAll('.shark-item').forEach(el => el.classList.remove('selected'));
                     item.classList.add('selected');
@@ -1088,9 +1151,57 @@
                         });
                     }
                 });
+
+                // Add event listener for visibility toggle button
+                const toggleButton = item.querySelector('.shark-visibility-toggle');
+                toggleButton.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent shark selection
+                    
+                    const sharkLayer = sharkLayers[sharkId];
+                    if (sharkLayer.visible) {
+                        // Hide the shark
+                        map.removeLayer(sharkLayer.layer);
+                        sharkLayer.visible = false;
+                        toggleButton.innerHTML = EYE_HIDDEN_ICON;
+                    } else {
+                        // Show the shark
+                        map.addLayer(sharkLayer.layer);
+                        sharkLayer.visible = true;
+                        toggleButton.innerHTML = EYE_VISIBLE_ICON;
+                    }
+                });
                 
                 listContainer.appendChild(item);
             });
+            
+            // Update visibility toggle buttons after populating the list
+            updateVisibilityToggleButtons();
+        }
+
+        // Function to update visibility toggle buttons based on current mode
+        function updateVisibilityToggleButtons() {
+            const toggleButtons = document.querySelectorAll('.shark-visibility-toggle');
+            
+            if (showOneMode) {
+                // Hide all toggle buttons in Show One mode
+                toggleButtons.forEach(button => {
+                    button.classList.add('hidden');
+                });
+            } else {
+                // Show all toggle buttons in Show All/Hide All modes
+                toggleButtons.forEach(button => {
+                    button.classList.remove('hidden');
+                    const sharkId = button.dataset.sharkId;
+                    const sharkLayer = sharkLayers[sharkId];
+                    
+                    // Update icon based on visibility
+                    if (sharkLayer && sharkLayer.visible) {
+                        button.innerHTML = EYE_VISIBLE_ICON;
+                    } else {
+                        button.innerHTML = EYE_HIDDEN_ICON;
+                    }
+                });
+            }
         }
 
         // Event listeners for controls
@@ -1126,6 +1237,9 @@
                 
                 // Reset shark list opacity
                 document.getElementById('shark-list').style.opacity = '1';
+                
+                // Update visibility toggle buttons
+                updateVisibilityToggleButtons();
             });
             
             document.getElementById('hide-all').addEventListener('click', () => {
@@ -1140,6 +1254,9 @@
                 document.getElementById('show-one').classList.remove('active');
                 showOneMode = false;
                 hideTimeSlider();
+                
+                // Update visibility toggle buttons
+                updateVisibilityToggleButtons();
             });
             
             document.getElementById('show-one').addEventListener('click', () => {
@@ -1156,6 +1273,9 @@
                 document.getElementById('show-one').classList.add('active');
                 document.getElementById('show-all').classList.remove('active');
                 document.getElementById('hide-all').classList.remove('active');
+                
+                // Update visibility toggle buttons to hide them in Show One mode
+                updateVisibilityToggleButtons();
                 
                 // Show instruction message
                 showNotification('Click on a shark in the list below to view its track over time!');
@@ -1217,6 +1337,8 @@
                     });
                     sharkLayers = {};
                     createSharkLayers();
+                    // Repopulate shark list to restore event handlers
+                    populateSharkList();
                 }
             });
             
@@ -1280,10 +1402,30 @@
             const bottomControls = document.getElementById('bottom-time-controls');
             bottomControls.addEventListener('mouseenter', () => {
                 map.dragging.disable();
+                map.doubleClickZoom.disable();
+                map.scrollWheelZoom.disable();
             });
             
             bottomControls.addEventListener('mouseleave', () => {
                 map.dragging.enable();
+                map.doubleClickZoom.enable();
+                map.scrollWheelZoom.enable();
+            });
+            
+            // Scroll zoom toggle
+            document.getElementById('toggle-scroll-zoom').addEventListener('click', (e) => {
+                const button = e.target;
+                if (button.classList.contains('active')) {
+                    // Disable scroll zoom
+                    map.scrollWheelZoom.disable();
+                    button.classList.remove('active');
+                    showNotification('Scroll zoom disabled');
+                } else {
+                    // Enable scroll zoom
+                    map.scrollWheelZoom.enable();
+                    button.classList.add('active');
+                    showNotification('Scroll zoom enabled');
+                }
             });
             
             // Initialize toggle points button state
@@ -1319,8 +1461,10 @@
             
             const track = sharkData[sharkId];
             const metadata = sharkMetadata[sharkId] || {};
-            const year = sharkId.match(/(\d{4})/)[1];
-            const shortId = sharkId.replace('160424_', '').replace('pnas_atn', '');
+            // Match the year which comes after the initial 160424_ prefix
+            const yearMatch = sharkId.match(/160424_(\d{4})/);
+            const year = yearMatch ? yearMatch[1] : sharkId.match(/(\d{4})/)[1];
+            const shortId = sharkId.replace('160424_', '').replace(`${year}_`, '').replace('pnas_atn', '').replace('_filtered', '');
             
             // Update bottom controls (no need to check for elements since they're commented out)
             // document.getElementById('bottom-control-title').textContent = `Shark ${shortId} (${year})`;
@@ -1378,6 +1522,15 @@
                 updateSharkVisualization();
             }
             
+            // Close any open popups when animation starts
+            if (timeSliderLayer) {
+                timeSliderLayer.eachLayer(layer => {
+                    if (layer instanceof L.CircleMarker && layer.isPopupOpen()) {
+                        layer.closePopup();
+                    }
+                });
+            }
+            
             isPlaying = true;
             document.getElementById('play-button').textContent = '⏸';
             document.getElementById('play-button').classList.add('playing');
@@ -1416,6 +1569,13 @@
                 clearInterval(playInterval);
                 playInterval = null;
             }
+            
+            // Show current marker popup when animation is paused
+            setTimeout(() => {
+                if (currentMarker && currentMarker._map) {
+                    currentMarker.openPopup();
+                }
+            }, 100); // Small delay to ensure layer is fully rendered and added to map
         }
         
         // Update shark visualization based on time slider
@@ -1487,7 +1647,7 @@
             
             // Add current position marker (moving circle)
             const currentPoint = track[currentTimeIndex];
-            const currentMarker = L.circleMarker([currentPoint.lat, currentPoint.lon], {
+            currentMarker = L.circleMarker([currentPoint.lat, currentPoint.lon], {
                 radius: 12,
                 fillColor: '#f39c12',
                 color: '#fff',
@@ -1504,6 +1664,8 @@
                 <strong>Current Position</strong><br/>
                 Date: ${currentPoint.date.toLocaleDateString()}<br/>
                 Day ${Math.round((currentPoint.date - startPoint.date) / (1000 * 60 * 60 * 24))} of tracking<br/>
+                Location: ${currentPoint.lat.toFixed(4)}, ${currentPoint.lon.toFixed(4)}<br/>
+                Quality: ${currentPoint.lc}<br/>
                 Distance traveled: ~${distanceTraveled.toFixed(0)} km<br/>
                 Progress: ${Math.round((currentTimeIndex / (track.length - 1)) * 100)}%
             `);
