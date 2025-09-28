@@ -1,89 +1,565 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-		<title>Blue Shark Tracking - Globe Map</title>
-		<!-- Favicon -->
-		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦈</text></svg>">
-		<style>
-			* {
-				margin: 0;
-				padding: 0;
-				box-sizing: border-box;
-			}
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+	<title>Blue Shark Tracking - Globe Map</title>
+	<!-- Favicon -->
+	<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦈</text></svg>">
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
 
-			body {
-				font-family: 'Arial', sans-serif;
-				background-color: #f5f5f5;
-			}
+		body {
+			font-family: 'Arial', sans-serif;
+			background-color: #f5f5f5;
+		}
 
-			.header {
-				background-color: #2c3e50;
-				color: white;
-				padding: 1rem 2rem;
-				box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-			}
+		.header {
+			background-color: #2c3e50;
+			color: white;
+			padding: 1rem 2rem;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
 
-			.header-content {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				max-width: 1200px;
-				margin: 0 auto;
-			}
+		.header-content {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			max-width: 1200px;
+			margin: 0 auto;
+		}
 
-			.header-title {
-				flex: 1;
-			}
+		.header-title {
+			flex: 1;
+		}
 
+		.header-title h1 {
+			font-size: 2rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.header-title p {
+			font-size: 1rem;
+			opacity: 0.9;
+		}
+
+		.nav-tabs {
+			display: flex;
+			gap: 0;
+			background: rgba(0, 0, 0, 0.2);
+			border-radius: 8px;
+			padding: 4px;
+		}
+
+		.nav-tab {
+			padding: 10px 20px;
+			text-decoration: none;
+			color: rgba(255, 255, 255, 0.7);
+			border-radius: 6px;
+			transition: all 0.3s ease;
+			font-weight: 500;
+			font-size: 0.9rem;
+		}
+
+		.nav-tab:hover {
+			color: white;
+			background: rgba(255, 255, 255, 0.1);
+		}
+
+		.nav-tab.active {
+			color: white;
+			background: #3498db;
+		}
+
+		.container {
+			display: flex;
+			height: calc(100vh - 120px);
+			position: relative;
+		}
+
+		.menu-toggle {
+			position: absolute;
+			top: 10px;
+			left: 365px; /* 350px sidebar width + 15px spacing */
+			z-index: 1001;
+			background: rgba(255, 255, 255, 0.9);
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			padding: 8px;
+			cursor: pointer;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			transition: left 0.3s ease, background-color 0.2s ease;
+		}
+
+		.container.sidebar-hidden .menu-toggle {
+			left: 15px; /* 15px from left when sidebar is hidden */
+		}
+
+		.menu-toggle:hover {
+			background: rgba(255, 255, 255, 1);
+		}
+
+		.menu-toggle svg {
+			display: block;
+		}
+
+		.sidebar {
+			width: 350px;
+			background-color: white;
+			box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+			padding: 1.5rem;
+			transition: transform 0.3s ease;
+			z-index: 1000;
+			overflow-y: auto;
+		}
+
+		.sidebar.hidden {
+			transform: translateX(-100%);
+		}
+
+		.sidebar h3 {
+			color: #2c3e50;
+			margin-bottom: 1rem;
+			font-size: 1.2rem;
+		}
+
+		.controls {
+			margin-bottom: 2rem;
+		}
+
+		.control-group {
+			margin-bottom: 1rem;
+		}
+
+		.control-group label {
+			display: block;
+			margin-bottom: 0.5rem;
+			font-weight: bold;
+			color: #34495e;
+		}
+
+		.control-group button {
+			background-color: #3498db;
+			color: white;
+			border: none;
+			padding: 0.5rem 1rem;
+			border-radius: 4px;
+			cursor: pointer;
+			margin-right: 0.5rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.control-group button:hover {
+			background: #2980b9;
+		}
+
+		.control-group button.active {
+			background: #27ae60;
+		}
+
+		.shark-list {
+			max-height: 400px;
+			overflow-y: auto;
+			border: 1px solid #ddd;
+			border-radius: 6px;
+			padding: 0.5rem;
+			background-color: #fafafa;
+		}
+
+		.shark-item {
+			padding: 1rem;
+			border: 1px solid #ecf0f1;
+			border-radius: 4px;
+			margin-bottom: 1rem;
+			cursor: pointer;
+			transition: background-color 0.3s;
+			position: relative;
+		}
+
+		.shark-item:hover {
+			background-color: #ecf0f1;
+		}
+
+		.shark-item.selected {
+			background-color: #e8f4f8;
+			border-color: #3498db;
+		}
+
+		.shark-id {
+			font-weight: bold;
+			color: #2c3e50;
+			margin-bottom: 0.5rem;
+		}
+
+		.shark-details {
+			font-size: 0.9rem;
+			color: #7f8c8d;
+		}
+		
+		.shark-details div {
+			margin-bottom: 0.2rem;
+		}
+
+		.shark-visibility-toggle {
+			position: absolute;
+			top: 0.75rem;
+			right: 0.75rem;
+			background: rgba(255, 255, 255, 0.9);
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			padding: 0.4rem;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 32px;
+			height: 32px;
+		}
+
+		.shark-visibility-toggle:hover {
+			background: rgba(255, 255, 255, 1);
+			border-color: #3498db;
+			transform: scale(1.05);
+		}
+
+		.shark-visibility-toggle svg {
+			width: 20px;
+			height: 20px;
+			transition: fill 0.2s ease;
+		}
+
+		.shark-visibility-toggle:hover svg {
+			fill: #3498db !important;
+		}
+
+		.shark-visibility-toggle.hidden {
+			display: none;
+		}
+
+		.cesium-container {
+			flex: 1;
+			position: relative;
+		}
+
+		#cesiumContainer {
+			width: 100%;
+			height: 100%;
+			font-family: sans-serif;
+		}
+
+		/* Bottom time control panel styles */
+        .bottom-time-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 16px 20px;
+            display: none;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .bottom-time-controls.visible {
+            display: block;
+        }
+
+        .time-control-info {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .time-control-main {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .play-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .play-button:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        .play-button.playing {
+            background: #e74c3c;
+        }
+
+        .play-button.playing:hover {
+            background: #c0392b;
+        }
+
+        .bottom-time-slider-container {
+            flex: 1;
+            margin: 0 8px;
+        }
+
+        .bottom-time-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #ecf0f1;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bottom-time-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .bottom-time-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .bottom-time-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .time-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+
+        .current-time-label {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            flex-shrink: 0;
+        }
+
+        .speed-button {
+            background: none;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            transition: all 0.2s ease;
+        }
+
+        .speed-button:hover {
+            background: #ecf0f1;
+            border-color: #95a5a6;
+        }
+
+        .speed-button.active {
+            background: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        .follow-button {
+            background: none;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            white-space: nowrap;
+            margin-left: 12px;
+        }
+
+        .follow-button:hover {
+            background: #ecf0f1;
+            border-color: #95a5a6;
+        }
+
+        .follow-button.active {
+            background: #27ae60;
+            border-color: #27ae60;
+            color: white;
+        }
+
+		.loading-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(44, 62, 80, 0.9);
+			color: white;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			z-index: 10000;
+			font-family: Arial, sans-serif;
+		}
+
+		.loading-content {
+			text-align: center;
+			max-width: 400px;
+		}
+
+		.loading-content h2 {
+			margin-bottom: 1rem;
+			font-size: 1.5rem;
+		}
+
+		.loading-progress {
+			font-size: 0.9rem;
+			opacity: 0.8;
+			margin-top: 1rem;
+		}
+
+		.loading-spinner {
+			width: 60px;
+			height: 60px;
+			border: 4px solid rgba(255,255,255,0.3);
+			border-top: 4px solid #3498db;
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			margin: 1rem auto;
+		}
+
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+
+		.notification {
+			position: fixed;
+			top: 2rem;
+			right: 2rem;
+			background: rgba(44, 62, 80, 0.95);
+			color: white;
+			padding: 1rem 1.5rem;
+			border-radius: 8px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+			z-index: 9999;
+			max-width: 350px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			animation: slideInRight 0.3s ease;
+		}
+
+		.notification.fadeOut {
+			animation: slideOutRight 0.3s ease;
+		}
+
+		@keyframes slideInRight {
+			from {
+				opacity: 0;
+				transform: translateX(50px);
+			}
+			to {
+				opacity: 1;
+				transform: translateX(0);
+			}
+		}
+
+		@keyframes slideOutRight {
+			from {
+				opacity: 1;
+				transform: translateX(0);
+			}
+			to {
+				opacity: 0;
+				transform: translateX(50px);
+			}
+		}
+
+		/* Media Queries for Responsive Design */
+		@media (max-width: 768px) {
+			.sidebar {
+				width: 100%;
+				position: absolute;
+				height: 100%;
+			}
+			
 			.header-title h1 {
-				font-size: 2rem;
+				font-size: 1.4rem;
+			}
+			
+			.nav-tabs {
+				display: none;
+			}
+		}
+
+		@media (max-height: 600px) {
+			.bottom-time-controls {
+				padding: 0.5rem;
+			}
+			
+			.time-info {
 				margin-bottom: 0.5rem;
 			}
-
-			.header-title p {
-				font-size: 1rem;
-				opacity: 0.9;
+			
+			.play-controls {
+				margin-top: 0.5rem;
 			}
-
-			.nav-tabs {
-				display: flex;
-				gap: 0;
-				background: rgba(0, 0, 0, 0.2);
-				border-radius: 8px;
-				padding: 4px;
-			}
-
-			.nav-tab {
-				padding: 10px 20px;
-				text-decoration: none;
-				color: rgba(255, 255, 255, 0.7);
-				border-radius: 6px;
-				transition: all 0.3s ease;
-				font-weight: 500;
-				font-size: 0.9rem;
-			}
-
-			.nav-tab:hover {
-				color: white;
-				background: rgba(255, 255, 255, 0.1);
-			}
-
-			.nav-tab.active {
-				color: white;
-				background: #3498db;
-			}
-		</style>
-		<script src="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Cesium.js"></script>
-		<link href="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-	</head>
-	<body>
-		<div class="header">
-			<div class="header-content">
+		}
+	</style>
+	<script src="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Cesium.js"></script>
+	<link href="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+	<!-- Papa Parse for CSV reading -->
+	<script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+	<div class="loading-overlay" id="loadingOverlay">
+		<div class="loading-content">
+			<h2>🦈 Loading Blue Shark Data</h2>
+			<div class="loading-spinner"></div>
+			<div class="loading-progress" id="loading-progress">Initializing...</div>
+		</div>
+	</div>
+	<div class="header">
+		<div class="header-content">
 			<div class="header-title">
 				<h1>Blue Shark Tracking Project</h1>
-				<p>Woah! A globe!</p>
+				<p>Interactive 3D globe showing satellite tracking data of blue sharks (Prionace glauca) in the North Atlantic</p>
 			</div>
 			<nav class="nav-tabs">
 				<a href="index.html" class="nav-tab">About</a>
@@ -91,25 +567,960 @@
 				<a href="globe.html" class="nav-tab active">3D Map</a>
 				<a href="model.html" class="nav-tab">Design</a>
 			</nav>
+		</div>
+	</div>
+
+	<div class="container" id="container">
+		<!-- Menu toggle button -->
+		<button class="menu-toggle" id="menu-toggle" title="Toggle Sidebar">
+			<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+				<path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/>
+			</svg>
+		</button>
+		
+		<div class="sidebar" id="sidebar">
+			<div class="controls">
+				<h3>Map Controls</h3>
+				<div class="control-group">
+					<label>Display Mode</label>
+					<button id="show-all" class="active">Show All</button>
+					<button id="hide-all">Hide All</button>
+					<button id="show-one">Animate</button>
+				</div>
+				
+				<div class="control-group">
+					<label>View Controls</label>
+					<button id="fit-bounds">Fit Map</button>
+					<button id="toggle-points" class="active">Toggle Points</button>
+					<button id="reset-camera" style="display: none;">Reset Camera</button>
+					<button id="toggle-mouse-controls" class="active" style="display: none;">Disable Mouse</button>
+				</div>
+				
+			</div>
+			<h3>Tracked Sharks</h3>
+			<div id="shark-list" class="shark-list">
+				<div class="loading">
+					<div>Loading shark data...</div>
+					<div id="loading-progress" style="font-size: 0.9em; margin-top: 0.5rem; color: #3498db;"></div>
+				</div>
 			</div>
 		</div>
-		<div id="cesiumContainer" class="fullSize"></div>
-		<div id="toolbar"></div>
-		<script>
-			Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1ODU1MWJiOS05YjFkLTRlMzctOTdiOS1lNmVmNDhlYzRiYWEiLCJpZCI6MzQ1MTIwLCJpYXQiOjE3NTg5ODY3NzZ9.wH_jI8DjDJZ16iD_1V4j0yie550-jYNLwf1P_MEmCbA';
-			// Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
-			const viewer = new Cesium.Viewer('cesiumContainer', {
-			terrain: Cesium.Terrain.fromWorldTerrain(),
-			});    
+		
+		<div class="cesium-container">
+			<div id="cesiumContainer"></div>
+			<!-- Bottom time controls overlay -->
+			<div class="bottom-time-controls" id="bottom-time-controls">
+				<!-- <div class="time-control-header">
+					<div class="time-control-title" id="bottom-control-title">Time Control</div>
+					<div class="time-control-info" id="bottom-control-info">Select a shark in "Show One" mode</div>
+				</div> -->
+				<div class="time-control-main">
+					<button class="play-button" id="play-button" title="Play/Pause">
+						▶
+					</button>
+					<div class="bottom-time-slider-container">
+						<input type="range" class="bottom-time-slider" id="bottom-time-slider" min="0" max="100" value="100">
+						<div class="time-labels">
+							<span id="bottom-start-time">Start</span>
+							<span class="current-time-label" id="bottom-current-time">Current</span>
+							<span id="bottom-end-time">End</span>
+						</div>
+					</div>
+					<div class="speed-control">
+						<span>Speed:</span>
+						<button class="speed-button" data-speed="0.5">0.5x</button>
+						<button class="speed-button active" data-speed="1">1x</button>
+						<button class="speed-button" data-speed="2">2x</button>
+						<button class="speed-button" data-speed="4">4x</button>
+						<button class="speed-button" data-speed="10">10x</button>
+					</div>
+					<button class="follow-button" id="follow-button" title="Toggle Follow Mode">
+						🦈 Follow
+					</button>
+				</div>
+			</div>
+		</div>
 
-			// Fly the camera to Dertian at the given longitude, latitude, and height.
-			viewer.camera.flyTo({
-			destination : Cesium.Cartesian3.fromDegrees(121.541328, 25.019414, 1000),
-			orientation : {
-				heading : Cesium.Math.toRadians(0.0),
-				pitch : Cesium.Math.toRadians(-90.0),
-			}
+	</div>
+
+	<script>
+		// Set Cesium Ion token
+		Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1ODU1MWJiOS05YjFkLTRlMzctOTdiOS1lNmVmNDhlYzRiYWEiLCJpZCI6MzQ1MTIwLCJpYXQiOjE3NTg5ODY3NzZ9.wH_jI8DjDJZ16iD_1V4j0yie550-jYNLwf1P_MEmCbA';
+		
+		// Global variables
+		let viewer;
+		let sharkData = {};
+		let sharkMetadata = {};
+		let sharkEntities = {};
+		let allBounds = [];
+		let showPoints = true;
+		
+		// Show one mode variables
+		let showOneMode = false;
+		let selectedSharkId = null;
+		let currentTimeIndex = 0;
+		let timeSliderEntities = [];
+		let currentMarkerEntity = null;
+		
+		// Auto-play variables
+		let isPlaying = false;
+		let playInterval = null;
+		let playSpeed = 1;
+		let playStepDelay = 500;
+		let followMode = false;
+
+		// SVG icons for visibility toggle buttons
+		const EYE_VISIBLE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2c3e50"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg>';
+		const EYE_HIDDEN_ICON = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#95a5a6"><path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"/></svg>';
+
+		// Color palette for different sharks
+		const colors = [
+			'#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6',
+			'#1abc9c', '#34495e', '#e67e22', '#95a5a6', '#c0392b',
+			'#8e44ad', '#16a085', '#2c3e50', '#d35400', '#7f8c8d'
+		];
+
+		// Initialize the Cesium Viewer
+		function initViewer() {
+			viewer = new Cesium.Viewer('cesiumContainer', {
+				terrain: Cesium.Terrain.fromWorldTerrain(),
+				homeButton: false,
+				sceneModePicker: false,
+				baseLayerPicker: true,
+				navigationHelpButton: false,
+				animation: false,
+				timeline: false,
+				fullscreenButton: false,
+				vrButton: false
 			});
-		</script>
-	</body>
+
+			// Set initial camera position over North Atlantic
+			viewer.camera.setView({
+				destination: Cesium.Cartesian3.fromDegrees(-40.0, 45.0, 15000000),
+			});
+
+			// Enable lighting based on sun/moon positions
+			viewer.scene.globe.enableLighting = true;
+
+			// Set up mouse/touch interaction listeners
+			setupViewerInteractionListeners();
+		}
+
+		// Calculate distance between two lat/lon points using Haversine formula
+		function calculateDistance(track) {
+			if (track.length < 2) return 0;
+			
+			let totalDistance = 0;
+			for (let i = 1; i < track.length; i++) {
+				const R = 6371; // Earth's radius in km
+				const dLat = (track[i].lat - track[i-1].lat) * Math.PI / 180;
+				const dLon = (track[i].lon - track[i-1].lon) * Math.PI / 180;
+				const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+					Math.cos(track[i-1].lat * Math.PI / 180) * Math.cos(track[i].lat * Math.PI / 180) *
+					Math.sin(dLon/2) * Math.sin(dLon/2);
+				const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+				totalDistance += R * c;
+			}
+			return totalDistance;
+		}
+
+		// Show notification function
+		function showNotification(message, duration = 5000) {
+			const existingNotification = document.querySelector('.notification');
+			if (existingNotification) {
+				existingNotification.remove();
+			}
+
+			const notification = document.createElement('div');
+			notification.className = 'notification';
+			notification.textContent = message;
+			
+			notification.addEventListener('click', () => {
+				notification.classList.add('fadeOut');
+				setTimeout(() => {
+					if (notification.parentNode) {
+						notification.remove();
+					}
+				}, 300);
+			});
+
+			document.body.appendChild(notification);
+
+			setTimeout(() => {
+				if (notification.parentNode && !notification.classList.contains('fadeOut')) {
+					notification.classList.add('fadeOut');
+					setTimeout(() => {
+						if (notification.parentNode) {
+							notification.remove();
+						}
+					}, 300);
+				}
+			}, duration);
+		}
+
+		// Load and parse CSV data
+		async function loadData() {
+			try {
+				// First, load metadata
+				const metadataResponse = await fetch('data/Braun_atn_tag_deployment_metadata.csv');
+				const metadataCsv = await metadataResponse.text();
+				const metadataData = Papa.parse(metadataCsv, { header: true, skipEmptyLines: true });
+
+				// Process metadata
+				metadataData.data.forEach(row => {
+					sharkMetadata[row['Deployment ID']] = {
+						species: row['Species'],
+						length: row['Animal Length_cm'],
+						sex: row['Animal Sex'],
+						deploymentStart: row['Deployment Start Datetime'],
+						deploymentStop: row['Deployment Stop Datetime'],
+						startLat: parseFloat(row['geospatial_lat_start']),
+						startLon: parseFloat(row['geospatial_lon_start']),
+						endLat: parseFloat(row['geospatial_lat_end']),
+						endLon: parseFloat(row['geospatial_lon_end']),
+						endType: row['end_type']
+					};
+				});
+
+				// Define all shark files to load
+				const sharkFiles = [
+					'160424_2013_132346pnas_atn.csv',
+					'160424_2014_141195pnas_atn.csv',
+					'160424_2015_141261pnas_atn_filtered.csv',
+					'160424_2015_141264pnas_atn.csv',
+					'160424_2015_141268pnas_atn.csv',
+					'160424_2015_141270pnas_atn.csv',
+					'160424_2016_106744pnas_atn_filtered.csv',
+					'160424_2016_106745pnas_atn_filtered.csv',
+					'160424_2016_106746pnas_atn_filtered.csv',
+					'160424_2016_106747pnas_atn_filtered.csv',
+					'160424_2016_106748pnas_atn.csv',
+					'160424_2016_141262pnas_atn_filtered.csv',
+					'160424_2016_141263pnas_atn.csv',
+					'160424_2016_141265pnas_atn.csv',
+					'160424_2016_141266pnas_atn.csv',
+					'160424_2016_165927pnas_atn.csv',
+					'160424_2016_165928pnas_atn.csv'
+				];
+
+				// Load all shark tracking files
+				const sharkPromises = sharkFiles.map(async (filename, index) => {
+					try {
+						const progressEl = document.getElementById('loading-progress');
+						if (progressEl) {
+							progressEl.textContent = `Loading ${filename}... (${index + 1}/${sharkFiles.length})`;
+						}
+						
+						const response = await fetch(`data/${filename}`);
+						const csvText = await response.text();
+						const parsedData = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+						
+						parsedData.data.forEach(row => {
+							const id = row.id;
+							const lat = parseFloat(row.lat);
+							const lon = parseFloat(row.lon);
+							const date = new Date(row.date);
+							
+							if (!isNaN(lat) && !isNaN(lon) && !isNaN(date.getTime())) {
+								if (!sharkData[id]) {
+									sharkData[id] = [];
+								}
+								sharkData[id].push({
+									lat: lat,
+									lon: lon,
+									date: date,
+									lc: row.lc
+								});
+								
+								allBounds.push([lat, lon]);
+							}
+						});
+						
+						return filename;
+					} catch (error) {
+						console.warn(`Failed to load ${filename}:`, error);
+						return null;
+					}
+				});
+
+				// Wait for all shark files to load
+				const results = await Promise.all(sharkPromises);
+				const successfulLoads = results.filter(r => r !== null);
+				
+				console.log(`Successfully loaded ${successfulLoads.length} out of ${sharkFiles.length} shark files`);
+
+				// Sort tracking data by date for each shark
+				Object.keys(sharkData).forEach(id => {
+					sharkData[id].sort((a, b) => a.date - b.date);
+				});
+
+				console.log('Loaded data:', Object.keys(sharkData).length, 'sharks');
+				console.log('Metadata:', Object.keys(sharkMetadata).length, 'entries');
+				
+				createSharkEntities();
+				populateSharkList();
+				
+				// Hide loading overlay
+				document.getElementById('loadingOverlay').style.display = 'none';
+				
+			} catch (error) {
+				console.error('Error loading data:', error);
+				document.getElementById('shark-list').innerHTML = '<div style="color: red; padding: 1rem;">Error loading data. Please check that CSV files are in the data directory.</div>';
+				document.getElementById('loadingOverlay').style.display = 'none';
+			}
+		}
+
+		// Create Cesium entities for each shark
+		function createSharkEntities() {
+			let colorIndex = 0;
+			
+			Object.keys(sharkData).forEach(sharkId => {
+				const track = sharkData[sharkId];
+				const color = Cesium.Color.fromCssColorString(colors[colorIndex % colors.length]);
+				colorIndex++;
+				
+				const entities = [];
+				
+				// Create track polyline
+				const positions = track.map(point => 
+					Cesium.Cartesian3.fromDegrees(point.lon, point.lat)
+				);
+				
+				const polylineEntity = viewer.entities.add({
+					name: `Track-${sharkId}`,
+					polyline: {
+						positions: positions,
+						width: 3,
+						material: color,
+						clampToGround: true
+					}
+				});
+				entities.push(polylineEntity);
+				
+				// Add start marker (deployment)
+				const startPoint = track[0];
+				const startEntity = viewer.entities.add({
+					name: `Start-${sharkId}`,
+					position: Cesium.Cartesian3.fromDegrees(startPoint.lon, startPoint.lat),
+					point: {
+						pixelSize: 12,
+						color: Cesium.Color.RED,
+						outlineColor: Cesium.Color.WHITE,
+						outlineWidth: 2,
+						heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+					}
+				});
+				entities.push(startEntity);
+				
+				// Add end marker
+				const endPoint = track[track.length - 1];
+				const endEntity = viewer.entities.add({
+					name: `End-${sharkId}`,
+					position: Cesium.Cartesian3.fromDegrees(endPoint.lon, endPoint.lat),
+					point: {
+						pixelSize: 10,
+						color: Cesium.Color.GREEN,
+						outlineColor: Cesium.Color.WHITE,
+						outlineWidth: 2,
+						heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+					}
+				});
+				entities.push(endEntity);
+
+				// Add individual points if enabled
+				if (showPoints) {
+					track.forEach(point => {
+						const pointEntity = viewer.entities.add({
+							name: `Point-${sharkId}`,
+							position: Cesium.Cartesian3.fromDegrees(point.lon, point.lat),
+							point: {
+								pixelSize: 3,
+								color: color,
+								heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+							}
+						});
+						entities.push(pointEntity);
+					});
+				}
+				
+				sharkEntities[sharkId] = {
+					entities: entities,
+					color: colors[colorIndex - 1],
+					visible: true
+				};
+			});
+		}
+
+		// Populate shark list in sidebar
+		function populateSharkList() {
+			const listContainer = document.getElementById('shark-list');
+			listContainer.innerHTML = '';
+			
+			const sortedSharkIds = Object.keys(sharkData).sort();
+			
+			sortedSharkIds.forEach(sharkId => {
+				const track = sharkData[sharkId];
+				const metadata = sharkMetadata[sharkId] || {};
+				const sharkEntityGroup = sharkEntities[sharkId];
+				
+				const item = document.createElement('div');
+				item.className = 'shark-item';
+				item.dataset.sharkId = sharkId;
+				
+				const duration = Math.round((track[track.length - 1].date - track[0].date) / (1000 * 60 * 60 * 24));
+				
+				const yearMatch = sharkId.match(/160424_(\d{4})/);
+				const year = yearMatch ? yearMatch[1] : sharkId.match(/(\d{4})/)[1];
+				const shortId = sharkId.replace('160424_', '').replace(`${year}_`, '').replace('pnas_atn', '').replace('_filtered', '');
+				
+				item.innerHTML = `
+					<div class="shark-id" style="color: ${sharkEntityGroup.color};">
+						🦈 Shark ${shortId} (${year})
+					</div>
+					<div class="shark-details">
+						<div><strong>Length:</strong> ${metadata.length ? metadata.length + ' cm' : 'Unknown'}</div>
+						<div><strong>Duration:</strong> ${duration} days</div>
+						<div><strong>Points:</strong> ${track.length.toLocaleString()}</div>
+						<div><strong>Status:</strong> ${metadata.endType || 'Unknown'}</div>
+						<div><strong>Sex:</strong> ${metadata.sex || 'Unknown'}</div>
+					</div>
+					<button class="shark-visibility-toggle" data-shark-id="${sharkId}" title="Toggle visibility">
+						${sharkEntityGroup.visible ? EYE_VISIBLE_ICON : EYE_HIDDEN_ICON}
+					</button>
+				`;
+				
+				item.addEventListener('click', (e) => {
+					if (e.target.closest('.shark-visibility-toggle')) {
+						return;
+					}
+					
+					document.querySelectorAll('.shark-item').forEach(el => el.classList.remove('selected'));
+					item.classList.add('selected');
+					
+					if (showOneMode) {
+						selectedSharkId = sharkId;
+						hideAllSharks();
+						showTimeSlider(sharkId);
+						updateSharkVisualization();
+					} else {
+						// Fly to shark track
+						const track = sharkData[sharkId];
+						const positions = track.map(point => 
+							Cesium.Cartesian3.fromDegrees(point.lon, point.lat)
+						);
+						
+						viewer.flyTo(sharkEntities[sharkId].entities);
+					}
+				});
+
+				// Add event listener for visibility toggle button
+				const toggleButton = item.querySelector('.shark-visibility-toggle');
+				toggleButton.addEventListener('click', (e) => {
+					e.stopPropagation();
+					
+					const sharkEntityGroup = sharkEntities[sharkId];
+					if (sharkEntityGroup.visible) {
+						// Hide the shark
+						sharkEntityGroup.entities.forEach(entity => {
+							entity.show = false;
+						});
+						sharkEntityGroup.visible = false;
+						toggleButton.innerHTML = EYE_HIDDEN_ICON;
+					} else {
+						// Show the shark
+						sharkEntityGroup.entities.forEach(entity => {
+							entity.show = true;
+						});
+						sharkEntityGroup.visible = true;
+						toggleButton.innerHTML = EYE_VISIBLE_ICON;
+					}
+				});
+				
+				listContainer.appendChild(item);
+			});
+			
+			updateVisibilityToggleButtons();
+		}
+
+		// Function to update visibility toggle buttons based on current mode
+		function updateVisibilityToggleButtons() {
+			const toggleButtons = document.querySelectorAll('.shark-visibility-toggle');
+			
+			if (showOneMode) {
+				toggleButtons.forEach(button => {
+					button.classList.add('hidden');
+				});
+			} else {
+				toggleButtons.forEach(button => {
+					button.classList.remove('hidden');
+					const sharkId = button.dataset.sharkId;
+					const sharkEntityGroup = sharkEntities[sharkId];
+					
+					if (sharkEntityGroup && sharkEntityGroup.visible) {
+						button.innerHTML = EYE_VISIBLE_ICON;
+					} else {
+						button.innerHTML = EYE_HIDDEN_ICON;
+					}
+				});
+			}
+		}
+
+		// Hide all sharks
+		function hideAllSharks() {
+			Object.values(sharkEntities).forEach(sharkGroup => {
+				sharkGroup.entities.forEach(entity => {
+					entity.show = false;
+				});
+				sharkGroup.visible = false;
+			});
+		}
+
+		// Show all sharks
+		function showAllSharks() {
+			Object.values(sharkEntities).forEach(sharkGroup => {
+				sharkGroup.entities.forEach(entity => {
+					entity.show = true;
+				});
+				sharkGroup.visible = true;
+			});
+		}
+
+		// Show time slider
+		function showTimeSlider(sharkId) {
+			const bottomContainer = document.getElementById('bottom-time-controls');
+			bottomContainer.classList.add('visible');
+			
+			const track = sharkData[sharkId];
+			const startDate = track[0].date.toLocaleDateString();
+			const endDate = track[track.length - 1].date.toLocaleDateString();
+			
+			document.getElementById('bottom-start-time').textContent = startDate;
+			document.getElementById('bottom-end-time').textContent = endDate;
+			document.getElementById('bottom-current-time').textContent = endDate;
+			
+			document.getElementById('bottom-time-slider').value = 100;
+			currentTimeIndex = track.length - 1;
+		}
+
+		// Hide time slider
+		function hideTimeSlider() {
+			const bottomContainer = document.getElementById('bottom-time-controls');
+			bottomContainer.classList.remove('visible');
+			
+			pauseAnimation();
+			clearTimeSliderEntities();
+		}
+
+		// Clear time slider entities
+		function clearTimeSliderEntities() {
+			timeSliderEntities.forEach(entity => {
+				viewer.entities.remove(entity);
+			});
+			timeSliderEntities = [];
+			
+			if (currentMarkerEntity) {
+				viewer.entities.remove(currentMarkerEntity);
+				currentMarkerEntity = null;
+			}
+		}
+
+		// Update time slider display
+		function updateTimeSliderDisplay() {
+			if (selectedSharkId && sharkData[selectedSharkId]) {
+				const track = sharkData[selectedSharkId];
+				const currentDate = track[currentTimeIndex].date.toLocaleDateString();
+				document.getElementById('bottom-current-time').textContent = currentDate;
+			}
+		}
+
+		// Update shark visualization based on time slider
+		function updateSharkVisualization() {
+			if (!selectedSharkId || !sharkData[selectedSharkId]) return;
+			
+			clearTimeSliderEntities();
+			
+			const track = sharkData[selectedSharkId];
+			const color = Cesium.Color.fromCssColorString(sharkEntities[selectedSharkId].color);
+			
+			// Draw the complete track with two segments: past and future
+			if (track.length > 1) {
+				// Past segment (from start to current position) - full opacity
+				if (currentTimeIndex > 0) {
+					const pastPositions = track.slice(0, currentTimeIndex + 1).map(point => 
+						Cesium.Cartesian3.fromDegrees(point.lon, point.lat)
+					);
+					const pastEntity = viewer.entities.add({
+						name: 'Past Track',
+						polyline: {
+							positions: pastPositions,
+							width: 4,
+							material: color,
+							clampToGround: true
+						}
+					});
+					timeSliderEntities.push(pastEntity);
+				}
+				
+				// Future segment (from current position to end) - reduced opacity
+				if (currentTimeIndex < track.length - 1) {
+					const futurePositions = track.slice(currentTimeIndex).map(point => 
+						Cesium.Cartesian3.fromDegrees(point.lon, point.lat)
+					);
+					const futureColor = color.withAlpha(0.3);
+					const futureEntity = viewer.entities.add({
+						name: 'Future Track',
+						polyline: {
+							positions: futurePositions,
+							width: 4,
+							material: futureColor,
+							clampToGround: true
+						}
+					});
+					timeSliderEntities.push(futureEntity);
+				}
+			}
+			
+			// Add start marker (deployment location)
+			const startPoint = track[0];
+			const startEntity = viewer.entities.add({
+				name: 'Deployment Location',
+				position: Cesium.Cartesian3.fromDegrees(startPoint.lon, startPoint.lat),
+				point: {
+					pixelSize: 15,
+					color: Cesium.Color.RED,
+					outlineColor: Cesium.Color.WHITE,
+					outlineWidth: 3,
+					heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+				}
+			});
+			timeSliderEntities.push(startEntity);
+			
+			// Add end marker (final location)
+			const endPoint = track[track.length - 1];
+			const endEntity = viewer.entities.add({
+				name: 'Final Location',
+				position: Cesium.Cartesian3.fromDegrees(endPoint.lon, endPoint.lat),
+				point: {
+					pixelSize: 12,
+					color: Cesium.Color.GREEN.withAlpha(0.6),
+					outlineColor: Cesium.Color.WHITE,
+					outlineWidth: 2,
+					heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+				}
+			});
+			timeSliderEntities.push(endEntity);
+			
+			// Add current position marker
+			const currentPoint = track[currentTimeIndex];
+			currentMarkerEntity = viewer.entities.add({
+				name: 'Current Position',
+				position: Cesium.Cartesian3.fromDegrees(currentPoint.lon, currentPoint.lat),
+				point: {
+					pixelSize: 18,
+					color: Cesium.Color.ORANGE,
+					outlineColor: Cesium.Color.WHITE,
+					outlineWidth: 4,
+					heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+				}
+			});
+			
+			// Add individual points if enabled
+			if (showPoints) {
+				track.forEach((point, index) => {
+					const isPast = index <= currentTimeIndex;
+					const pointColor = isPast ? color : color.withAlpha(0.3);
+					const pointEntity = viewer.entities.add({
+						name: `Track Point ${index}`,
+						position: Cesium.Cartesian3.fromDegrees(point.lon, point.lat),
+						point: {
+							pixelSize: isPast ? 4 : 3,
+							color: pointColor,
+							heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+						}
+					});
+					timeSliderEntities.push(pointEntity);
+				});
+			}
+			
+			// Follow mode: fly to current position
+			if (followMode && currentMarkerEntity) {
+				viewer.flyTo(currentMarkerEntity, {
+					offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-45), 1000000)
+				});
+			}
+		}
+
+		// Start animation
+		function startAnimation() {
+			if (!selectedSharkId || !sharkData[selectedSharkId] || isPlaying) return;
+			
+			const track = sharkData[selectedSharkId];
+			
+			if (currentTimeIndex >= track.length - 1) {
+				currentTimeIndex = 0;
+				document.getElementById('bottom-time-slider').value = 0;
+				updateTimeSliderDisplay();
+				updateSharkVisualization();
+			}
+			
+			isPlaying = true;
+			document.getElementById('play-button').textContent = '⏸';
+			document.getElementById('play-button').classList.add('playing');
+			
+			const delay = playStepDelay / playSpeed;
+			
+			playInterval = setInterval(() => {
+				if (currentTimeIndex >= track.length - 1) {
+					pauseAnimation();
+					return;
+				} else {
+					currentTimeIndex++;
+				}
+				
+				const percentage = (currentTimeIndex / (track.length - 1)) * 100;
+				document.getElementById('bottom-time-slider').value = percentage;
+				
+				updateTimeSliderDisplay();
+				updateSharkVisualization();
+			}, delay);
+		}
+
+		// Pause animation
+		function pauseAnimation() {
+			if (!isPlaying) return;
+			
+			isPlaying = false;
+			document.getElementById('play-button').textContent = '▶';
+			document.getElementById('play-button').classList.remove('playing');
+			
+			if (playInterval) {
+				clearInterval(playInterval);
+				playInterval = null;
+			}
+		}
+
+		// Event listeners for controls
+		function setupEventListeners() {
+			// Menu toggle button
+			document.getElementById('menu-toggle').addEventListener('click', () => {
+				const sidebar = document.getElementById('sidebar');
+				const container = document.querySelector('.container');
+				
+				sidebar.classList.toggle('hidden');
+				container.classList.toggle('sidebar-hidden');
+
+				// Force immediate and delayed Cesium viewer resize
+				const resizeViewer = () => {
+					if (viewer && viewer.canvas) {
+						// Force canvas size recalculation
+						const cesiumContainer = document.getElementById('cesiumContainer');
+						const rect = cesiumContainer.getBoundingClientRect();
+						
+						// Trigger Cesium resize
+						viewer.resize();
+						viewer.scene.requestRender();
+						
+						// Force a second render to ensure everything is updated
+						requestAnimationFrame(() => {
+							viewer.scene.requestRender();
+						});
+					}
+				};
+				
+				// Immediate resize
+				resizeViewer();
+				
+				// Delayed resize after transition
+				setTimeout(resizeViewer, 350);
+				
+			});	
+			
+			document.getElementById('show-all').addEventListener('click', () => {
+				showOneMode = false;
+				selectedSharkId = null;
+				hideTimeSlider();
+				
+				showAllSharks();
+				document.getElementById('show-all').classList.add('active');
+				document.getElementById('hide-all').classList.remove('active');
+				document.getElementById('show-one').classList.remove('active');
+				
+				updateVisibilityToggleButtons();
+			});
+			
+			document.getElementById('hide-all').addEventListener('click', () => {
+				hideAllSharks();
+				document.getElementById('hide-all').classList.add('active');
+				document.getElementById('show-all').classList.remove('active');
+				document.getElementById('show-one').classList.remove('active');
+				showOneMode = false;
+				hideTimeSlider();
+				
+				updateVisibilityToggleButtons();
+			});
+			
+			document.getElementById('show-one').addEventListener('click', () => {
+				showOneMode = true;
+				hideAllSharks();
+				
+				document.getElementById('show-one').classList.add('active');
+				document.getElementById('show-all').classList.remove('active');
+				document.getElementById('hide-all').classList.remove('active');
+				
+				updateVisibilityToggleButtons();
+				showNotification('Click on a shark in the list below to view its track over time!');
+			});
+			
+			// Fit to Data button
+			document.getElementById('fit-bounds').addEventListener('click', () => {
+				if (showOneMode && selectedSharkId && sharkData[selectedSharkId]) {
+					viewer.flyTo(sharkEntities[selectedSharkId].entities);
+				} else {
+					const visibleEntities = [];
+					Object.keys(sharkEntities).forEach(sharkId => {
+						if (sharkEntities[sharkId].visible) {
+							visibleEntities.push(...sharkEntities[sharkId].entities);
+						}
+					});
+					if (visibleEntities.length > 0) {
+						viewer.flyTo(visibleEntities);
+					}
+				}
+			});
+			
+			document.getElementById('toggle-points').addEventListener('click', () => {
+				showPoints = !showPoints;
+				
+				const toggleButton = document.getElementById('toggle-points');
+				if (showPoints) {
+					toggleButton.classList.add('active');
+					toggleButton.textContent = 'Hide Points';
+				} else {
+					toggleButton.classList.remove('active');
+					toggleButton.textContent = 'Show Points';
+				}
+				
+				if (showOneMode && selectedSharkId) {
+					updateSharkVisualization();
+				} else {
+					// Recreate all entities with/without points
+					viewer.entities.removeAll();
+					sharkEntities = {};
+					createSharkEntities();
+					populateSharkList();
+				}
+			});
+
+			document.getElementById('reset-camera').addEventListener('click', () => {
+				viewer.camera.flyTo({
+					destination: Cesium.Cartesian3.fromDegrees(-40.0, 45.0, 15000000),
+				});
+			});
+
+			document.getElementById('toggle-mouse-controls').addEventListener('click', (e) => {
+				const button = e.target;
+				if (button.classList.contains('active')) {
+					// Disable mouse controls
+					viewer.scene.screenSpaceCameraController.enableRotate = false;
+					viewer.scene.screenSpaceCameraController.enableTranslate = false;
+					viewer.scene.screenSpaceCameraController.enableZoom = false;
+					button.classList.remove('active');
+					button.textContent = 'Enable Mouse';
+					showNotification('Mouse navigation disabled');
+				} else {
+					// Enable mouse controls
+					viewer.scene.screenSpaceCameraController.enableRotate = true;
+					viewer.scene.screenSpaceCameraController.enableTranslate = true;
+					viewer.scene.screenSpaceCameraController.enableZoom = true;
+					button.classList.add('active');
+					button.textContent = 'Disable Mouse';
+					showNotification('Mouse navigation enabled');
+				}
+			});
+			
+			// Bottom time slider event listener
+			document.getElementById('bottom-time-slider').addEventListener('input', (e) => {
+				if (selectedSharkId && sharkData[selectedSharkId]) {
+					const percentage = e.target.value / 100;
+					const track = sharkData[selectedSharkId];
+					currentTimeIndex = Math.floor((track.length - 1) * percentage);
+					updateTimeSliderDisplay();
+					updateSharkVisualization();
+					
+					if (isPlaying) {
+						pauseAnimation();
+					}
+				}
+			});
+			
+			// Play/Pause button
+			document.getElementById('play-button').addEventListener('click', () => {
+				if (isPlaying) {
+					pauseAnimation();
+				} else {
+					startAnimation();
+				}
+			});
+			
+			// Speed control buttons
+			document.querySelectorAll('.speed-button').forEach(button => {
+				button.addEventListener('click', (e) => {
+					document.querySelectorAll('.speed-button').forEach(b => b.classList.remove('active'));
+					e.target.classList.add('active');
+					
+					playSpeed = parseFloat(e.target.dataset.speed);
+					
+					if (isPlaying) {
+						pauseAnimation();
+						startAnimation();
+					}
+				});
+			});
+			
+			// Follow button
+			document.getElementById('follow-button').addEventListener('click', (e) => {
+				followMode = !followMode;
+				const button = e.target;
+				if (followMode) {
+					button.classList.add('active');
+					button.textContent = '🦈 Following';
+				} else {
+					button.classList.remove('active');
+					button.textContent = '🦈 Follow';
+				}
+			});
+
+			// Initialize toggle points button state
+			const toggleButton = document.getElementById('toggle-points');
+			if (showPoints) {
+				toggleButton.classList.add('active');
+				toggleButton.textContent = 'Hide Points';
+			} else {
+				toggleButton.classList.remove('active');
+				toggleButton.textContent = 'Show Points';
+			}
+		}
+
+		// Set up viewer interaction listeners
+		function setupViewerInteractionListeners() {
+			// Disable follow mode on user interaction
+			// viewer.scene.screenSpaceCameraController.startListening();
+			// viewer.camera.moveStart.addEventListener(() => {
+			// 	if (followMode) {
+			// 		followMode = false;
+			// 		const followButton = document.getElementById('follow-button');
+			// 		followButton.classList.remove('active');
+			// 		followButton.textContent = '🦈 Follow';
+			// 	}
+			// });
+		}
+
+		// Initialize everything
+		document.addEventListener('DOMContentLoaded', () => {
+			initViewer();
+			setupEventListeners();
+			loadData();
+		});
+	</script>
+</body>
 </html>
