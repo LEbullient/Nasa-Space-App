@@ -226,7 +226,7 @@
     <!-- Three.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     
     <script>
         // Global variables
@@ -277,8 +277,8 @@
             directionalLight2.position.set(-50, -50, -50);
             scene.add(directionalLight2);
             
-            // Load STL model
-            loadSTL();
+            // Load OBJ model
+            loadOBJ();
             
             // Set up controls
             setupControls();
@@ -287,38 +287,40 @@
             window.addEventListener('resize', onWindowResize, false);
         }
         
-        function loadSTL() {
-            const loader = new THREE.STLLoader();
+        function loadOBJ() {
+            const loader = new THREE.OBJLoader();
             
-            loader.load('models/AC Light.stl', function(geometry) {
+            loader.load('models/white shark model-20250929.obj', function(object) {
                 // Hide loading indicator
                 document.getElementById('loading').classList.add('hidden');
                 
-                // Create material
-                const material = new THREE.MeshPhongMaterial({ 
-                    color: 0x3498db,
-                    shininess: 100,
-                    specular: 0x111111
+                // Apply material to all meshes in the object
+                object.traverse(function(child) {
+                    if (child instanceof THREE.Mesh) {
+                        child.material = new THREE.MeshPhongMaterial({ 
+                            color: 0x6c7b7f, // Shark gray color
+                            shininess: 100,
+                            specular: 0x333333
+                        });
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
                 });
                 
-                // Create mesh
-                model = new THREE.Mesh(geometry, material);
-                model.castShadow = true;
-                model.receiveShadow = true;
+                model = object;
                 
                 // Center the model
-                geometry.computeBoundingBox();
-                const box = geometry.boundingBox;
+                const box = new THREE.Box3().setFromObject(object);
                 const center = box.getCenter(new THREE.Vector3());
-                model.position.sub(center);
+                object.position.sub(center);
                 
                 // Scale model to fit screen
                 const size = box.getSize(new THREE.Vector3());
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const scale = 50 / maxDim;
-                model.scale.setScalar(scale);
+                object.scale.setScalar(scale);
                 
-                scene.add(model);
+                scene.add(object);
                 
                 // Start animation
                 animate();
@@ -329,11 +331,11 @@
                 
             }, function(error) {
                 // Error handling
-                console.error('Error loading STL file:', error);
+                console.error('Error loading OBJ file:', error);
                 document.getElementById('loading').innerHTML = `
                     <div class="error">
                         <h3>❌ Failed to load model</h3>
-                        <p>Could not load AC Light.stl</p>
+                        <p>Could not load white shark model-20250929.obj</p>
                         <p>Please check if the file exists in the models folder.</p>
                     </div>
                 `;
