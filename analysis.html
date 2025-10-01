@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Shark Tracking - Velocity Analysis</title>
+	<!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦈</text></svg>">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff;
+            color: white;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header.hidden {
+            transform: translateY(-100%);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-title {
+            flex: 1;
+        }
+
+        .header-title h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-title p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-tab:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tab.active {
+            color: white;
+            background: #3498db;
+        }
+
+        .content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .analysis-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .analysis-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .analysis-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .analysis-title p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .stats-summary {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .analysis-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #ffd700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .analysis-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .analysis-image:hover {
+            transform: scale(1.02);
+            cursor: pointer;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .shark-info {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 95%;
+            max-height: 95%;
+            margin: auto;
+            animation: zoomIn 0.3s ease;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 0, 0, 0.7);
+            transform: scale(1.1);
+        }
+
+        .modal-download {
+            position: absolute;
+            top: -40px;
+            right: 50px;
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-download:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 1rem;
+            }
+            
+            .analysis-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .analysis-title h2 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .card-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .modal-content {
+                max-width: 98%;
+                max-height: 90%;
+            }
+            
+            .modal-close {
+                top: -30px;
+                right: 0;
+                font-size: 1.5rem;
+                width: 30px;
+                height: 30px;
+            }
+            
+            .modal-download {
+                top: -30px;
+                right: 40px;
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>Blue Shark Tracking Project</h1>
+                <p>Analysis of Shark Velocities</p>
+            </div>
+            <nav class="nav-tabs">
+                <a href="index.html" class="nav-tab">About</a>
+                <a href="map.html" class="nav-tab">2D Map</a>
+				<a href="globe.html" class="nav-tab">3D Map</a>
+                <a href="model.html" class="nav-tab">Design</a>
+                <a href="analysis.html" class="nav-tab active">Analysis</a>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="content">
+        <div class="analysis-container">
+            <div class="analysis-title">
+                <h2>🦈 Shark Velocity Analysis Results</h2>
+                <p>Comprehensive analysis of 17 shark tracking datasets with high-velocity point filtering. Each visualization shows velocity patterns over time and speed distribution after removing GPS errors and unrealistic movement data.</p>
+            </div>
+
+            <div class="stats-summary">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number">17</span>
+                        <div class="stat-label">Shark Datasets</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">472</span>
+                        <div class="stat-label">High-Velocity Segments Filtered</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">5.63</span>
+                        <div class="stat-label">Average Speed (km/h)</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">89.9%</span>
+                        <div class="stat-label">Data Retention Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2013_132346</div>
+                    <img src="analysis/160424_2013_132346pnas_atn_filtered_analysis.png" alt="Shark 160424_2013_132346 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2013_132346pnas_atn_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2013_132346pnas_atn_filtered_analysis.png" download="Shark_160424_2013_132346_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">25 high-velocity segments removed • Mean: 5.54 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2014_141195</div>
+                    <img src="analysis/160424_2014_141195pnas_atn_filtered_analysis.png" alt="Shark 160424_2014_141195 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2014_141195pnas_atn_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2014_141195pnas_atn_filtered_analysis.png" download="Shark_160424_2014_141195_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">4 high-velocity segments removed • Mean: 4.91 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2015_141261 (Filtered)</div>
+                    <img src="analysis/160424_2015_141261pnas_atn_filtered_filtered_analysis.png" alt="Shark 160424_2015_141261 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2015_141261pnas_atn_filtered_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2015_141261pnas_atn_filtered_filtered_analysis.png" download="160424_2015_141261pnas_atn_filtered_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">31 high-velocity segments removed • Mean: 5.07 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2015_141264</div>
+                    <img src="analysis/160424_2015_141264pnas_atn_filtered_analysis.png" alt="Shark 160424_2015_141264 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2015_141264pnas_atn_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2015_141264pnas_atn_filtered_analysis.png" download="160424_2015_141264pnas_atn_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">7 high-velocity segments removed • Mean: 3.88 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2015_141268</div>
+                    <img src="analysis/160424_2015_141268pnas_atn_filtered_analysis.png" alt="Shark 160424_2015_141268 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2015_141268pnas_atn_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2015_141268pnas_atn_filtered_analysis.png" download="160424_2015_141268pnas_atn_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">109 high-velocity segments removed • Mean: 5.10 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2015_141270</div>
+                    <img src="analysis/160424_2015_141270pnas_atn_filtered_analysis.png" alt="Shark 160424_2015_141270 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2015_141270pnas_atn_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2015_141270pnas_atn_filtered_analysis.png" download="160424_2015_141270pnas_atn_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">182 high-velocity segments removed • Mean: 5.81 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2016_106744 (Filtered)</div>
+                    <img src="analysis/160424_2016_106744pnas_atn_filtered_filtered_analysis.png" alt="Shark 160424_2016_106744 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2016_106744pnas_atn_filtered_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2016_106744pnas_atn_filtered_filtered_analysis.png" download="160424_2016_106744pnas_atn_filtered_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">21 high-velocity segments removed • Mean: 7.50 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2016_106745 (Filtered)</div>
+                    <img src="analysis/160424_2016_106745pnas_atn_filtered_filtered_analysis.png" alt="Shark 160424_2016_106745 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2016_106745pnas_atn_filtered_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2016_106745pnas_atn_filtered_filtered_analysis.png" download="160424_2016_106745pnas_atn_filtered_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">4 high-velocity segments removed • Mean: 5.05 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2016_106746 (Filtered)</div>
+                    <img src="analysis/160424_2016_106746pnas_atn_filtered_filtered_analysis.png" alt="Shark 160424_2016_106746 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2016_106746pnas_atn_filtered_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2016_106746pnas_atn_filtered_filtered_analysis.png" download="160424_2016_106746pnas_atn_filtered_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">14 high-velocity segments removed • Mean: 6.37 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2016_106747 (Filtered)</div>
+                    <img src="analysis/160424_2016_106747pnas_atn_filtered_filtered_analysis.png" alt="Shark 160424_2016_106747 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2016_106747pnas_atn_filtered_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2016_106747pnas_atn_filtered_filtered_analysis.png" download="160424_2016_106747pnas_atn_filtered_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">7 high-velocity segments removed • Mean: 7.24 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2016_106748</div>
+                    <img src="analysis/160424_2016_106748pnas_atn_filtered_analysis.png" alt="Shark 160424_2016_106748 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2016_106748pnas_atn_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2016_106748pnas_atn_filtered_analysis.png" download="160424_2016_106748pnas_atn_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">5 high-velocity segments removed • Mean: 5.06 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2016_141262 (Filtered)</div>
+                    <img src="analysis/160424_2016_141262pnas_atn_filtered_filtered_analysis.png" alt="Shark 160424_2016_141262 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2016_141262pnas_atn_filtered_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2016_141262pnas_atn_filtered_filtered_analysis.png" download="160424_2016_141262pnas_atn_filtered_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">11 high-velocity segments removed • Mean: 5.90 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2016_141263</div>
+                    <img src="analysis/160424_2016_141263pnas_atn_filtered_analysis.png" alt="Shark 160424_2016_141263 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2016_141263pnas_atn_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2016_141263pnas_atn_filtered_analysis.png" download="160424_2016_141263pnas_atn_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">12 high-velocity segments removed • Mean: 5.48 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2016_141265</div>
+                    <img src="analysis/160424_2016_141265pnas_atn_filtered_analysis.png" alt="Shark 160424_2016_141265 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2016_141265pnas_atn_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2016_141265pnas_atn_filtered_analysis.png" download="160424_2016_141265pnas_atn_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">11 high-velocity segments removed • Mean: 5.82 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2016_141266</div>
+                    <img src="analysis/160424_2016_141266pnas_atn_filtered_analysis.png" alt="Shark 160424_2016_141266 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2016_141266pnas_atn_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2016_141266pnas_atn_filtered_analysis.png" download="160424_2016_141266pnas_atn_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">8 high-velocity segments removed • Mean: 5.06 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2016_165927</div>
+                    <img src="analysis/160424_2016_165927pnas_atn_filtered_analysis.png" alt="Shark 160424_2016_165927 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2016_165927pnas_atn_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2016_165927pnas_atn_filtered_analysis.png" download="160424_2016_165927pnas_atn_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">8 high-velocity segments removed • Mean: 4.82 km/h</div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="card-title">Shark 160424_2016_165928</div>
+                    <img src="analysis/160424_2016_165928pnas_atn_filtered_analysis.png" alt="Shark 160424_2016_165928 Analysis" class="analysis-image" onclick="openModal(this)">
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="openModal('analysis/160424_2016_165928pnas_atn_filtered_analysis.png')">🔍 View Large</button>
+                        <a href="analysis/160424_2016_165928pnas_atn_filtered_analysis.png" download="160424_2016_165928pnas_atn_filtered_analysis_Analysis.png" class="btn btn-secondary">📥 Download</a>
+                    </div>
+                    <div class="shark-info">13 high-velocity segments removed • Mean: 7.06 km/h</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for enlarged images -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <a id="modalDownload" class="modal-download" download>📥 Download</a>
+            <img id="modalImage" class="modal-image" src="" alt="">
+        </div>
+    </div>
+
+    <script>
+        function openModal(imageSrc) {
+            // Handle both img element and direct src string
+            const src = typeof imageSrc === 'string' ? imageSrc : imageSrc.src;
+            const alt = typeof imageSrc === 'string' ? 'Shark Analysis' : imageSrc.alt;
+            
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const downloadLink = document.getElementById('modalDownload');
+            
+            modal.classList.add('show');
+            modalImg.src = src;
+            modalImg.alt = alt;
+            downloadLink.href = src;
+            
+            // Extract filename for download
+            const filename = src.split('/').pop().replace('.png', '_Analysis.png');
+            downloadLink.download = filename;
+            
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('show');
+            
+            // Restore body scroll
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Add click handlers to all existing images
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('.analysis-image');
+            images.forEach(img => {
+                if (!img.onclick) {
+                    img.onclick = function() { openModal(this); };
+                    img.style.cursor = 'pointer';
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>

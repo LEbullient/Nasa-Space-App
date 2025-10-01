@@ -762,7 +762,7 @@
 		async function loadData() {
 			try {
 				// First, load metadata
-				const metadataResponse = await fetch('data/Braun_atn_tag_deployment_metadata.csv');
+				const metadataResponse = await fetch('data/blue-shark-gps/Braun_atn_tag_deployment_metadata.csv');
 				const metadataCsv = await metadataResponse.text();
 				const metadataData = Papa.parse(metadataCsv, { header: true, skipEmptyLines: true });
 
@@ -784,23 +784,23 @@
 
 				// Define all shark files to load
 				const sharkFiles = [
-					'160424_2013_132346pnas_atn.csv',
-					'160424_2014_141195pnas_atn.csv',
-					'160424_2015_141261pnas_atn_filtered.csv',
-					'160424_2015_141264pnas_atn.csv',
-					'160424_2015_141268pnas_atn.csv',
-					'160424_2015_141270pnas_atn.csv',
-					'160424_2016_106744pnas_atn_filtered.csv',
-					'160424_2016_106745pnas_atn_filtered.csv',
-					'160424_2016_106746pnas_atn_filtered.csv',
-					'160424_2016_106747pnas_atn_filtered.csv',
-					'160424_2016_106748pnas_atn.csv',
-					'160424_2016_141262pnas_atn_filtered.csv',
-					'160424_2016_141263pnas_atn.csv',
-					'160424_2016_141265pnas_atn.csv',
-					'160424_2016_141266pnas_atn.csv',
-					'160424_2016_165927pnas_atn.csv',
-					'160424_2016_165928pnas_atn.csv'
+					'filtered_160424_2013_132346pnas_atn.csv',
+					'filtered_160424_2014_141195pnas_atn.csv',
+					'filtered_160424_2015_141261pnas_atn_filtered.csv',
+					'filtered_160424_2015_141264pnas_atn.csv',
+					'filtered_160424_2015_141268pnas_atn.csv',
+					'filtered_160424_2015_141270pnas_atn.csv',
+					'filtered_160424_2016_106744pnas_atn_filtered.csv',
+					'filtered_160424_2016_106745pnas_atn_filtered.csv',
+					'filtered_160424_2016_106746pnas_atn_filtered.csv',
+					'filtered_160424_2016_106747pnas_atn_filtered.csv',
+					'filtered_160424_2016_106748pnas_atn.csv',
+					'filtered_160424_2016_141262pnas_atn_filtered.csv',
+					'filtered_160424_2016_141263pnas_atn.csv',
+					'filtered_160424_2016_141265pnas_atn.csv',
+					'filtered_160424_2016_141266pnas_atn.csv',
+					'filtered_160424_2016_165927pnas_atn.csv',
+					'filtered_160424_2016_165928pnas_atn.csv'
 				];
 
 				// Load all shark tracking files
@@ -811,7 +811,7 @@
 							progressEl.textContent = `Loading ${filename}... (${index + 1}/${sharkFiles.length})`;
 						}
 						
-						const response = await fetch(`data/${filename}`);
+						const response = await fetch(`data/blue-shark-gps/${filename}`);
 						const csvText = await response.text();
 						const parsedData = Papa.parse(csvText, { header: true, skipEmptyLines: true });
 						
