@@ -167,6 +167,32 @@
             background-color: #27ae60;
         }
 
+        /* Loading indicator styles */
+        .button-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .button-loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            right: -25px;
+            margin-top: -8px;
+            border: 2px solid transparent;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .shark-list {
             max-height: 400px;
             overflow-y: auto;
@@ -711,6 +737,10 @@
                     <button id="toggle-points">Toggle Points</button>
                     <button id="toggle-scroll-zoom" class="active" style="display: none;">Scroll Zoom</button>
                 </div>
+                <div class="control-group">
+                    <label>Marine Protected Areas</label>
+                    <button id="toggle-mpa">Load MPAs</button>
+                </div>
                 <!-- <div class="control-group">
                     <label>Filter by Year:</label>
                     <button id="filter-all" class="active">All Years</button>
@@ -787,6 +817,9 @@
     
     <!-- Papa Parse for CSV reading -->
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    
+    <!-- Shapefile library for handling shapefiles -->
+    <script src="https://unpkg.com/shapefile@0.6.6/dist/shapefile.js"></script>
 
     <script>
         // Global variables
@@ -796,6 +829,10 @@
         let sharkLayers = {};
         let allBounds = [];
         let showPoints = true;
+        
+        // MPA variables
+        let mpaLayer = null;
+        let showMPA = false;
         
         // Show one mode variables
         let showOneMode = false;
@@ -810,6 +847,82 @@
         let playSpeed = 1; // 1x speed
         let playStepDelay = 500; // Base delay in ms
         let followMode = false; // Follow mode for map centering during animation (disabled by default)
+
+        // ISO3 to country name mapping
+        const iso3ToCountry = {
+            'ABNJ': 'Area Beyond National Jurisdiction', 'AFG': 'Afghanistan', 'ALB': 'Albania', 'DZA': 'Algeria', 'ASM': 'American Samoa', 'AND': 'Andorra',
+            'AGO': 'Angola', 'AIA': 'Anguilla', 'ATA': 'Antarctica', 'ATG': 'Antigua and Barbuda', 'ARG': 'Argentina',
+            'ARM': 'Armenia', 'ABW': 'Aruba', 'AUS': 'Australia', 'AUT': 'Austria', 'AZE': 'Azerbaijan',
+            'BHS': 'Bahamas', 'BHR': 'Bahrain', 'BGD': 'Bangladesh', 'BRB': 'Barbados', 'BLR': 'Belarus',
+            'BEL': 'Belgium', 'BLZ': 'Belize', 'BEN': 'Benin', 'BMU': 'Bermuda', 'BTN': 'Bhutan',
+            'BOL': 'Bolivia', 'BES': 'Bonaire, Sint Eustatius and Saba', 'BIH': 'Bosnia and Herzegovina', 'BWA': 'Botswana', 'BVT': 'Bouvet Island',
+            'BRA': 'Brazil', 'IOT': 'British Indian Ocean Territory', 'BRN': 'Brunei', 'BGR': 'Bulgaria', 'BFA': 'Burkina Faso',
+            'BDI': 'Burundi', 'CPV': 'Cabo Verde', 'KHM': 'Cambodia', 'CMR': 'Cameroon', 'CAN': 'Canada',
+            'CYM': 'Cayman Islands', 'CAF': 'Central African Republic', 'TCD': 'Chad', 'CHL': 'Chile', 'CHN': 'China',
+            'CXR': 'Christmas Island', 'CCK': 'Cocos (Keeling) Islands', 'COL': 'Colombia', 'COM': 'Comoros', 'COG': 'Congo',
+            'COD': 'Congo (Democratic Republic)', 'COK': 'Cook Islands', 'CRI': 'Costa Rica', 'CIV': 'Côte d\'Ivoire', 'HRV': 'Croatia',
+            'CUB': 'Cuba', 'CUW': 'Curaçao', 'CYP': 'Cyprus', 'CZE': 'Czech Republic', 'DNK': 'Denmark',
+            'DJI': 'Djibouti', 'DMA': 'Dominica', 'DOM': 'Dominican Republic', 'ECU': 'Ecuador', 'EGY': 'Egypt',
+            'SLV': 'El Salvador', 'GNQ': 'Equatorial Guinea', 'ERI': 'Eritrea', 'EST': 'Estonia', 'SWZ': 'Eswatini',
+            'ETH': 'Ethiopia', 'FLK': 'Falkland Islands', 'FRO': 'Faroe Islands', 'FJI': 'Fiji', 'FIN': 'Finland',
+            'FRA': 'France', 'GUF': 'French Guiana', 'PYF': 'French Polynesia', 'ATF': 'French Southern Territories', 'GAB': 'Gabon',
+            'GMB': 'Gambia', 'GEO': 'Georgia', 'DEU': 'Germany', 'GHA': 'Ghana', 'GIB': 'Gibraltar',
+            'GRC': 'Greece', 'GRL': 'Greenland', 'GRD': 'Grenada', 'GLP': 'Guadeloupe', 'GUM': 'Guam',
+            'GTM': 'Guatemala', 'GGY': 'Guernsey', 'GIN': 'Guinea', 'GNB': 'Guinea-Bissau', 'GUY': 'Guyana',
+            'HTI': 'Haiti', 'HMD': 'Heard Island and McDonald Islands', 'VAT': 'Holy See', 'HND': 'Honduras', 'HKG': 'Hong Kong',
+            'HUN': 'Hungary', 'ISL': 'Iceland', 'IND': 'India', 'IDN': 'Indonesia', 'IRN': 'Iran',
+            'IRQ': 'Iraq', 'IRL': 'Ireland', 'IMN': 'Isle of Man', 'ISR': 'Israel', 'ITA': 'Italy',
+            'JAM': 'Jamaica', 'JPN': 'Japan', 'JEY': 'Jersey', 'JOR': 'Jordan', 'KAZ': 'Kazakhstan',
+            'KEN': 'Kenya', 'KIR': 'Kiribati', 'PRK': 'North Korea', 'KOR': 'South Korea', 'KWT': 'Kuwait',
+            'KGZ': 'Kyrgyzstan', 'LAO': 'Laos', 'LVA': 'Latvia', 'LBN': 'Lebanon', 'LSO': 'Lesotho',
+            'LBR': 'Liberia', 'LBY': 'Libya', 'LIE': 'Liechtenstein', 'LTU': 'Lithuania', 'LUX': 'Luxembourg',
+            'MAC': 'Macao', 'MDG': 'Madagascar', 'MWI': 'Malawi', 'MYS': 'Malaysia', 'MDV': 'Maldives',
+            'MLI': 'Mali', 'MLT': 'Malta', 'MHL': 'Marshall Islands', 'MTQ': 'Martinique', 'MRT': 'Mauritania',
+            'MUS': 'Mauritius', 'MYT': 'Mayotte', 'MEX': 'Mexico', 'FSM': 'Micronesia', 'MDA': 'Moldova',
+            'MCO': 'Monaco', 'MNG': 'Mongolia', 'MNE': 'Montenegro', 'MSR': 'Montserrat', 'MAR': 'Morocco',
+            'MOZ': 'Mozambique', 'MMR': 'Myanmar', 'NAM': 'Namibia', 'NRU': 'Nauru', 'NPL': 'Nepal',
+            'NLD': 'Netherlands', 'NCL': 'New Caledonia', 'NZL': 'New Zealand', 'NIC': 'Nicaragua', 'NER': 'Niger',
+            'NGA': 'Nigeria', 'NIU': 'Niue', 'NFK': 'Norfolk Island', 'MKD': 'North Macedonia', 'MNP': 'Northern Mariana Islands',
+            'NOR': 'Norway', 'OMN': 'Oman', 'PAK': 'Pakistan', 'PLW': 'Palau', 'PSE': 'Palestine',
+            'PAN': 'Panama', 'PNG': 'Papua New Guinea', 'PRY': 'Paraguay', 'PER': 'Peru', 'PHL': 'Philippines',
+            'PCN': 'Pitcairn', 'POL': 'Poland', 'PRT': 'Portugal', 'PRI': 'Puerto Rico', 'QAT': 'Qatar',
+            'REU': 'Réunion', 'ROU': 'Romania', 'RUS': 'Russia', 'RWA': 'Rwanda', 'BLM': 'Saint Barthélemy',
+            'SHN': 'Saint Helena', 'KNA': 'Saint Kitts and Nevis', 'LCA': 'Saint Lucia', 'MAF': 'Saint Martin',
+            'SPM': 'Saint Pierre and Miquelon', 'VCT': 'Saint Vincent and the Grenadines', 'WSM': 'Samoa', 'SMR': 'San Marino', 'STP': 'Sao Tome and Principe',
+            'SAU': 'Saudi Arabia', 'SEN': 'Senegal', 'SRB': 'Serbia', 'SYC': 'Seychelles', 'SLE': 'Sierra Leone',
+            'SGP': 'Singapore', 'SXM': 'Sint Maarten', 'SVK': 'Slovakia', 'SVN': 'Slovenia', 'SLB': 'Solomon Islands',
+            'SOM': 'Somalia', 'ZAF': 'South Africa', 'SGS': 'South Georgia and the South Sandwich Islands', 'SSD': 'South Sudan', 'ESP': 'Spain',
+            'LKA': 'Sri Lanka', 'SDN': 'Sudan', 'SUR': 'Suriname', 'SJM': 'Svalbard and Jan Mayen', 'SWE': 'Sweden',
+            'CHE': 'Switzerland', 'SYR': 'Syria', 'TWN': 'Taiwan', 'TJK': 'Tajikistan', 'TZA': 'Tanzania',
+            'THA': 'Thailand', 'TLS': 'Timor-Leste', 'TGO': 'Togo', 'TKL': 'Tokelau', 'TON': 'Tonga',
+            'TTO': 'Trinidad and Tobago', 'TUN': 'Tunisia', 'TUR': 'Turkey', 'TKM': 'Turkmenistan', 'TCA': 'Turks and Caicos Islands',
+            'TUV': 'Tuvalu', 'UGA': 'Uganda', 'UKR': 'Ukraine', 'ARE': 'United Arab Emirates', 'GBR': 'United Kingdom',
+            'USA': 'United States', 'UMI': 'United States Minor Outlying Islands', 'URY': 'Uruguay', 'UZB': 'Uzbekistan', 'VUT': 'Vanuatu',
+            'VEN': 'Venezuela', 'VNM': 'Vietnam', 'VGB': 'Virgin Islands (British)', 'VIR': 'Virgin Islands (U.S.)', 'WLF': 'Wallis and Futuna',
+            'ESH': 'Western Sahara', 'YEM': 'Yemen', 'ZMB': 'Zambia', 'ZWE': 'Zimbabwe'
+        };
+
+        // Function to get country name from ISO3 code
+        // Handles both single codes and multiple codes separated by semicolons (for transboundary sites)
+        function getCountryName(iso3Code) {
+            if (!iso3Code) {
+                return 'Unknown';
+            }
+            
+            // Check if this is a transboundary site (contains semicolons)
+            if (iso3Code.includes(';')) {
+                const codes = iso3Code.split(';');
+                const countryNames = codes.map(code => {
+                    const trimmedCode = code.trim();
+                    return iso3ToCountry[trimmedCode] || trimmedCode;
+                }).filter(name => name); // Remove any empty names
+                
+                return countryNames.length > 0 ? countryNames.join(' & ') : 'Unknown';
+            } else {
+                // Single country code
+                return iso3ToCountry[iso3Code] || iso3Code || 'Unknown';
+            }
+        }
 
         // SVG icons for visibility toggle buttons
         const EYE_VISIBLE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2c3e50"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg>';
@@ -877,6 +990,151 @@
                     }, 300);
                 }
             }, duration);
+        }
+
+        // Load MPA data from shapefiles and create layer
+        async function loadMPALayer() {
+            console.log('Loading MPA data from shapefiles...');
+            
+            // Show loading indicator on button
+            const mpaButton = document.getElementById('toggle-mpa');
+            if (mpaButton) {
+                mpaButton.classList.add('button-loading');
+                mpaButton.textContent = 'Loading MPAs...';
+            }
+            
+            // Show loading notification
+            showNotification('Loading Marine Protected Areas...', 2000);
+            
+            if (mpaLayer) {
+                map.removeLayer(mpaLayer);
+            }
+            
+            mpaLayer = L.layerGroup();
+            
+            const shapefiles = ['0ps', '1ps', '2ps'];
+            let totalFeatures = 0;
+            
+            try {
+                for (let i = 0; i < shapefiles.length; i++) {
+                    const filename = shapefiles[i];
+                    console.log(`Loading ${filename}.shp... (${i + 1}/${shapefiles.length})`);
+                    
+                    // Update button text with progress
+                    if (mpaButton) {
+                        mpaButton.textContent = `Loading MPAs... (${i + 1}/${shapefiles.length})`;
+                    }
+                    
+                    // Load the shapefile
+                    const collection = await shapefile.read(`data/mpa/${filename}.shp`);
+                    
+                    if (collection && collection.features) {
+                        console.log(`Loaded ${collection.features.length} features from ${filename}.shp`);
+                        
+                        collection.features.forEach(feature => {
+                            if (feature.geometry && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')) {
+                                // Convert GeoJSON to Leaflet layer
+                                const leafletLayer = L.geoJSON(feature, {
+                                    style: {
+                                        color: '#1e88e5',
+                                        weight: 1,
+                                        opacity: 0.7,
+                                        fillColor: '#42a5f5',
+                                        fillOpacity: 0.15
+                                    },
+                                    onEachFeature: (feature, layer) => {
+                                        // Create popup with MPA information
+                                        const props = feature.properties || {};
+                                        const popupContent = `
+                                            <div style="font-family: Arial, sans-serif; max-width: 250px;">
+                                                <h4 style="margin: 0 0 10px 0; color: #1565c0;">${props.NAME || 'Marine Protected Area'}</h4>
+                                                <p><strong>ID:</strong> ${props.WDPAID || 'N/A'}</p>
+                                                <p><strong>Designation:</strong> ${props.DESIG_ENG || props.DESIG || 'Protected Area'}</p>
+                                                <p><strong>Country:</strong> ${getCountryName(props.ISO3)}</p>
+                                                <p><strong>Status:</strong> ${props.STATUS || 'Unknown'}</p>
+                                                <p><strong>Marine Area:</strong> ${props.REP_M_AREA ? parseFloat(props.REP_M_AREA).toFixed(2) + ' km²' : 'Unknown'}</p>
+                                                </div>
+                                                `;
+                                                // <p><strong>IUCN Category:</strong> ${props.IUCN_CAT || 'Not specified'}</p>
+                                        layer.bindPopup(popupContent);
+                                    }
+                                });
+                                
+                                mpaLayer.addLayer(leafletLayer);
+                                totalFeatures++;
+                            }
+                        });
+                    }
+                }
+                
+                console.log(`Total MPA features loaded: ${totalFeatures}`);
+                
+                // Remove loading indicator and update button
+                if (mpaButton) {
+                    mpaButton.classList.remove('button-loading');
+                    mpaButton.textContent = `Show MPAs (${totalFeatures} zones)`;
+                }
+                
+                // Show success notification
+                showNotification(`Successfully loaded ${totalFeatures} Marine Protected Areas`, 3000);
+                
+            } catch (error) {
+                console.error('Error loading MPA shapefiles:', error);
+                
+                // Remove loading indicator on error
+                if (mpaButton) {
+                    mpaButton.classList.remove('button-loading');
+                    mpaButton.textContent = 'Show MPAs (Error)';
+                }
+                
+                showNotification('Error loading MPA data. Please check that shapefile files are available.', 5000);
+            }
+        }
+
+        // Toggle MPA layer visibility
+        async function toggleMPALayer() {
+            const toggleButton = document.getElementById('toggle-mpa');
+            
+            // Prevent clicking while loading
+            if (toggleButton && toggleButton.classList.contains('button-loading')) {
+                return;
+            }
+            
+            if (!mpaLayer) {
+                await loadMPALayer();
+                return;
+            }
+            
+            if (showMPA) {
+                // Hide MPA layer
+                if (mpaLayer && map.hasLayer(mpaLayer)) {
+                    map.removeLayer(mpaLayer);
+                }
+                showMPA = false;
+                toggleButton.classList.remove('active');
+                const count = toggleButton.textContent.match(/\((\d+)\)/);
+                if (count) {
+                    toggleButton.textContent = `Show MPAs (${count[1]} zones)`;
+                } else {
+                    toggleButton.textContent = 'Show MPAs';
+                }
+            } else {
+                // Show MPA layer
+                if (mpaLayer) {
+                    map.addLayer(mpaLayer);
+                }
+                showMPA = true;
+                toggleButton.classList.add('active');
+                const count = toggleButton.textContent.match(/\((\d+)\)/);
+                if (count) {
+                    toggleButton.textContent = `Hide MPAs (${count[1]} zones)`;
+                } else {
+                    toggleButton.textContent = 'Hide MPAs';
+                }
+            }
+            
+            // Update legend to show/hide MPA item
+            updateLegendContent();
         }
 
         // Initialize the map
@@ -1450,6 +1708,9 @@
                 }
             });
             
+            // MPA toggle event listener
+            document.getElementById('toggle-mpa').addEventListener('click', toggleMPALayer);
+            
             // Bottom time slider event listener
             document.getElementById('bottom-time-slider').addEventListener('input', (e) => {
                 if (selectedSharkId && sharkData[selectedSharkId]) {
@@ -1855,6 +2116,12 @@
                         <div class="legend-emoji">🦈</div>
                         <span class="legend-text">Current Position</span>
                     </div>
+                    ${showMPA && mpaLayer ? `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #42a5f5; border: 1px solid #1e88e5;"></div>
+                        <span class="legend-text">Marine Protected Areas</span>
+                    </div>
+                    ` : ''}
                 `;
             } else {
                 // Show All/Hide All mode - display visible sharks
@@ -1880,6 +2147,12 @@
                             <div class="legend-color" style="background-color: #27ae60;"></div>
                             <span class="legend-text">Last Known Position</span>
                         </div>
+                        ${showMPA && mpaLayer ? `
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #42a5f5; border: 1px solid #1e88e5;"></div>
+                            <span class="legend-text">Marine Protected Areas</span>
+                        </div>
+                        ` : ''}
                     `;
                     
                     // Calculate approximate height to determine if legend would overflow
