@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>Blue Shark Tracking - Ocean & Climate Story</title>
+  <title>Blue Shark Tracking - Introduction</title>
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦈</text></svg>">
 
@@ -153,6 +153,251 @@
       object-fit: cover;
     }
 
+    /* Contact Section Styles */
+    .contact-section {
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      backdrop-filter: blur(10px);
+      position: relative;
+      min-height: 80vh;
+      padding: 4rem 2rem;
+    }
+
+    .contact-container {
+      width: 100%;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .contact-section h2 {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      color: white;
+      font-weight: bold;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 3rem;
+      margin-top: 4rem;
+      justify-items: center;
+    }
+
+    .team-member {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      max-width: 300px;
+      width: 100%;
+    }
+
+    .team-member:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .member-photo {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1.5rem;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .team-member:hover .member-photo {
+      border-color: #3498db;
+      transform: scale(1.05);
+    }
+
+    .team-member h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: white;
+      font-weight: bold;
+    }
+
+    .member-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .contact-link:hover {
+      background: #3498db;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .contact-link svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .contact-section {
+        padding: 2rem 1rem;
+      }
+      
+      .contact-section h2 {
+        font-size: 2rem;
+      }
+      
+      .team-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+      
+      .team-member {
+        padding: 1.5rem;
+      }
+      
+      .member-photo {
+        width: 120px;
+        height: 120px;
+      }
+    }
+
+    /* Footer Styles */
+    .footer {
+      background: rgba(44, 62, 80, 0.95);
+      color: white;
+      padding: 2rem 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .footer-references {
+      flex: 1;
+    }
+
+    .footer-references h4 {
+      font-size: 1rem;
+      margin-bottom: 0.8rem;
+      color: #3498db;
+      font-weight: bold;
+    }
+
+    .references-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .reference-item {
+      font-size: 0.9rem;
+      line-height: 1.2;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .reference-item strong {
+      color: white;
+      font-weight: 600;
+    }
+
+    .reference-item a {
+      color: #3498db;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .reference-item a:hover {
+      color: #5dade2;
+      text-decoration: underline;
+    }
+
+    .footer-github {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .github-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .github-link:hover {
+      background: #3498db;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .github-link svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    /* Responsive Footer */
+    @media (max-width: 768px) {
+      .footer-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
+      }
+      
+      .references-grid {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+      }
+      
+      .footer-github {
+        order: -1;
+      }
+      
+      .github-link {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .github-link svg {
+        width: 28px;
+        height: 28px;
+      }
+    }
+
     /* Background images */
 	/* [image: earth picture with wide ocean from the space] */
     #bg1 { background-image: url("images/blue_marble.jpg"); }
@@ -174,7 +419,7 @@
     <div class="header-content">
       <div class="header-title">
         <h1>Blue Shark Tracking Project</h1>
-        <p>Interactive story and satellite tracking data visualization</p>
+        <p>Interactive story and introduction to this project</p>
       </div>
       <nav class="nav-tabs">
         <a href="index.html" class="nav-tab active">About</a>
@@ -199,32 +444,131 @@
 
   <!-- Text sections -->
   <section>
-    <p>五十年前，是人類歷史第一次登陸月球，”beautiful” is the word 當時候站在月球表面的太空人阿姆斯壯回看藍色星球形容的。</p>
+    <p>More than 50 years ago, humankind took its first step onto the moon. From that distant vantage point, astronaut Neil Armstrong gazed back at our blue planet and called it <i>beautiful</i>.</p>
   </section>
 
   <section>
-    <p>我們的地球與其他星球 金星 火星 木星 不一樣，因為我們有海洋。地球的主角是水，而非陸地。70%的海洋調節環境，孕育眾生。</p>
+    <p>Our Earth is unique among other planets like Venus, Mars, Jupiter because we have oceans. Covering around 70% of the planet’s surface, the ocean regulates our climate, sustains ecosystems, and cradles the very origin of life itself.</p>
   </section>
 
   <section>
-    <p>但全球氣候變遷正在發生。</p>
+    <p>But climate change is happening.</p>
   </section>
 
   <section>
-    <p>過去，人類主要靠太空衛星觀察海洋表層環境數據，作為氣候變遷的唯一海洋指標。</p>
+    <p>In the past, humanity has relied on satellites, watching only the surface of the sea to track environmental change.</p>
   </section>
 
   <section>
-    <p>NASA開始關注海裡的魚住民行為模式。鯊魚的洄游路線、覓食路徑是否會因氣候變遷改變？</p>
+    <p>Now, NASA has begun to look far deeper, into the lives of the ocean’s own residents. Have sharks' migration paths and foraging habitats changed due to climate change?</p>
   </section>
 
   <section>
-    <p>我們迫切需要一套能整合 衛星數據 + bio-tag，即時預測鯊魚動向的系統。</p>
+    <p>A system integrating satellite data and bio-tags is in dire need to monitor and predict shark movements in real-time.</p>
   </section>
   
   <section>
-    <p>We only have one ocean. There is no planet B.</p>
+    <p>We have only one ocean. There is no planet B.</p>
   </section>
+
+  <!-- Contact Us Section -->
+  <div id="contact" class="contact-section">
+    <div class="contact-container">
+      <h2>Contact Us</h2>
+      
+      <div class="team-grid">
+        <!-- Anthony Ching -->
+        <div class="team-member">
+          <img src="images/anthony.jpg" alt="Anthony Ching" class="member-photo">
+          <h3>Anthony Ching</h3>
+          <div class="member-links">
+            <a href="mailto:aching517@gmail.com" title="Email" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+            </a>
+            <a href="https://www.linkedin.com/in/anthony-ching/" title="LinkedIn" class="contact-link" target="_blank" rel="noopener noreferrer">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+              </svg>
+            </a>
+            <a href="https://github.com/AnthonyChing" title="GitHub" class="contact-link" target="_blank" rel="noopener noreferrer">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Placeholder Team Members -->
+        <div class="team-member">
+          <img src="images/hsinmu.jpg" alt="Team Member 2" class="member-photo">
+          <h3>Lilian Lee</h3>
+          <div class="member-links">
+            <a href="mailto:placeholder@example.com" title="Email" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+            </a>
+            <a href="#" title="LinkedIn" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+              </svg>
+            </a>
+            <a href="https://github.com/LEbullient" title="GitHub" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="team-member">
+          <img src="images/hsinmu.jpg" alt="Team Member 3" class="member-photo">
+          <h3>Huai-Pu Chen</h3>
+          <div class="member-links">
+            <a href="mailto:placeholder@example.com" title="Email" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+            </a>
+            <a href="#" title="LinkedIn" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+              </svg>
+            </a>
+            <a href="#" title="GitHub" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="team-member">
+          <img src="images/hsinmu.jpg" alt="Team Member 4" class="member-photo">
+          <h3>Qing-Wei Chen</h3>
+          <div class="member-links">
+            <a href="mailto:placeholder@example.com" title="Email" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+            </a>
+            <a href="#" title="LinkedIn" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+              </svg>
+            </a>
+            <a href="#" title="GitHub" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     const bgs = document.querySelectorAll(".bg");
@@ -284,6 +628,53 @@
     });
     window.addEventListener("load", checkVisibility);
   </script>
+
+  <!-- Footer Section -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-references">
+        <h4>Image & Video References</h4>
+        <div class="references-grid">
+          <div class="reference-item">
+            <strong>blue_marble.jpg:</strong> 
+            <a href="https://images.nasa.gov/details/GSFC_20171208_Archive_e001016" target="_blank" rel="noopener noreferrer">NASA Image Gallery</a>
+          </div>
+          <div class="reference-item">
+            <strong>ocean_boat.jpg:</strong> 
+            <a href="https://unsplash.com/photos/person-in-boat-sailing-at-daytime-JXMIexzAkos" target="_blank" rel="noopener noreferrer">Photo by Ewan Robertson on Unsplash</a>
+          </div>
+          <div class="reference-item">
+            <strong>melting_icecap.webp:</strong> 
+            <a href="https://www.nasa.gov/science-research/earth-science/arctic-sea-ice-update-unlikely-to-break-records-but-continuing-downward-trend/" target="_blank" rel="noopener noreferrer">NASA Earth Science</a>
+          </div>
+          <div class="reference-item">
+            <strong>satellite.mp4:</strong> 
+            <a href="https://images.nasa.gov/details/GSFC_20171031_Landsat_m12754_pushbroom" target="_blank" rel="noopener noreferrer">NASA Image Gallery</a>
+          </div>
+          <div class="reference-item">
+            <strong>shark.jpg:</strong> 
+            <a href="https://unsplash.com/photos/a-large-shark-swimming-in-the-ocean-pWSjdGBWyAo" target="_blank" rel="noopener noreferrer">Photo by Gerald Schömbs on Unsplash</a>
+          </div>
+          <div class="reference-item">
+            <strong>shark_human.jpg:</strong> 
+            <a href="https://www.pexels.com/photo/woman-scuba-diving-with-fish-18659802/" target="_blank" rel="noopener noreferrer">Photo by Daniel Torobekov on Pexels</a>
+          </div>
+          <div class="reference-item">
+            <strong>land_sea.jpg:</strong> 
+            <a href="https://unsplash.com/photos/a-beach-with-blue-water-K5znWBYPk-Q" target="_blank" rel="noopener noreferrer">Photo by Mariko Akagi on Unsplash</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-github">
+        <a href="https://github.com/LEbullient/Nasa-Space-App" target="_blank" rel="noopener noreferrer" class="github-link" title="View Project on GitHub">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
 
 </body>
 </html>
