@@ -1171,6 +1171,15 @@
                 position: 'topright'
             }).addTo(map);
             
+            // Add horizontal scale control at bottom right
+            L.control.scale({
+                position: 'bottomright',
+                maxWidth: 200,
+                metric: true,
+                imperial: true,
+                updateWhenIdle: false
+            }).addTo(map);
+            
             // Set up map interaction listeners for follow mode
             setupMapInteractionListeners();
         }
@@ -1851,6 +1860,13 @@
             // Set slider to end (100%)
             document.getElementById('bottom-time-slider').value = 100;
             currentTimeIndex = track.length - 1;
+            
+            // Move scale control up to avoid collision with time slider
+            const scaleControl = document.querySelector('.leaflet-control-scale');
+            if (scaleControl) {
+                scaleControl.style.bottom = '90px';
+                scaleControl.style.transition = 'bottom 0.3s ease';
+            }
         }
         
         // Hide time slider
@@ -1864,6 +1880,13 @@
             if (timeSliderLayer) {
                 map.removeLayer(timeSliderLayer);
                 timeSliderLayer = null;
+            }
+            
+            // Move scale control back to original position
+            const scaleControl = document.querySelector('.leaflet-control-scale');
+            if (scaleControl) {
+                scaleControl.style.bottom = '10px';
+                scaleControl.style.transition = 'bottom 0.3s ease';
             }
         }
         
