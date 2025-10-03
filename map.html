@@ -1291,6 +1291,9 @@
                 // Initialize legend content
                 updateLegendContent();
                 
+                // Fit map to show all visible sharks on initial load
+                fitMapToVisibleSharks();
+                
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('shark-list').innerHTML = '<div style="color: red; padding: 1rem;">Error loading data. Please check that CSV files are in the data directory.</div>';
@@ -1567,6 +1570,28 @@
             }
         }
 
+        // Fit map to all currently visible sharks
+        function fitMapToVisibleSharks() {
+            // Fit to all currently visible shark layers
+            const visibleSharkLayers = Object.values(sharkLayers).filter(s => s.visible);
+            if (visibleSharkLayers.length > 0) {
+                // Collect all lat/lng bounds from visible sharks
+                let allVisibleBounds = [];
+                Object.keys(sharkData).forEach(sharkId => {
+                    if (sharkLayers[sharkId] && sharkLayers[sharkId].visible) {
+                        const track = sharkData[sharkId];
+                        const trackLatLngs = track.map(point => [point.lat, point.lon]);
+                        allVisibleBounds = allVisibleBounds.concat(trackLatLngs);
+                    }
+                });
+                
+                if (allVisibleBounds.length > 0) {
+                    const bounds = L.latLngBounds(allVisibleBounds);
+                    map.fitBounds(bounds.pad(0.1));
+                }
+            }
+        }
+
         // Event listeners for controls
         function setupEventListeners() {
             // Legend toggle
@@ -1662,30 +1687,11 @@
                 if (showOneMode && selectedSharkId && sharkData[selectedSharkId]) {
                     const track = sharkData[selectedSharkId];
                     const allLatLngs = track.map(point => [point.lat, point.lon]);
-					// console.log(allLatLngs)
                     const bounds = L.latLngBounds(allLatLngs);
-					// console.log(bounds)
                     map.fitBounds(bounds.pad(0.1));
                 } else {
-                    // Fit to all currently visible shark layers
-                    const visibleSharkLayers = Object.values(sharkLayers).filter(s => s.visible);
-					// console.log(visibleSharkLayers)
-                    if (visibleSharkLayers.length > 0) {
-                        // Collect all lat/lng bounds from visible sharks
-                        let allVisibleBounds = [];
-                        Object.keys(sharkData).forEach(sharkId => {
-                            if (sharkLayers[sharkId] && sharkLayers[sharkId].visible) {
-                                const track = sharkData[sharkId];
-                                const trackLatLngs = track.map(point => [point.lat, point.lon]);
-                                allVisibleBounds = allVisibleBounds.concat(trackLatLngs);
-                            }
-                        });
-                        
-                        if (allVisibleBounds.length > 0) {
-                            const bounds = L.latLngBounds(allVisibleBounds);
-                            map.fitBounds(bounds.pad(0.1));
-                        }
-                    }
+                    // Use the reusable function for fitting to visible sharks
+                    fitMapToVisibleSharks();
                 }
             });
             
@@ -2200,7 +2206,9 @@
                             
                             content += `
                                 <div class="legend-shark-item">
-                                    <div class="legend-color" style="background-color: ${color};"></div>
+                                    <svg width="20" height="12" style="margin-right: 8px; vertical-align: middle;">
+                                        <line x1="2" y1="6" x2="18" y2="6" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+                                    </svg>
                                     <span class="legend-text">Shark ${shortId} (${year})</span>
                                 </div>
                             `;
