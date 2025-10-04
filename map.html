@@ -1345,6 +1345,9 @@
             
             // Update time slider text color
             updateTimeSliderTextColor();
+            
+            // Update max zoom constraint
+            updateMaxZoom();
         }
 
         // Toggle SST layer visibility
@@ -1405,6 +1408,9 @@
             
             // Update time slider text color
             updateTimeSliderTextColor();
+            
+            // Update max zoom constraint
+            updateMaxZoom();
         }
 
         // Toggle POC layer visibility
@@ -1454,6 +1460,9 @@
             
             // Update time slider text color
             updateTimeSliderTextColor();
+            
+            // Update max zoom constraint
+            updateMaxZoom();
         }
 
         // Function to update time slider text color based on active layers
@@ -1468,6 +1477,21 @@
                 timeLabels.classList.add('white-text');
             } else {
                 timeLabels.classList.remove('white-text');
+            }
+        }
+
+        // Function to update max zoom based on environmental layer visibility
+        function updateMaxZoom() {
+            // If any environmental layer is visible, limit zoom to 6
+            if (showChlorophyll || showSST || showPOC) {
+                map.setMaxZoom(6);
+                // If current zoom is greater than 6, zoom out to 6
+                if (map.getZoom() > 6) {
+                    map.setZoom(6);
+                }
+            } else {
+                // No environmental layers, allow full zoom (20)
+                map.setMaxZoom(20);
             }
         }
 
@@ -2142,6 +2166,9 @@
                 
                 // Update legend content
                 updateLegendContent();
+
+                // Update max zoom
+                updateMaxZoom();
             });
             
             document.getElementById('hide-all').addEventListener('click', () => {
@@ -2199,6 +2226,9 @@
                 
                 // Update legend content
                 updateLegendContent();
+
+                // Update max zoom
+                updateMaxZoom();
             });
             
             document.getElementById('show-one').addEventListener('click', () => {
