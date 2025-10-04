@@ -301,6 +301,7 @@
 
     .footer-references {
       flex: 1;
+      margin: 0 1rem;
     }
 
     .footer-references h4 {
@@ -314,6 +315,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 0.8rem;
+      margin-bottom: 2rem;
     }
 
     .reference-item {
@@ -566,6 +568,27 @@
             </a>
           </div>
         </div>
+        <div class="team-member">
+          <img src="images/hsinmu.jpg" alt="Team Member 4" class="member-photo">
+          <h3>Jeng-Qi Wang</h3>
+          <div class="member-links">
+            <a href="mailto:placeholder@example.com" title="Email" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+            </a>
+            <a href="#" title="LinkedIn" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+              </svg>
+            </a>
+            <a href="#" title="GitHub" class="contact-link">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -575,34 +598,34 @@
     const sections = document.querySelectorAll("section");
     const header = document.querySelector(".header");
     
-    // Header auto-hide variables
-    let lastScrollY = window.scrollY;
-    let ticking = false;
+    // // Header auto-hide variables
+    // let lastScrollY = window.scrollY;
+    // let ticking = false;
 
-    function updateHeader() {
-      const currentScrollY = window.scrollY;
+    // function updateHeader() {
+    //   const currentScrollY = window.scrollY;
       
-      if (currentScrollY < 100) {
-        // Always show header when near top
-        header.classList.remove("hidden");
-      } else if (currentScrollY > lastScrollY) {
-        // Scrolling down - hide header
-        header.classList.add("hidden");
-      } else {
-        // Scrolling up - show header
-        header.classList.remove("hidden");
-      }
+    //   if (currentScrollY < 100) {
+    //     // Always show header when near top
+    //     header.classList.remove("hidden");
+    //   } else if (currentScrollY > lastScrollY) {
+    //     // Scrolling down - hide header
+    //     header.classList.add("hidden");
+    //   } else {
+    //     // Scrolling up - show header
+    //     header.classList.remove("hidden");
+    //   }
       
-      lastScrollY = currentScrollY;
-      ticking = false;
-    }
+    //   lastScrollY = currentScrollY;
+    //   ticking = false;
+    // }
 
-    function requestHeaderUpdate() {
-      if (!ticking) {
-        requestAnimationFrame(updateHeader);
-        ticking = true;
-      }
-    }
+    // function requestHeaderUpdate() {
+    //   if (!ticking) {
+    //     requestAnimationFrame(updateHeader);
+    //     ticking = true;
+    //   }
+    // }
 
     function checkVisibility() {
       let index = 0;
@@ -624,7 +647,7 @@
 
     window.addEventListener("scroll", () => {
       checkVisibility();
-      requestHeaderUpdate();
+      // requestHeaderUpdate();
     });
     window.addEventListener("load", checkVisibility);
   </script>
@@ -633,6 +656,14 @@
   <footer class="footer">
     <div class="footer-content">
       <div class="footer-references">
+        <h4>Special Thanks & Acknowledgements</h4>
+        <div class="references-grid">
+          <div class="reference-item">
+            <strong>
+            <a href="https://fisheryscience.ntu.edu.tw/cp_n_100828.html" target="_blank" rel="noopener noreferrer">Professor C.-Y. Ko</a>
+            </strong>
+          </div>
+        </div>
         <h4>Image & Video References</h4>
         <div class="references-grid">
           <div class="reference-item">
