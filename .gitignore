@@ -1,0 +1,5 @@
+./sdm/train_data/chl
+./sdm/train_data/par
+./sdm/train_data/poc
+./sdm/train_data/sst
+./sdm/train_data/maxent_model.joblib
