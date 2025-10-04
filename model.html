@@ -16,9 +16,10 @@
         
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            overflow: hidden;
+            background: #f5f5f5;
+            color: #333;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
         
         .header {
@@ -26,6 +27,9 @@
             color: white;
             padding: 1rem 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .header.hidden {
@@ -82,20 +86,162 @@
             background: #3498db;
         }
         
+        .hero-section {
+            height: calc(100vh - 80px);
+            display: flex;
+            position: relative;
+            background: #f5f5f5;
+        }
+        
+        .hero-viewer {
+            width: 60%;
+            position: relative;
+        }
+        
+        .hero-message {
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 3rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .hero-message h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        .hero-message p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+        
+        .scroll-button {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .scroll-button:hover {
+            background: #2980b9;
+            transform: translateX(-50%) translateY(-5px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .detail-section {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 4rem 2rem;
+            color: white;
+        }
+        
+        .detail-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .detail-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .detail-header h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .detail-header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+        
+        .detail-viewer-container {
+            display: flex;
+            gap: 3rem;
+            margin-bottom: 3rem;
+            align-items: flex-start;
+        }
+        
+        .detail-viewer {
+            flex: 1;
+            position: relative;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .detail-info {
+            flex: 1;
+        }
+        
+        .detail-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #64b5f6;
+        }
+        
+        .detail-info p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .detail-info ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .detail-info li {
+            padding: 0.8rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+        
+        .detail-info li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #64b5f6;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
         .controls {
             position: absolute;
             bottom: 20px;
             left: 20px;
             z-index: 100;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
             padding: 15px;
             border-radius: 10px;
             backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
         .controls h3 {
             margin-bottom: 10px;
             font-size: 1rem;
+            color: #2c3e50;
         }
         
         .control-group {
@@ -134,6 +280,7 @@
             transform: translate(-50%, -50%);
             text-align: center;
             z-index: 200;
+            color: #333;
         }
         
         .loading.hidden {
@@ -141,7 +288,7 @@
         }
         
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
+            border: 4px solid rgba(52, 152, 219, 0.3);
             border-radius: 50%;
             border-top: 4px solid #3498db;
             width: 40px;
@@ -155,13 +302,23 @@
             100% { transform: rotate(360deg); }
         }
         
-        #viewer {
-            width: 100vw;
-            height: 100vh;
+        #heroViewer {
+            width: 100%;
+            height: 100%;
             cursor: grab;
         }
         
-        #viewer:active {
+        #heroViewer:active {
+            cursor: grabbing;
+        }
+        
+        #detailViewer {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        
+        #detailViewer:active {
             cursor: grabbing;
         }
         
@@ -194,221 +351,378 @@
         </div>
     </div>
     
-    <!-- <div class="header-old">
-        <h1>🔧 AC Light Model</h1>
-        <p>Interactive 3D STL Viewer</p>
-    </div> -->
-    
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <p>Loading 3D model...</p>
-    </div>
-    
-    <div class="controls">
-        <h3>Controls</h3>
-        <div class="control-group">
-            <label>Zoom:</label>
-            <input type="range" id="zoomSlider" min="0.5" max="5" step="0.1" value="1">
+    <!-- Hero Section with Tag Model -->
+    <section class="hero-section">
+        <div class="hero-viewer">
+            <div class="loading" id="heroLoading">
+                <div class="spinner"></div>
+                <p>Loading 3D model...</p>
+            </div>
+            
+            <div class="controls" id="heroControls">
+                <h3>Controls</h3>
+                <div class="control-group">
+                    <label>Zoom:</label>
+                    <input type="range" id="heroZoomSlider" min="0.5" max="5" step="0.1" value="1">
+                </div>
+                <div class="control-group">
+                    <label>Rotation Speed:</label>
+                    <input type="range" id="heroSpeedSlider" min="0" max="0.05" step="0.005" value="0.01">
+                </div>
+                <div class="control-group">
+                    <button id="heroResetBtn">Reset View</button>
+                    <button id="heroToggleRotation" style="background: #c0392b;">Stop Rotate</button>
+                </div>
+            </div>
+            
+            <div id="heroViewer"></div>
         </div>
-        <div class="control-group">
-            <label>Rotation Speed:</label>
-            <input type="range" id="speedSlider" min="0" max="0.05" step="0.005" value="0.01">
+        
+        <div class="hero-message">
+            <h2>Bio-Tag Design</h2>
+            <p>Wondering how we know the location of each shark in 2D maps? Want to know more about how we can track sharks even if they're 1000 miles away?</p>
+            <p style="font-size: 1.4rem; font-weight: 600; color: #ffd700;">See our Bio-tag design!</p>
         </div>
-        <div class="control-group">
-            <button id="resetBtn">Reset View</button>
-            <button id="toggleRotation">Auto Rotate</button>
-            <button id="wireframeBtn">Wireframe</button>
-        </div>
-    </div>
+        
+        <button class="scroll-button" id="scrollButton">See more about the tag ↓</button>
+    </section>
     
-    <div id="viewer"></div>
+    <!-- Detail Section with Shark Remora Model -->
+    <section class="detail-section" id="detailSection">
+        <div class="detail-content">
+            <div class="detail-header">
+                <h2>How Our Bio-Tag Works</h2>
+                <p>Advanced tracking technology inspired by nature</p>
+            </div>
+            
+            <div class="detail-viewer-container">
+                <div class="detail-viewer">
+                    <div class="loading" id="detailLoading">
+                        <div class="spinner"></div>
+                        <p>Loading 3D model...</p>
+                    </div>
+                    
+                    <div class="controls" id="detailControls">
+                        <h3>Controls</h3>
+                        <div class="control-group">
+                            <label>Zoom:</label>
+                            <input type="range" id="detailZoomSlider" min="0.5" max="5" step="0.1" value="1">
+                        </div>
+                        <div class="control-group">
+                            <label>Rotation Speed:</label>
+                            <input type="range" id="detailSpeedSlider" min="0" max="0.05" step="0.005" value="0.01">
+                        </div>
+                        <div class="control-group">
+                            <button id="detailResetBtn">Reset View</button>
+                            <button id="detailToggleRotation" style="background: #c0392b;">Stop Rotate</button>
+                        </div>
+                    </div>
+                    
+                    <div id="detailViewer"></div>
+                </div>
+                
+                <div class="detail-info">
+                    <h3>Remora-Inspired Design</h3>
+                    <p>Our bio-tag uses a biomimetic design inspired by the remora fish, which naturally attaches to sharks. This allows the tag to stay securely attached without interfering with the shark's natural swimming behavior.</p>
+                    
+                    <h3>Key Features</h3>
+                    <ul>
+                        <li>GPS and satellite communication for real-time tracking</li>
+                        <li>Depth and temperature sensors for environmental data</li>
+                        <li>Long-lasting battery life (up to 2 years)</li>
+                        <li>Hydrodynamic shape for minimal drag</li>
+                        <li>Biodegradable release mechanism</li>
+                        <li>Solar panel for extended operations</li>
+                    </ul>
+                    
+                    <h3>Technical Specifications</h3>
+                    <p>Designed to withstand extreme ocean conditions including depths up to 1000 meters and temperatures from -2°C to 30°C. The tag transmits location data via satellite when the shark surfaces, allowing us to track migration patterns across thousands of miles.</p>
+                    
+                    <h3>Research Impact</h3>
+                    <p>These tracking devices help us understand blue shark migration patterns, feeding behaviors, and habitat preferences, contributing to better conservation strategies and marine ecosystem management.</p>
+                </div>
+            </div>
+        </div>
+    </section>
     
     <!-- Three.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     
     <script>
-        // Global variables
-        let scene, camera, renderer, controls;
-        let model;
-        let autoRotate = true;
-        let rotationSpeed = 0.01;
-        let wireframeMode = false;
+        // Scroll button functionality
+        document.getElementById('scrollButton').addEventListener('click', function() {
+            document.getElementById('detailSection').scrollIntoView({ behavior: 'smooth' });
+        });
         
-        // Initialize the 3D viewer
-        function init() {
-            // Create scene
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x222222);
+        // Hero viewer (tag.glb)
+        let heroScene, heroCamera, heroRenderer, heroControls, heroModel;
+        let heroAutoRotate = true;
+        let heroRotationSpeed = 0.01;
+
+        // Detail viewer (shark.glb)
+        let detailScene, detailCamera, detailRenderer, detailControls, detailModel;
+        let detailAutoRotate = true;
+        let detailRotationSpeed = 0.01;
+        
+        // Initialize hero viewer
+        function initHeroViewer() {
+            const container = document.getElementById('heroViewer');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
             
-            // Create camera
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 0, 100);
+            heroScene = new THREE.Scene();
+            heroScene.background = new THREE.Color(0xf5f5f5);
             
-            // Create renderer
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            heroCamera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            heroCamera.position.set(0, 0, 100);
             
-            // Add renderer to DOM
-            document.getElementById('viewer').appendChild(renderer.domElement);
+            heroRenderer = new THREE.WebGLRenderer({ antialias: true });
+            heroRenderer.setSize(width, height);
+            heroRenderer.shadowMap.enabled = true;
+            heroRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(heroRenderer.domElement);
             
-            // Add orbit controls
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.25;
-            controls.screenSpacePanning = false;
-            controls.maxPolarAngle = Math.PI;
+            heroControls = new THREE.OrbitControls(heroCamera, heroRenderer.domElement);
+            heroControls.enableDamping = true;
+            heroControls.dampingFactor = 0.25;
+            heroControls.screenSpacePanning = false;
+            heroControls.maxPolarAngle = Math.PI;
             
-            // Add lights
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-            scene.add(ambientLight);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+            heroScene.add(ambientLight);
             
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
             directionalLight.position.set(50, 50, 50);
             directionalLight.castShadow = true;
-            directionalLight.shadow.mapSize.width = 2048;
-            directionalLight.shadow.mapSize.height = 2048;
-            scene.add(directionalLight);
+            heroScene.add(directionalLight);
             
-            const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+            const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
             directionalLight2.position.set(-50, -50, -50);
-            scene.add(directionalLight2);
+            heroScene.add(directionalLight2);
             
-            // Load OBJ model
-            loadOBJ();
+            const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.5);
+            fillLight1.position.set(-50, 50, 50);
+            heroScene.add(fillLight1);
             
-            // Set up controls
-            setupControls();
+            const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+            fillLight2.position.set(50, -50, 50);
+            heroScene.add(fillLight2);
             
-            // Handle window resize
-            window.addEventListener('resize', onWindowResize, false);
+            loadHeroModel();
+            setupHeroControls();
+            animateHero();
         }
         
-        function loadOBJ() {
-            const loader = new THREE.OBJLoader();
+        function loadHeroModel() {
+            const loader = new THREE.GLTFLoader();
             
-            loader.load('models/shark remora r1.obj', function(object) {
-                // Hide loading indicator
-                document.getElementById('loading').classList.add('hidden');
+            loader.load('models/tag.glb', function(gltf) {
+                document.getElementById('heroLoading').classList.add('hidden');
                 
-                // Apply material to all meshes in the object
+                const object = gltf.scene;
                 object.traverse(function(child) {
                     if (child instanceof THREE.Mesh) {
-                        child.material = new THREE.MeshPhongMaterial({ 
-                            color: 0x6c7b7f, // Shark gray color
-                            shininess: 100,
-                            specular: 0x333333
-                        });
                         child.castShadow = true;
                         child.receiveShadow = true;
                     }
                 });
                 
-                model = object;
+                heroModel = object;
                 
-                // Center the model
                 const box = new THREE.Box3().setFromObject(object);
                 const center = box.getCenter(new THREE.Vector3());
                 object.position.sub(center);
                 
-                // Scale model to fit screen
                 const size = box.getSize(new THREE.Vector3());
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const scale = 50 / maxDim;
                 object.scale.setScalar(scale);
                 
-                scene.add(object);
-                
-                // Start animation
-                animate();
-                
-            }, function(progress) {
-                // Loading progress
-                console.log('Loading progress: ', (progress.loaded / progress.total * 100) + '%');
-                
-            }, function(error) {
-                // Error handling
-                console.error('Error loading OBJ file:', error);
-                document.getElementById('loading').innerHTML = `
-                    <div class="error">
-                        <h3>❌ Failed to load model</h3>
-                        <p>Could not load white shark model-20250929.obj</p>
-                        <p>Please check if the file exists in the models folder.</p>
-                    </div>
-                `;
+                heroScene.add(object);
+            }, undefined, function(error) {
+                console.error('Error loading tag.glb:', error);
             });
         }
         
-        function setupControls() {
-            // Zoom slider
-            document.getElementById('zoomSlider').addEventListener('input', function(e) {
-                const zoom = parseFloat(e.target.value);
-                camera.zoom = zoom;
-                camera.updateProjectionMatrix();
+        function setupHeroControls() {
+            document.getElementById('heroZoomSlider').addEventListener('input', function(e) {
+                heroCamera.zoom = parseFloat(e.target.value);
+                heroCamera.updateProjectionMatrix();
             });
             
-            // Speed slider
-            document.getElementById('speedSlider').addEventListener('input', function(e) {
-                rotationSpeed = parseFloat(e.target.value);
+            document.getElementById('heroSpeedSlider').addEventListener('input', function(e) {
+                heroRotationSpeed = parseFloat(e.target.value);
             });
             
-            // Reset button
-            document.getElementById('resetBtn').addEventListener('click', function() {
-                camera.position.set(0, 0, 100);
-                camera.zoom = 1;
-                camera.updateProjectionMatrix();
-                controls.reset();
-                
-                if (model) {
-                    model.rotation.set(0, 0, 0);
-                }
+            document.getElementById('heroResetBtn').addEventListener('click', function() {
+                heroCamera.position.set(0, 0, 100);
+                heroCamera.zoom = 1;
+                heroCamera.updateProjectionMatrix();
+                heroControls.reset();
+                if (heroModel) heroModel.rotation.set(0, 0, 0);
             });
             
-            // Auto rotate toggle
-            document.getElementById('toggleRotation').addEventListener('click', function() {
-                autoRotate = !autoRotate;
-                this.textContent = autoRotate ? 'Stop Rotate' : 'Auto Rotate';
-                this.style.background = autoRotate ? '#e74c3c' : '#3498db';
-            });
-            
-            // Wireframe toggle
-            document.getElementById('wireframeBtn').addEventListener('click', function() {
-                if (model) {
-                    wireframeMode = !wireframeMode;
-                    model.material.wireframe = wireframeMode;
-                    this.textContent = wireframeMode ? 'Solid' : 'Wireframe';
-                    this.style.background = wireframeMode ? '#e67e22' : '#3498db';
-                }
+            document.getElementById('heroToggleRotation').addEventListener('click', function() {
+                heroAutoRotate = !heroAutoRotate;
+                this.textContent = heroAutoRotate ? 'Stop Rotate' : 'Auto Rotate';
+                this.style.background = heroAutoRotate ? '#c0392b' : '#3498db';
             });
         }
         
-        function animate() {
-            requestAnimationFrame(animate);
+        function animateHero() {
+            requestAnimationFrame(animateHero);
             
-            // Auto rotation
-            if (autoRotate && model) {
-                model.rotation.y += rotationSpeed;
-                model.rotation.x += rotationSpeed * 0.5;
+            if (heroAutoRotate && heroModel) {
+                heroModel.rotation.y += heroRotationSpeed;
+                heroModel.rotation.x += heroRotationSpeed * 0.5;
             }
             
-            // Update controls
-            controls.update();
-            
-            // Render scene
-            renderer.render(scene, camera);
+            heroControls.update();
+            heroRenderer.render(heroScene, heroCamera);
         }
         
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        // Initialize detail viewer
+        function initDetailViewer() {
+            const container = document.getElementById('detailViewer');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            
+            detailScene = new THREE.Scene();
+            detailScene.background = new THREE.Color(0x1a2332);
+            
+            detailCamera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            detailCamera.position.set(0, 0, 100);
+            
+            detailRenderer = new THREE.WebGLRenderer({ antialias: true });
+            detailRenderer.setSize(width, height);
+            detailRenderer.shadowMap.enabled = true;
+            detailRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(detailRenderer.domElement);
+            
+            detailControls = new THREE.OrbitControls(detailCamera, detailRenderer.domElement);
+            detailControls.enableDamping = true;
+            detailControls.dampingFactor = 0.25;
+            detailControls.screenSpacePanning = false;
+            detailControls.maxPolarAngle = Math.PI;
+            
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+            detailScene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            directionalLight.position.set(50, 50, 50);
+            directionalLight.castShadow = true;
+            detailScene.add(directionalLight);
+            
+            const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight2.position.set(-50, -50, -50);
+            detailScene.add(directionalLight2);
+            
+            const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.5);
+            fillLight1.position.set(-50, 50, 50);
+            detailScene.add(fillLight1);
+            
+            const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+            fillLight2.position.set(50, -50, 50);
+            detailScene.add(fillLight2);
+            
+            loadDetailModel();
+            setupDetailControls();
+            animateDetail();
         }
+        
+        function loadDetailModel() {
+            const loader = new THREE.GLTFLoader();
+            
+            loader.load('models/shark.glb', function(gltf) {
+                document.getElementById('detailLoading').classList.add('hidden');
+                
+                const object = gltf.scene;
+                object.traverse(function(child) {
+                    if (child instanceof THREE.Mesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                
+                detailModel = object;
+                
+                const box = new THREE.Box3().setFromObject(object);
+                const center = box.getCenter(new THREE.Vector3());
+                object.position.sub(center);
+                
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 50 / maxDim;
+                object.scale.setScalar(scale);
+                
+                detailScene.add(object);
+            }, undefined, function(error) {
+                console.error('Error loading shark.glb:', error);
+            });
+        }
+        
+        function setupDetailControls() {
+            document.getElementById('detailZoomSlider').addEventListener('input', function(e) {
+                detailCamera.zoom = parseFloat(e.target.value);
+                detailCamera.updateProjectionMatrix();
+            });
+            
+            document.getElementById('detailSpeedSlider').addEventListener('input', function(e) {
+                detailRotationSpeed = parseFloat(e.target.value);
+            });
+            
+            document.getElementById('detailResetBtn').addEventListener('click', function() {
+                detailCamera.position.set(0, 0, 100);
+                detailCamera.zoom = 1;
+                detailCamera.updateProjectionMatrix();
+                detailControls.reset();
+                if (detailModel) detailModel.rotation.set(0, 0, 0);
+            });
+            
+            document.getElementById('detailToggleRotation').addEventListener('click', function() {
+                detailAutoRotate = !detailAutoRotate;
+                this.textContent = detailAutoRotate ? 'Stop Rotate' : 'Auto Rotate';
+                this.style.background = detailAutoRotate ? '#c0392b' : '#3498db';
+            });
+        }
+        
+        function animateDetail() {
+            requestAnimationFrame(animateDetail);
+            
+            if (detailAutoRotate && detailModel) {
+                detailModel.rotation.y += detailRotationSpeed;
+                detailModel.rotation.x += detailRotationSpeed * 0.5;
+            }
+            
+            detailControls.update();
+            detailRenderer.render(detailScene, detailCamera);
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const heroContainer = document.getElementById('heroViewer');
+            const heroWidth = heroContainer.clientWidth;
+            const heroHeight = heroContainer.clientHeight;
+            heroCamera.aspect = heroWidth / heroHeight;
+            heroCamera.updateProjectionMatrix();
+            heroRenderer.setSize(heroWidth, heroHeight);
+            
+            const detailContainer = document.getElementById('detailViewer');
+            const detailWidth = detailContainer.clientWidth;
+            const detailHeight = detailContainer.clientHeight;
+            detailCamera.aspect = detailWidth / detailHeight;
+            detailCamera.updateProjectionMatrix();
+            detailRenderer.setSize(detailWidth, detailHeight);
+        });
         
         // Initialize when page loads
-        window.addEventListener('load', init);
+        window.addEventListener('load', function() {
+            initHeroViewer();
+            initDetailViewer();
+        });
     </script>
 </body>
 </html>
