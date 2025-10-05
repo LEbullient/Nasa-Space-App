@@ -409,11 +409,12 @@
 	#bg3 { background-image: url("images/melting_icecap.webp"); }
 	/* [image: earth and satellite - uses video element instead] */
 	/* [image: people monitoring sharks swimming in the ocean] */
-    #bg5 { background-image: url("images/shark.jpg"); }
+    #bg4 { background-image: url("images/shark.jpg"); }
 	/* [image: biotags on shark] */
-    #bg6 { background-image: url("images/shark_human.jpg"); }
+    #bg6 { background-image: url("images/heatmap.png"); }
     /* [image: beautiful ocean] */
 	#bg7 { background-image: url("images/land_sea.jpg"); }
+	#bg8 { background-image: url("images/wave.jpg"); }
   </style>
 </head>
 <body>
@@ -436,13 +437,14 @@
   <div id="bg1" class="bg active"></div>
   <div id="bg2" class="bg"></div>
   <div id="bg3" class="bg"></div>
-  <div id="bg3" class="bg"></div>
-  <div id="bg4" class="bg video-bg">
+  <div id="bg8" class="bg"></div>
+  <div id="bg4" class="bg">
+  </div>
+  <div id="bg5" class="bg video-bg">
     <video autoplay muted loop>
       <source src="videos/satellite.mp4" type="video/mp4">
     </video>
   </div>
-  <div id="bg5" class="bg"></div>
   <div id="bg6" class="bg"></div>
   <div id="bg7" class="bg"></div>
 
@@ -480,12 +482,12 @@
   </section>
 
   <!-- Contact Us Section -->
-  <div id="contact" class="contact-section">
+  <!-- <div id="contact" class="contact-section">
     <div class="contact-container">
       <h2>Contact Us</h2>
       
       <div class="team-grid">
-        <!-- Anthony Ching -->
+
         <div class="team-member">
           <img src="images/anthony.jpg" alt="Anthony Ching" class="member-photo">
           <h3>Anthony Ching</h3>
@@ -508,7 +510,7 @@
           </div>
         </div>
 
-        <!-- Placeholder Team Members -->
+
         <div class="team-member">
           <img src="images/hsinmu.jpg" alt="Team Member 2" class="member-photo">
           <h3>Lilian Lee</h3>
@@ -597,7 +599,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <script>
     const bgs = document.querySelectorAll(".bg");
@@ -665,8 +667,9 @@
         <h4>Special Thanks & Acknowledgements</h4>
         <div class="references-grid">
           <div class="reference-item">
+            <strong>Professor</strong> 
             <strong>
-            <a href="https://fisheryscience.ntu.edu.tw/cp_n_100828.html" target="_blank" rel="noopener noreferrer">Professor C.-Y. Ko</a>
+            <a href="https://fisheryscience.ntu.edu.tw/cp_n_100828.html" target="_blank" rel="noopener noreferrer">C.-Y. Ko</a>
             </strong>
           </div>
         </div>
@@ -692,9 +695,13 @@
             <strong>shark.jpg:</strong> 
             <a href="https://unsplash.com/photos/a-large-shark-swimming-in-the-ocean-pWSjdGBWyAo" target="_blank" rel="noopener noreferrer">Photo by Gerald Schömbs on Unsplash</a>
           </div>
-          <div class="reference-item">
+          <!-- <div class="reference-item">
             <strong>shark_human.jpg:</strong> 
             <a href="https://www.pexels.com/photo/woman-scuba-diving-with-fish-18659802/" target="_blank" rel="noopener noreferrer">Photo by Daniel Torobekov on Pexels</a>
+          </div> -->
+          <div class="reference-item">
+            <strong>wave.jpg:</strong> 
+            <a href="https://unsplash.com/photos/a-man-riding-a-wave-on-top-of-a-surfboard-FH1q0lbQCh4" target="_blank" rel="noopener noreferrer">Photo by Axel Antas-Bergkvist on Unsplash</a>
           </div>
           <div class="reference-item">
             <strong>land_sea.jpg:</strong> 
