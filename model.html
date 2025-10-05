@@ -265,6 +265,43 @@
             gap: 2rem;
         }
         
+        .scroll-to-next {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid rgba(52, 152, 219, 0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+        
+        .scroll-to-next:hover {
+            background: rgba(52, 152, 219, 0.9);
+            border-color: #3498db;
+            transform: translateX(-50%) translateY(3px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        }
+        
+        .scroll-to-next svg {
+            width: 28px;
+            height: 28px;
+            fill: #000000;
+            transition: fill 0.3s ease;
+        }
+        
+        .scroll-to-next:hover svg {
+            fill: white;
+        }
+        
         .tag-hero-image {
             width: 60%;
             max-width: 700px;
@@ -458,9 +495,9 @@
             </div>
             <nav class="nav-tabs">
                 <a href="mission.html" class="nav-tab">Our Mission</a>
-                <a href="index.html" class="nav-tab">2D Map</a>
+                <a href="index.html" class="nav-tab">Explore</a>
                 <a href="predict.html" class="nav-tab">Prediction</a>
-				<a href="globe.html" class="nav-tab">3D Map</a>
+				<a href="globe.html" class="nav-tab">3D Tracking</a>
                 <a href="model.html" class="nav-tab active">Bio-tag</a>
             </nav>
         </div>
@@ -507,51 +544,63 @@
     <section class="detail-section" id="detailSection">
         <div class="detail-content">
             <!-- Tag Image Hero Section -->
-            <div class="tag-hero-section">
+            <div class="tag-hero-section" id="tagSection">
                 <div class="tag-image-container">
                     <img src="./images/tag.jpg" alt="Self-Powered Edge AI Shark Tag Pro" class="tag-hero-image">
                     <div class="tag-title-overlay">
                         <h2>Self-Powered <i>x</i> Edge AI Shark Tag Pro</h2>
                         <p>Advanced tracking technology inspired by nature</p>
                     </div>
+                    <button class="scroll-to-next" onclick="scrollToSection('fiberSection')" aria-label="Scroll to next section">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/></svg>
+                    </button>
                 </div>
             </div>
             
             <!-- Fiber Image Section -->
-            <div class="component-hero-section">
+            <div class="component-hero-section" id="fiberSection">
                 <div class="tag-image-container">
                     <img src="./images/fiber.jpg" alt="Motion to Energy" class="tag-hero-image">
                     <div class="tag-title-overlay">
                         <h2>Motion to Energy</h2>
                         <p>Turning a shark's swim into power.</p>
                     </div>
+                    <button class="scroll-to-next" onclick="scrollToSection('preySection')" aria-label="Scroll to next section">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/></svg>
+                    </button>
                 </div>
             </div>
             
             <!-- Prey Sensor Image Section -->
-            <div class="component-hero-section">
+            <div class="component-hero-section" id="preySection">
                 <div class="tag-image-container">
                     <img src="./images/prey.jpg" alt="Prey Sensor" class="tag-hero-image">
                     <div class="tag-title-overlay">
                         <h2>Prey Sensor</h2>
                         <p>Revealing the Hunt</p>
                     </div>
+                    <button class="scroll-to-next" onclick="scrollToSection('suctionSection')" aria-label="Scroll to next section">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/></svg>
+                    </button>
                 </div>
             </div>
             
             <!-- Suction Disc Image Section -->
-            <div class="component-hero-section">
+            <div class="component-hero-section" id="suctionSection">
                 <div class="tag-image-container">
                     <img src="./images/suction.jpg" alt="Suction Disc" class="tag-hero-image">
                     <div class="tag-title-overlay">
                         <h2>Suction Disc</h2>
                         <p>A Gentle Hold to the Shark -- Non-invasive Mount</p>
                     </div>
+                    <button class="scroll-to-next" onclick="scrollToSection('modelSection')" aria-label="Scroll to next section">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/></svg>
+                    </button>
                 </div>
             </div>
 
                         
-            <div class="detail-viewer-container">
+            <div class="detail-viewer-container" id="modelSection">
                 <div class="detail-viewer">
                     <div class="loading" id="detailLoading">
                         <div class="spinner"></div>
@@ -630,6 +679,14 @@
         document.getElementById('scrollButton').addEventListener('click', function() {
             document.getElementById('detailSection').scrollIntoView({ behavior: 'smooth' });
         });
+        
+        // Scroll to next section functionality
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
         
         // Hero viewer (tag.glb)
         let heroScene, heroCamera, heroRenderer, heroControls, heroModel;
