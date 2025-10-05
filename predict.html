@@ -1293,7 +1293,15 @@
             <div class="modal-content">
                 <button class="modal-close" id="modal-close">&times;</button>
                 <h3>Oceanographic drivers of shark foraging</h3>
-                <p>Using feature-importance methods, we analyzed how environmental variables influence shark foraging patterns. Ranked from most to least influential, the variables are: POC (particulate organic carbon), SST (sea-surface temperature), cos_m and sin_m (sine–cosine month encoding for seasonality), and Chl (chlorophyll-a concentration).</p>
+                <p><strong>What makes sharks hunt where they do?</strong> We use machine learning to identify which ocean conditions best predict shark feeding behavior.</p>
+                <br>
+                <p><strong>📊 The Rankings (most important first):</strong></p>
+                <p>1. <strong>POC</strong> (Particulate Organic Carbon) - #1 predictor! Shows where food is abundant<br>
+                2. <strong>SST</strong> (Sea Surface Temperature) - Affects prey distribution and shark metabolism<br>
+                3. <strong>Seasonality</strong> (cos_m & sin_m) - Time of year matters for migration patterns<br>
+                4. <strong>Chl</strong> (Chlorophyll) - Indicates plankton blooms that start the food chain</p>
+                <br>
+                <p><strong>🎯 Why this matters:</strong> By understanding these "drivers," we can predict where sharks will feed even in areas we've never tracked them before!</p>
             </div>
         </div>
 
@@ -1301,8 +1309,18 @@
         <div class="modal-overlay" id="mpa-info-modal">
             <div class="modal-content">
                 <button class="modal-close" id="mpa-modal-close">&times;</button>
-                <h3>Marine Protected Areas</h3>
-                <p>MPA description here!</p>
+                <h3>Marine Protected Areas (MPAs)</h3>
+                <p><strong>Ocean "national parks"!</strong> MPAs are designated zones where human activities like fishing and development are restricted or prohibited to protect marine life and ecosystems.</p>
+                <br>
+                <p><strong>🌍 Global Goal:</strong> Countries worldwide aim to protect 30% of the ocean by 2030 (called the "30×30" target). We're using shark tracking data to help design these protected areas more effectively!</p>
+                <br>
+                <p><strong>🦈 The Problem:</strong> Many shark feeding hotspots we predicted fall OUTSIDE existing MPAs. This means we need to update protection boundaries to follow where sharks actually go, not just where we think they should be.</p>
+                <br>
+                <p><strong>💡 Smart Protection:</strong> Our data helps governments create MPAs that move with the sharks and protect the areas they truly need for survival.</p>
+                <br>
+                <p><strong>🔍 Learn More:</strong> Click on a random MPA on our map to see more details about it!</p>
+                <br>
+                <p>Note: Having the MPA layer might slow down the map's performance, especially on older devices.</p>
             </div>
         </div>
 
@@ -1595,7 +1613,7 @@
             console.log('Loading MPA data from shapefiles...');
             
             // Show loading notification with spinner that won't auto-dismiss
-            const loadingNotification = showNotification('Loading Marine Protected Areas...', null, true);
+            const loadingNotification = showNotification('Please Wait. Loading Marine Protected Areas...', null, true);
             
             if (mpaLayer) {
                 map.removeLayer(mpaLayer);
@@ -1616,7 +1634,7 @@
                         // Find the text node (it's the last child after the spinner)
                         const textNode = loadingNotification.childNodes[loadingNotification.childNodes.length - 1];
                         if (textNode) {
-                            textNode.textContent = `Loading Marine Protected Areas... (${i + 1}/${shapefiles.length})`;
+                            textNode.textContent = `Please Wait. Loading Marine Protected Areas... (${i + 1}/${shapefiles.length})`;
                         }
                     }
                     
