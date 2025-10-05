@@ -6,6 +6,10 @@
     <title>Blue Shark Tracking - Bio-tag design</title>
 	<!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦈</text></svg>">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
 
     <style>
         * {
@@ -15,7 +19,8 @@
         }
         
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
+            font-weight: 700;
             background: #f5f5f5;
             color: #333;
             overflow-x: hidden;
@@ -191,18 +196,37 @@
         
         .detail-info {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        
+        .detail-info.slide-in {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         .detail-info h3 {
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
             color: #2c3e50;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
         }
         
         .detail-info p {
             font-size: 1.1rem;
             line-height: 1.8;
             margin-bottom: 1.5rem;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            text-align: center;
+            max-width: 600px;
         }
         
         .detail-info ul {
@@ -238,22 +262,22 @@
         
         .tag-hero-section {
             background: white;
-            padding: 4rem 2rem;
+            padding: 3rem 2rem;
             margin: -6rem -2rem 0 -2rem;
             padding-top: 10rem;
-            padding-bottom: 4rem;
+            padding-bottom: 2rem;
         }
         
         .component-hero-section {
             background: white;
-            padding: 4rem 2rem;
+            padding: 2rem 2rem;
             margin: 0 -2rem;
-            padding-top: 4rem;
-            padding-bottom: 4rem;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
         }
         
         .component-hero-section:last-of-type {
-            padding-bottom: 3rem;
+            padding-bottom: 2rem;
         }
         
         .tag-image-container {
@@ -263,6 +287,23 @@
             display: flex;
             align-items: flex-start;
             gap: 2rem;
+            flex-direction: row;
+        }
+        
+        /* Reverse layout for alternating sections */
+        .tag-image-container.reverse {
+            flex-direction: row-reverse !important;
+        }
+        
+        /* Debug: Add background colors to verify layout */
+        .tag-image-container {
+            background: rgba(52, 152, 219, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        
+        .tag-image-container.reverse {
+            background: rgba(231, 76, 60, 0.05);
         }
         
         .tag-hero-image {
@@ -273,6 +314,7 @@
             object-fit: contain;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
+            flex-shrink: 0;
         }
         
         .tag-hero-image:hover {
@@ -283,21 +325,50 @@
         
         .tag-title-overlay {
             flex: 1;
-            text-align: right;
+            text-align: center;
             padding: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s ease-out;
+        }
+        
+        /* Slide in animation when visible */
+        .tag-title-overlay.slide-in {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* Reverse slide direction for reversed sections */
+        .tag-image-container.reverse .tag-title-overlay {
+            transform: translateX(50px);
+        }
+        
+        .tag-image-container.reverse .tag-title-overlay.slide-in {
+            transform: translateX(0);
         }
         
         .tag-title-overlay h2 {
-            font-size: 1.4rem;
+            font-size: 1.8rem;
             color: #2c3e50;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
             line-height: 1.3;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            text-align: center;
         }
         
         .tag-title-overlay p {
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             color: #555;
-            font-style: italic;
+            font-style: normal;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            text-align: center;
+            max-width: 400px;
         }
         
         .component-section {
@@ -519,10 +590,10 @@
             
             <!-- Fiber Image Section -->
             <div class="component-hero-section">
-                <div class="tag-image-container">
-                    <img src="./images/fiber.jpg" alt="Motion to Energy" class="tag-hero-image">
+                <div class="tag-image-container reverse">
+                    <img src="./images/fiber.jpg" alt="Energy Harvester" class="tag-hero-image">
                     <div class="tag-title-overlay">
-                        <h2>Motion to Energy</h2>
+                        <h2>Energy Harvester</h2>
                         <p>Turning a shark's swim into power.</p>
                     </div>
                 </div>
@@ -541,7 +612,7 @@
             
             <!-- Suction Disc Image Section -->
             <div class="component-hero-section">
-                <div class="tag-image-container">
+                <div class="tag-image-container reverse">
                     <img src="./images/suction.jpg" alt="Suction Disc" class="tag-hero-image">
                     <div class="tag-title-overlay">
                         <h2>Suction Disc</h2>
@@ -572,15 +643,27 @@
                             <button id="detailResetBtn">Reset View</button>
                             <button id="detailToggleRotation" style="background: #c0392b;">Stop Rotate</button>
                         </div>
+                        <div class="control-group">
+                            <button id="focusBioTagBtn" style="background: #27ae60;">Focus on Bio-Tag</button>
+                        </div>
                     </div>
                     
                     <div id="detailViewer"></div>
                 </div>
                 
                 <div class="detail-info">
-                    <h3>Key Features</h3>
-                    <p>Unlike traditional shark tags, which often last no longer than a year, this biomimetic tag draws its energy directly from the motion of the shark — powered by advanced piezoelectric fibers. As long as the shark lives and swims, the tag endures, extending observation far beyond conventional limits.</p>
-                    <p>Traditional satellite tags struggle to return data in real time. But this new generation of shark tag does more. It can sense what these ocean giants are eating, and transmit that knowledge instantly back to researchers. For the first time, we gain not just glimpses, but a living, continuous stream of intelligence — enabling the creation of predictive models of marine behavior.</p>
+                    <h3>About the Remora</h3>
+                    <p>The remora, often called the "hitchhiker" of the ocean, can grow up to 90 centimeters in length. With its remarkable suction disc, specially evolved from a dorsal fin, it clings effortlessly to the mighty bodies of sharks. More than one may accompany a single host, fastening themselves securely as their vessel glides across the vast blue. Together, shark and remora traverse thousands of kilometers across the open ocean — a partnership forged in the deep currents of survival and opportunity.</p>
+                    <p>By borrowing nature’s elegant solution, our tag rides with the shark comfortably and unobtrusively, turning a biological partnership into a durable engineering approach.</p>
+                </div>
+            </div>
+            
+            <!-- Key Features Section (moved below) -->
+            <div class="component-section" style="margin-top: 3rem;">
+                <h3>Key Features</h3>
+                <div style="max-width: 1200px; margin: 0 auto;">
+                    <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">Unlike traditional shark tags, which often last no longer than a year, this biomimetic tag draws its energy directly from the motion of the shark — powered by advanced piezoelectric fibers. As long as the shark lives and swims, the tag endures, extending observation far beyond conventional limits.</p>
+                    <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">Traditional satellite tags struggle to return data in real time. But this new generation of shark tag does more. It can sense what these ocean giants are eating, and transmit that knowledge instantly back to researchers. For the first time, we gain not just glimpses, but a living, continuous stream of intelligence — enabling the creation of predictive models of marine behavior.</p>
                 </div>
             </div>
             
@@ -640,6 +723,8 @@
         let detailScene, detailCamera, detailRenderer, detailControls, detailModel;
         let detailAutoRotate = true;
         let detailRotationSpeed = 0.01;
+        let tagComponent = null; // Store reference to tag component for glowing effect
+        let glowIntensity = 0; // For pulsing glow animation
         
         // Initialize hero viewer
         function initHeroViewer() {
@@ -842,10 +927,27 @@
                 document.getElementById('detailLoading').classList.add('hidden');
                 
                 const object = gltf.scene;
+                
+                // Find the tag component (組合) and add spotlight
+                let foundTagComponent = null;
                 object.traverse(function(child) {
                     if (child instanceof THREE.Mesh) {
                         child.castShadow = true;
                         child.receiveShadow = true;
+                    }
+                    // Look for the tag component by name
+                    if (child.name && child.name.includes('組合')) {
+                        foundTagComponent = child;
+                        tagComponent = child; // Store globally for animation
+                        console.log('Found tag component:', child.name);
+                        
+                        // Make the tag component glow
+                        if (child.material) {
+                            // Clone material to avoid affecting other objects
+                            child.material = child.material.clone();
+                            child.material.emissive = new THREE.Color(0x00ffff); // Cyan glow
+                            child.material.emissiveIntensity = 0.5;
+                        }
                     }
                 });
                 
@@ -866,6 +968,42 @@
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const scale = 50 / maxDim;
                 modelGroup.scale.setScalar(scale);
+                
+                // Add spotlight to highlight the tag component if found
+                if (foundTagComponent) {
+                    const spotlight = new THREE.SpotLight(0x00ffff, 2); // Cyan spotlight to match glow
+                    const tagWorldPos = new THREE.Vector3();
+                    foundTagComponent.getWorldPosition(tagWorldPos);
+                    
+                    // Position spotlight above and slightly to the side of the tag
+                    spotlight.position.set(
+                        tagWorldPos.x + 20,
+                        tagWorldPos.y + 30,
+                        tagWorldPos.z + 20
+                    );
+                    spotlight.target = foundTagComponent;
+                    spotlight.angle = Math.PI / 6;
+                    spotlight.penumbra = 0.3;
+                    spotlight.decay = 2;
+                    spotlight.distance = 100;
+                    spotlight.castShadow = true;
+                    
+                    detailScene.add(spotlight);
+                    detailScene.add(spotlight.target);
+                    
+                    // Add point light at tag position for extra glow
+                    const pointLight = new THREE.PointLight(0x00ffff, 1, 50);
+                    pointLight.position.copy(tagWorldPos);
+                    detailScene.add(pointLight);
+                    
+                    console.log('Spotlight and glow added at tag component');
+                } else {
+                    console.log('Tag component (組合) not found in model');
+                    // Log all object names for debugging
+                    object.traverse(function(child) {
+                        if (child.name) console.log('Object name:', child.name);
+                    });
+                }
                 
                 // Store reference to the group for rotation
                 detailModel = modelGroup;
@@ -899,6 +1037,69 @@
                 this.textContent = detailAutoRotate ? 'Stop Rotate' : 'Auto Rotate';
                 this.style.background = detailAutoRotate ? '#c0392b' : '#3498db';
             });
+            
+            document.getElementById('focusBioTagBtn').addEventListener('click', function() {
+                if (tagComponent) {
+                    // Get the world position of the tag component
+                    const tagWorldPos = new THREE.Vector3();
+                    tagComponent.getWorldPosition(tagWorldPos);
+                    
+                    // Calculate camera position to focus on the tag
+                    const distance = 30; // Distance from the tag
+                    const targetPos = new THREE.Vector3(
+                        tagWorldPos.x,
+                        tagWorldPos.y,
+                        tagWorldPos.z + distance
+                    );
+                    
+                    // Smoothly animate camera to the tag position
+                    animateCameraToPosition(targetPos, tagWorldPos);
+                    
+                    // Stop auto-rotation when focusing
+                    detailAutoRotate = false;
+                    document.getElementById('detailToggleRotation').textContent = 'Auto Rotate';
+                    document.getElementById('detailToggleRotation').style.background = '#3498db';
+                    
+                    // Zoom in
+                    detailCamera.zoom = 2.5;
+                    detailCamera.updateProjectionMatrix();
+                    document.getElementById('detailZoomSlider').value = 2.5;
+                } else {
+                    alert('Bio-tag component not found in the model. Please check the console for available component names.');
+                }
+            });
+        }
+        
+        // Smooth camera animation function
+        function animateCameraToPosition(targetPos, lookAtPos) {
+            const startPos = detailCamera.position.clone();
+            const startLookAt = detailControls.target.clone();
+            let progress = 0;
+            const duration = 1000; // 1 second animation
+            const startTime = Date.now();
+            
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                progress = Math.min(elapsed / duration, 1);
+                
+                // Ease in-out function
+                const eased = progress < 0.5 
+                    ? 2 * progress * progress 
+                    : -1 + (4 - 2 * progress) * progress;
+                
+                // Interpolate camera position
+                detailCamera.position.lerpVectors(startPos, targetPos, eased);
+                
+                // Interpolate look-at target
+                detailControls.target.lerpVectors(startLookAt, lookAtPos, eased);
+                detailControls.update();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            }
+            
+            animate();
         }
         
         function animateDetail() {
@@ -907,6 +1108,13 @@
             if (detailAutoRotate && detailModel) {
                 detailModel.rotation.y += detailRotationSpeed;
                 detailModel.rotation.x += detailRotationSpeed * 0.5;
+            }
+            
+            // Pulsing glow effect for tag component
+            if (tagComponent && tagComponent.material) {
+                glowIntensity += 0.02;
+                const pulse = Math.sin(glowIntensity) * 0.3 + 0.5; // Oscillates between 0.2 and 0.8
+                tagComponent.material.emissiveIntensity = pulse;
             }
             
             detailControls.update();
@@ -934,7 +1142,34 @@
         window.addEventListener('load', function() {
             initHeroViewer();
             initDetailViewer();
+            setupScrollAnimations();
         });
+        
+        // Scroll-triggered slide-in animations
+        function setupScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.2,
+                rootMargin: '0px 0px -100px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('slide-in');
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all text overlays
+            document.querySelectorAll('.tag-title-overlay').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Observe detail-info section
+            document.querySelectorAll('.detail-info').forEach(el => {
+                observer.observe(el);
+            });
+        }
     </script>
 </body>
 </html>
