@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blue Shark Tracking - Interactive Map</title>
+    <title>Blue Shark Tracking - Model Prediction</title>
     
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦈</text></svg>">
@@ -167,6 +167,16 @@
             background-color: #27ae60;
         }
 
+        .control-group button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .control-group button:disabled:hover {
+            background-color: #95a5a6;
+        }
+
         /* Loading indicator styles */
         .button-loading {
             position: relative;
@@ -193,7 +203,175 @@
             100% { transform: rotate(360deg); }
         }
 
+        .shark-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 0.5rem;
+            background-color: #fafafa;
+        }
 
+        .shark-item {
+            padding: 1rem;
+            border: 1px solid #ecf0f1;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: relative;
+        }
+
+        .shark-item:hover {
+            background-color: #ecf0f1;
+        }
+
+        .shark-item.selected {
+            background-color: #e8f4f8;
+            border-color: #3498db;
+        }
+
+        .shark-visibility-toggle {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.4rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+        }
+
+        .shark-visibility-toggle:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: #3498db;
+            transform: scale(1.05);
+        }
+
+        .shark-visibility-toggle svg {
+            width: 20px;
+            height: 20px;
+            transition: fill 0.2s ease;
+        }
+
+        .shark-visibility-toggle:hover svg {
+            fill: #3498db !important;
+        }
+
+        .shark-visibility-toggle.hidden {
+            display: none;
+        }
+
+        .shark-emoji-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Prediction Color Scale Styles */
+        .prediction-scale {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            width: 30px;
+            height: 200px;
+            z-index: 1000;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prediction-scale-gradient {
+            flex: 1;
+            width: 100%;
+            border-radius: 2px 2px 0 0;
+            background: linear-gradient(to top, #00ff00 0%, #ffff00 50%, #ff0000 100%);
+        }
+
+        .prediction-scale-labels {
+            position: absolute;
+            left: 35px;
+            top: 0;
+            height: 100%;
+            width: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 4px 6px;
+            border-radius: 0 2px 2px 0;
+            text-align: left;
+        }
+
+        .prediction-scale-title {
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 3px 6px;
+            border-radius: 2px;
+            white-space: nowrap;
+        }
+
+        /* Map Legend Styles */
+        .map-legend {
+            position: absolute;
+            top: 310px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #333;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+        }
+
+        .legend-item .emoji {
+            font-size: 18px;
+        }
+
+        .shark-id {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .shark-details {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .shark-details div {
+            margin-bottom: 0.2rem;
+        }
 
         #map {
             flex: 1;
@@ -301,47 +479,20 @@
             line-height: 1.2;
         }
 
-        .shark-list {
-            max-height: 400px;
+        .legend-shark-list {
             overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 0.5rem;
-            background-color: #fafafa;
         }
 
-        .shark-item {
-            padding: 0.75rem;
-            border: 1px solid #ecf0f1;
-            border-radius: 4px;
-            margin-bottom: 0.75rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .shark-item:hover {
-            background-color: #ecf0f1;
-        }
-
-        .shark-item.selected {
-            background-color: #e8f4f8;
-            border-color: #3498db;
-        }
-
-        .shark-id {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-
-        .shark-details {
-            font-size: 0.85rem;
-            color: #7f8c8d;
-        }
-
-        .shark-details div {
+        .legend-shark-item {
+            display: flex;
+            align-items: center;
             margin-bottom: 0.2rem;
+            font-size: 0.8rem;
         }
+
+        .legend-shark-item:last-child {
+            margin-bottom: 0;
+        } */
 
         .loading {
             text-align: center;
@@ -382,27 +533,212 @@
             color: #2c3e50;
         }
 
+        /* Bottom time control panel styles */
+        .bottom-time-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 16px 20px;
+            display: block;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
+		/* Removed */
+        /* .time-control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .time-control-title {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        } */
+
+        .time-control-info {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .time-control-main {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .play-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .play-button:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        .play-button.playing {
+            background: #e74c3c;
+        }
+
+        .play-button.playing:hover {
+            background: #c0392b;
+        }
+
+        .bottom-time-slider-container {
+            flex: 1;
+            margin: 0 8px;
+        }
+
+        .bottom-time-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #ecf0f1;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bottom-time-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .bottom-time-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .bottom-time-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .time-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+
+        .time-labels.white-text #bottom-start-time, .time-labels.white-text #bottom-end-time {
+            background-color: #555;
+            border-radius: 2px;
+            color: white;
+            padding: 0 2px;
+        }
+
+        .current-time-label {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            flex-shrink: 0;
+        }
+
+        .speed-button {
+            background: none;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            transition: all 0.2s ease;
+        }
+
+        .speed-button:hover {
+            background: #ecf0f1;
+            border-color: #95a5a6;
+        }
+
+        .speed-button.active {
+            background: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        .follow-button {
+            background: none;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            white-space: nowrap;
+            margin-left: 12px;
+        }
+
+        .follow-button:hover {
+            background: #ecf0f1;
+            border-color: #95a5a6;
+        }
+
+        .follow-button.active {
+            background: #27ae60;
+            border-color: #27ae60;
+            color: white;
+        }
 
         /* Notification styles */
         .notification {
             position: fixed;
-            top: 20px;
+            top: 120px;
             left: 50%;
             transform: translateX(-50%);
             background: #3498db;
             color: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
+            padding: 48px 72px;
+            border-radius: 24px;
+            box-shadow: 0 12px 48px rgba(52, 152, 219, 0.3);
             font-family: Arial, sans-serif;
-            font-size: 14px;
+            font-size: 42px;
             z-index: 10000;
             cursor: pointer;
             animation: slideDown 0.3s ease-out;
-            max-width: 400px;
+            max-width: 1200px;
             text-align: center;
-            border-left: 4px solid #2980b9;
+            border-left: 12px solid #2980b9;
         }
 
         .notification:hover {
@@ -442,7 +778,113 @@
             }
         }
 
+        /* Color Scale Styles */
+        .color-scale {
+            position: absolute;
+            top: 250px;
+            left: 20px;
+            width: 30px;
+            height: 200px;
+            z-index: 1000;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+        }
 
+        .color-scale.visible {
+            display: flex;
+        }
+
+        .color-scale-gradient {
+            flex: 1;
+            width: 100%;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .color-scale-labels {
+            position: absolute;
+            left: 35px;
+            top: 0;
+            height: 100%;
+            width: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 4px;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .color-scale-title {
+            position: absolute;
+            bottom: -25px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 4px;
+            border-radius: 2px;
+            white-space: nowrap;
+        }
+
+        #chl-scale .color-scale-gradient {
+            background: linear-gradient(to top, #000080 0%, #0066cc 25%, #00ccff 50%, #66ff66 75%, #ffff00 100%);
+        }
+
+        #sst-scale .color-scale-gradient {
+            background: linear-gradient(to top, #000066 0%, #0033cc 25%, #ff3300 50%, #ff9900 75%, #ffcc00 100%);
+        }
+
+        #poc-scale .color-scale-gradient {
+            background: linear-gradient(to top, #2c2c54 0%, #40407a 25%, #706fd3 50%, #f7b731 75%, #ff5252 100%);
+        }
+
+        /* Adjust scale position when multiple scales are visible */
+        #sst-scale.with-chl-scale {
+            left: 140px;
+        }
+
+        #poc-scale.with-chl-scale {
+            left: 140px;
+        }
+
+        #poc-scale.with-sst-scale {
+            left: 140px;
+        }
+
+        #poc-scale.with-chl-sst-scale {
+            left: 250px;
+        }
+
+        /* Custom home button control */
+        .leaflet-control-home {
+            background: white;
+            border: 2px solid rgba(0,0,0,0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+            margin-top: 10px;
+        }
+
+        .leaflet-control-home:hover {
+            background: #f4f4f4;
+        }
+
+        .leaflet-control-home svg {
+            width: 30px;
+            height: 30px;
+        }
     </style>
 </head>
 <body>
@@ -450,7 +892,7 @@
         <div class="header-content">
             <div class="header-title">
                 <h1>Blue Shark Tracking Project</h1>
-                <p>Interactive map showing satellite tracking data of blue sharks (Prionace glauca) in the North Atlantic</p>
+                <p>Interactive map showing predictions of blue sharks' (Prionace glauca) foraging hotspots</p>
             </div>
             <nav class="nav-tabs">
                 <a href="mission.html" class="nav-tab">Our Mission</a>
@@ -471,7 +913,7 @@
         </button>
         
         <div class="sidebar" id="sidebar">
-            <div class="stats">
+            <!-- <div class="stats">
                 <h4>Dataset Summary</h4>
                 <div class="stats-grid">
                     <div class="stats-item">
@@ -491,46 +933,76 @@
                         <span class="stats-value">Blue Shark</span>
                     </div>
                 </div>
-            </div>
-
+            </div> -->
             <div class="controls">
                 <h3>Map Controls</h3>
                 <div class="control-group">
-                    <label>Display Mode</label>
-                    <button id="show-all" class="active">Show All</button>
-                    <button id="show-one">Show One</button>
-                </div>
-                <div class="control-group">
-                    <label>Marine Protected Areas</label>
+                    <label>Marine Protected Areas<br>(Might Take a while to load)</label>
                     <button id="toggle-mpa">Load MPAs</button>
                 </div>
-            </div>
-
-            <h3>Tracked Sharks</h3>
-            <div id="shark-list" class="shark-list">
-                <div class="loading">Loading shark data...</div>
             </div>
         </div>
 
         <div id="map">
             <!-- Legend overlay -->
-            <div class="legend" id="legend">
+            <!-- <div class="legend" id="legend">
                 <div class="legend-header">
                     <span class="legend-title">Legend</span>
                     <span class="legend-toggle">▼</span>
                 </div>
                 <div class="legend-content" id="legend-content">
-                    <!-- Dynamic content will be populated by JavaScript -->
+                    Dynamic content will be populated by JavaScript
+                </div>
+            </div> -->
+
+            <!-- Map Legend -->
+            <div class="map-legend">
+                <div class="legend-item">
+                    <span class="emoji">🦈</span>
+                    <span>Recorded occurrences within a month</span>
                 </div>
             </div>
 
+            <!-- Prediction Probability Scale -->
+            <div class="prediction-scale">
+                <div class="prediction-scale-gradient"></div>
+                <div class="prediction-scale-labels">
+                    <span>High</span>
+                    <span>Medium</span>
+                    <span>Low</span>
+                </div>
+                <div class="prediction-scale-title">Foraging Habitat Probability</div>
+            </div>
+
+            
+            <!-- Bottom time controls overlay -->
+            <div class="bottom-time-controls" id="bottom-time-controls">
+                <!-- <div class="time-control-header">
+                    <div class="time-control-title" id="bottom-control-title">Time Control</div>
+                    <div class="time-control-info" id="bottom-control-info">Select a shark in "Show One" mode</div>
+                </div> -->
+                <div class="time-control-main">
+                    <button class="play-button" id="play-button" title="Play/Pause">
+                        ▶
+                    </button>
+                    <div class="bottom-time-slider-container">
+                        <input type="range" class="bottom-time-slider" id="bottom-time-slider" min="0" max="42" value="0">
+                        <div class="time-labels">
+                            <span id="bottom-start-time">2013-07</span>
+                            <span class="current-time-label" id="bottom-current-time">2013-07</span>
+                            <span id="bottom-end-time">2017-01</span>
+                        </div>
+                    </div>
+                    <div class="speed-control">
+                        <span>Speed:</span>
+                        <button class="speed-button" data-speed="0.25">0.25x</button>
+                        <button class="speed-button" data-speed="0.5">0.5x</button>
+                        <button class="speed-button active" data-speed="1">1x</button>
+                        <button class="speed-button" data-speed="2">2x</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- Intro Section -->
-        <section id="intro" style="display: none;">
-            <h2>Welcome to the Blue Shark Tracking Project</h2>
-            <p>This interactive map visualizes satellite tracking data of blue sharks (Prionace glauca) in the North Atlantic. Use the controls to explore individual shark movements, view deployment locations, and analyze their swimming tracks over time.</p>
-            <p>Data Source: <a href="https://www.seaturtle.org/tracking/" target="_blank" rel="noopener noreferrer">SEATURTLE.ORG</a></p>
-        </section><!-- --- IGNORE --- -->
     </div>
 
     <!-- Leaflet JS -->
@@ -546,16 +1018,46 @@
         // Global variables
         let map;
         let sharkData = {};
+        let sharkMetadata = {};
         let sharkLayers = {};
         let allBounds = [];
+        let showPoints = true;
         
         // MPA variables
         let mpaLayer = null;
         let showMPA = false;
         
+        // Environmental layer variables
+        let chlorophyllLayer = null;
+        let sstLayer = null;
+        let pocLayer = null;
+        let showChlorophyll = false;
+        let showSST = false;
+        let showPOC = false;
+        let currentEnvironmentalMonth = null; // Track current month for caching
+        
+        // Base layer tracking
+        let currentBaseLayer = 'Ocean'; // Default base layer
+        
         // Show one mode variables
         let showOneMode = false;
         let selectedSharkId = null;
+        let currentTimeIndex = 0;
+        let timeSliderLayer = null;
+        let currentMarker = null; // Reference to the current position marker
+        
+        // Auto-play variables
+        let isPlaying = false;
+        let playInterval = null;
+        let playSpeed = 1; // 1x speed
+        let playStepDelay = 500; // Base delay in ms
+        let followMode = false; // Follow mode for map centering during animation (disabled by default)
+        
+        // Prediction layer variables
+        let predictionLayer = null;
+        let currentMonthIndex = 0;
+        let monthsList = []; // Will be populated with months from 2013-07 to 2017-01
+        let sharkMonthMarkers = {}; // Store markers for each shark by month
 
         // ISO3 to country name mapping
         const iso3ToCountry = {
@@ -843,192 +1345,10 @@
             }
             
             // Update legend to show/hide MPA item
-            updateLegendContent();
+            // updateLegendContent();
         }
 
-        // Removed environmental layer functions - no longer needed
-        /*
-        function toggleChlorophyllLayer() {
-            const toggleButton = document.getElementById('toggle-chlorophyll');
-            const chlScale = document.getElementById('chl-scale');
-            const sstScale = document.getElementById('sst-scale');
-            const pocScale = document.getElementById('poc-scale');
-            
-            if (showChlorophyll) {
-                // Hide Chlorophyll layer
-                if (chlorophyllLayer && map.hasLayer(chlorophyllLayer)) {
-                    map.removeLayer(chlorophyllLayer);
-                }
-                showChlorophyll = false;
-                toggleButton.classList.remove('active');
-                toggleButton.textContent = 'Chlorophyll';
-                
-                // Hide chlorophyll scale
-                chlScale.classList.remove('visible');
-                
-                // Adjust SST scale position if it's visible
-                if (showSST) {
-                    sstScale.classList.remove('with-chl-scale');
-                }
 
-                // Adjust POC scale position if it's visible
-                if (showPOC) {
-                    pocScale.classList.remove('with-chl-sst-scale');
-                    if (showSST) {
-                        pocScale.classList.add('with-chl-scale');
-                    } else {
-                        pocScale.classList.remove('with-chl-scale');
-                    }
-                }
-            } else {
-                // Show Chlorophyll layer
-                showChlorophyll = true;
-                toggleButton.classList.add('active');
-                toggleButton.textContent = 'Hide Chlorophyll';
-                
-                // Show chlorophyll scale
-                chlScale.classList.add('visible');
-                
-                // Adjust SST scale position if it's visible
-                if (showSST) {
-                    sstScale.classList.add('with-chl-scale');
-                }
-                
-                // Adjust POC scale position if it's visible
-                if (showPOC) {
-                    if (showSST) {
-                        pocScale.classList.add('with-chl-sst-scale');
-                    } else {
-                        pocScale.classList.add('with-chl-scale');
-                    }
-                }
-            }
-            updateEnvironmentalLayers();
-            
-            // Update legend
-            updateLegendContent();
-            
-            // Update time slider text color
-            updateTimeSliderTextColor();
-            
-            // Update max zoom constraint
-            updateMaxZoom();
-        }
-
-        // Toggle SST layer visibility
-        function toggleSSTLayer() {
-            const toggleButton = document.getElementById('toggle-sst');
-            const chlScale = document.getElementById('chl-scale');
-            const sstScale = document.getElementById('sst-scale');
-            const pocScale = document.getElementById('poc-scale');
-            
-            if (showSST) {
-                // Hide SST layer
-                if (sstLayer && map.hasLayer(sstLayer)) {
-                    map.removeLayer(sstLayer);
-                }
-                showSST = false;
-                toggleButton.classList.remove('active');
-                toggleButton.textContent = 'Sea Surface Temp';
-                
-                // Hide SST scale
-                sstScale.classList.remove('visible');
-                sstScale.classList.remove('with-chl-scale');
-
-                // Adjust POC scale position if it's visible
-                if (showPOC) {
-                    if (showChlorophyll) {
-                        pocScale.classList.remove('with-chl-sst-scale');
-                        pocScale.classList.add('with-chl-scale');
-                    } else {
-                        pocScale.classList.remove('with-chl-scale');
-                    }
-                }
-            } else {
-                // Show SST layer
-                showSST = true;
-                toggleButton.classList.add('active');
-                toggleButton.textContent = 'Hide SST';
-                
-                // Show SST scale
-                sstScale.classList.add('visible');
-                
-                // Adjust position if chlorophyll scale is also visible
-                if (showChlorophyll) {
-                    sstScale.classList.add('with-chl-scale');
-                }
-                // Adjust POC scale position if it's visible
-                if (showPOC) {
-                    if (showChlorophyll) {
-                        pocScale.classList.add('with-chl-sst-scale');
-                    } else {
-                        pocScale.classList.add('with-chl-scale');
-                    }
-                }
-            }
-            updateEnvironmentalLayers();
-
-            // Update legend
-            updateLegendContent();
-            
-            // Update time slider text color
-            updateTimeSliderTextColor();
-            
-            // Update max zoom constraint
-            updateMaxZoom();
-        }
-
-        // Toggle POC layer visibility
-        function togglePOCLayer() {
-            const toggleButton = document.getElementById('toggle-poc');
-            const chlScale = document.getElementById('chl-scale');
-            const sstScale = document.getElementById('sst-scale');
-            const pocScale = document.getElementById('poc-scale');
-            
-            if (showPOC) {
-                // Hide POC layer
-                if (pocLayer && map.hasLayer(pocLayer)) {
-                    map.removeLayer(pocLayer);
-                }
-                showPOC = false;
-                toggleButton.classList.remove('active');
-                toggleButton.textContent = 'POC';
-                
-                // Hide POC scale and adjust other scales
-                pocScale.classList.remove('visible');
-                pocScale.classList.remove('with-chl-scale', 'with-sst-scale', 'with-chl-sst-scale');
-                
-                // Adjust SST scale position if it's visible
-                if (showSST && !showChlorophyll) {
-                    sstScale.classList.remove('with-chl-scale');
-                }
-            } else {
-                // Show POC layer
-                showPOC = true;
-                toggleButton.classList.add('active');
-                toggleButton.textContent = 'Hide POC';
-                
-                // Show POC scale and adjust positioning
-                pocScale.classList.add('visible');
-                
-                // Adjust position based on other visible scales
-                if (showChlorophyll && showSST) {
-                    pocScale.classList.add('with-chl-sst-scale');
-                } else if (showChlorophyll || showSST) {
-                    pocScale.classList.add('with-chl-scale');
-                }
-            }
-            updateEnvironmentalLayers();
-            
-            // Update legend
-            updateLegendContent();
-            
-            // Update time slider text color
-            updateTimeSliderTextColor();
-            
-            // Update max zoom constraint
-            updateMaxZoom();
-        }
 
         // Function to update time slider text color based on active layers
         function updateTimeSliderTextColor() {
@@ -1047,12 +1367,12 @@
 
         // Function to update max zoom based on environmental layer visibility
         function updateMaxZoom() {
-            // If any environmental layer is visible, limit zoom to 6
+            // If any environmental layer is visible, limit zoom to 5
             if (showChlorophyll || showSST || showPOC) {
-                map.setMaxZoom(6);
-                // If current zoom is greater than 6, zoom out to 6
-                if (map.getZoom() > 6) {
-                    map.setZoom(6);
+                map.setMaxZoom(5);
+                // If current zoom is greater than 5, zoom out to 5 and show notification
+                if (map.getZoom() > 5) {
+                    map.setZoom(5);
                 }
             } else {
                 // No environmental layers, allow full zoom (20)
@@ -1060,111 +1380,13 @@
             }
         }
 
-        // Function to update environmental layers based on current timestamp
-        function updateEnvironmentalLayers() {
-            // Only show environmental layers in show one mode
-            if (!showOneMode || !selectedSharkId || !sharkData[selectedSharkId]) {
-                return;
-            }
-
-            const track = sharkData[selectedSharkId];
-            if (!track || track.length === 0 || currentTimeIndex >= track.length) {
-                return;
-            }
-
-            const currentPoint = track[currentTimeIndex];
-            const currentDate = currentPoint.date;
-            
-            // Format date for tile naming (YYYY-MM-DD format)
-            const year = currentDate.getFullYear();
-            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-            const day = '01'; // Use first day of month for monthly data
-            const dateString = `${year}-${month}-${day}`;
-            const monthKey = `${year}-${month}`; // Key for month comparison
-            
-            // Check if we need to update tiles (only if month has changed OR layers don't exist yet)
-            const monthChanged = currentEnvironmentalMonth !== monthKey;
-            const needsInitialization = (showPOC && !pocLayer) || (showSST && !sstLayer) || (showChlorophyll && !chlorophyllLayer);
-
-            if (monthChanged || needsInitialization) {
-                if (monthChanged) {
-                    // console.log(`Environmental layers: Month changed from ${currentEnvironmentalMonth} to ${monthKey}`);
-                }
-                currentEnvironmentalMonth = monthKey;
-                
-                // const baseUrl = 'http://localhost:8001'; // Change this to your server URL
-                // const baseUrl = 'https://www.csie.ntu.edu.tw/~b12902118/Nasa-Space-App';
-                const baseUrl = 'https://lebullient.github.io/Nasa-Space-App/';
-
-                // Update POC layer if it's enabled
-                if (showPOC) {
-                    // Remove old layer
-                    if (pocLayer && map.hasLayer(pocLayer)) {
-                        map.removeLayer(pocLayer);
-                    }
-                    // Create new layer with updated date
-                    const pocTileUrl = `${baseUrl}/tiles/poc/${dateString}/{z}/{x}/{y}.png`;
-                    pocLayer = L.tileLayer(pocTileUrl, {
-                        opacity: 0.6,
-                        attribution: 'Particulate Organic Carbon Data',
-                        errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==' // Transparent 1x1 pixel
-                    });
-                    map.addLayer(pocLayer);
-                }
-
-                // Update SST layer if it's enabled
-                if (showSST) {
-                    // Remove old layer
-                    if (sstLayer && map.hasLayer(sstLayer)) {
-                        map.removeLayer(sstLayer);
-                    }
-                    // Create new layer with updated date
-                    const sstTileUrl = `${baseUrl}/tiles/sst/${dateString}/{z}/{x}/{y}.png`;
-                    sstLayer = L.tileLayer(sstTileUrl, {
-                        opacity: 0.6,
-                        attribution: 'Sea Surface Temperature Data',
-                        errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==' // Transparent 1x1 pixel
-                    });
-                    map.addLayer(sstLayer);
-                }
-                
-                // Update Chlorophyll layer if it's enabled
-                if (showChlorophyll) {
-                    // Remove old layer
-                    if (chlorophyllLayer && map.hasLayer(chlorophyllLayer)) {
-                        map.removeLayer(chlorophyllLayer);
-                    }
-                    // Create new layer with updated date
-                    const chlTileUrl = `${baseUrl}/tiles/chl/${dateString}/{z}/{x}/{y}.png`;
-                    chlorophyllLayer = L.tileLayer(chlTileUrl, {
-                        opacity: 0.6,
-                        attribution: 'Chlorophyll Data',
-                        errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==' // Transparent 1x1 pixel
-                    });
-                    map.addLayer(chlorophyllLayer);
-                }
-                
-            } else {
-                // Month hasn't changed, but we still need to ensure layers are visible if they should be
-                if (showPOC && pocLayer && !map.hasLayer(pocLayer)) {
-                    map.addLayer(pocLayer);
-                }
-                if (showSST && sstLayer && !map.hasLayer(sstLayer)) {
-                    map.addLayer(sstLayer);
-                }
-                if (showChlorophyll && chlorophyllLayer && !map.hasLayer(chlorophyllLayer)) {
-                    map.addLayer(chlorophyllLayer);
-                }
-            }
-        }
-        */
-
         // Initialize the map
         function initMap() {
             map = L.map('map', {
                 renderer: L.canvas(), // Use canvas renderer for better performance with many points
                 zoomControl: false, // Disable default zoom control
-                scrollWheelZoom: true // Enable scroll wheel zoom by default
+                scrollWheelZoom: true, // Enable scroll wheel zoom by default
+                maxZoom: 5 // Limit max zoom to match prediction tiles
             }).setView([40.0, -60.0], 4);
 
             // Add base layers
@@ -1174,96 +1396,192 @@
                 maxZoom: 20
             }).addTo(map);
 
-            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-            });
+            // const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            //     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            // });
 
             // Layer control - add first so it appears on top
             const baseMaps = {
                 "Ocean": oceanBase,
-                "Satellite": satellite
+                // "Satellite": satellite
             };
 
-            const layerControl = L.control.layers(baseMaps, null, {
-                position: 'topright'
-            }).addTo(map);
+            // const layerControl = L.control.layers(baseMaps, null, {
+            //     position: 'topright'
+            // }).addTo(map);
 
             // Listen for base layer changes
-            map.on('baselayerchange', function(e) {
-                // Base layer changed
-            });
+            // map.on('baselayerchange', function(e) {
+            //     currentBaseLayer = e.name;
+            //     updateTimeSliderTextColor();
+            // });
 
             // Add zoom control on the right side - add after layer control so it appears below
             L.control.zoom({
                 position: 'topright'
             }).addTo(map);
             
-            // Add horizontal scale control at bottom right
-            L.control.scale({
+            // Add horizontal scale control at bottom right (positioned to avoid time slider)
+            const scaleControl = L.control.scale({
                 position: 'bottomright',
                 maxWidth: 200,
                 metric: true,
                 imperial: true,
                 updateWhenIdle: false
             }).addTo(map);
+            
+            // Move scale control up to avoid collision with time slider
+            setTimeout(() => {
+                const scaleElement = document.querySelector('.leaflet-control-scale');
+                if (scaleElement) {
+                    scaleElement.style.bottom = '90px';
+                }
+            }, 100);
+            
+            // Set up map interaction listeners for follow mode
+            setupMapInteractionListeners();
+            
+            // Initialize months list and prediction layer
+            initializeMonthsAndPrediction();
+        }
+        
+        // Initialize months list from 2013-07 to 2017-01
+        function initializeMonthsAndPrediction() {
+            // Generate months from July 2013 to January 2017
+            const startYear = 2013;
+            const startMonth = 7; // July
+            const endYear = 2017;
+            const endMonth = 1; // January
+            
+            for (let year = startYear; year <= endYear; year++) {
+                const firstMonth = (year === startYear) ? startMonth : 1;
+                const lastMonth = (year === endYear) ? endMonth : 12;
+                
+                for (let month = firstMonth; month <= lastMonth; month++) {
+                    monthsList.push({
+                        year: year,
+                        month: month,
+                        dateStr: `${year}-${String(month).padStart(2, '0')}-01`,
+                        label: `${year}-${String(month).padStart(2, '0')}`
+                    });
+                }
+            }
+            
+            // console.log(`Initialized ${monthsList.length} months from ${monthsList[0].label} to ${monthsList[monthsList.length-1].label}`);
+            
+            // Initialize prediction layer
+            updatePredictionLayer(0);
+            
+            // Update time slider
+            updateTimeSliderForMonths();
+        }
+        
+        // Update prediction tile layer for current month
+        function updatePredictionLayer(monthIndex) {
+            // Remove existing prediction layer
+            if (predictionLayer) {
+                map.removeLayer(predictionLayer);
+            }
+            
+            // Get current month info
+            const monthInfo = monthsList[monthIndex];
+            if (!monthInfo) return;
+            
+            // Create tile layer for this month
+            predictionLayer = L.tileLayer(`tiles/predict/${monthInfo.dateStr}/{z}/{x}/{y}.png`, {
+                opacity: 0.7,
+                attribution: 'Foraging habitat predictions',
+                minZoom: 0,
+                maxZoom: 5
+            });
+            
+            predictionLayer.addTo(map);
+            // console.log(`Loaded prediction tiles for ${monthInfo.label}`);
+        }
+        
+        // Update the time slider for months
+        function updateTimeSliderForMonths() {
+            const slider = document.getElementById('bottom-time-slider');
+            slider.min = 0;
+            slider.max = monthsList.length - 1;
+            slider.value = currentMonthIndex;
+            
+            // Update labels
+            document.getElementById('bottom-start-time').textContent = monthsList[0].label;
+            document.getElementById('bottom-end-time').textContent = monthsList[monthsList.length - 1].label;
+            document.getElementById('bottom-current-time').textContent = monthsList[currentMonthIndex].label;
+        }
+        
+        // Update month display (both prediction layer and shark markers)
+        function updateMonthDisplay() {
+            if (monthsList.length === 0) return;
+            
+            // Update prediction layer
+            updatePredictionLayer(currentMonthIndex);
+            
+            // Update shark markers
+            updateSharkMarkersForMonth(currentMonthIndex);
+            
+            // Update time display
+            const monthInfo = monthsList[currentMonthIndex];
+            document.getElementById('bottom-current-time').textContent = monthInfo.label;
         }
 
-        // Load and parse CSV data from GBIF
+        // Load and parse CSV data
         async function loadData() {
             try {
-                console.log('Loading GBIF shark data...');
-                
-                // Get list of all CSV files in the GBIF directory
+                // First, load metadata
+                const metadataResponse = await fetch('data/blue-shark-gps/Braun_atn_tag_deployment_metadata.csv');
+                const metadataCsv = await metadataResponse.text();
+                const metadataData = Papa.parse(metadataCsv, { header: true, skipEmptyLines: true });
+
+                // Process metadata
+                metadataData.data.forEach(row => {
+                    sharkMetadata[row['Deployment ID']] = {
+                        species: row['Species'],
+                        length: row['Animal Length_cm'],
+                        sex: row['Animal Sex'],
+                        deploymentStart: row['Deployment Start Datetime'],
+                        deploymentStop: row['Deployment Stop Datetime'],
+                        startLat: parseFloat(row['geospatial_lat_start']),
+                        startLon: parseFloat(row['geospatial_lon_start']),
+                        endLat: parseFloat(row['geospatial_lat_end']),
+                        endLon: parseFloat(row['geospatial_lon_end']),
+                        endType: row['end_type']
+                    };
+                });
+
+                // Define all shark files to load
                 const sharkFiles = [
-                    'NSBS-1248824.csv', 'NSBS-1248825-2017-08-22.csv', 'NSBS-1248826-2017-08-25.csv',
-                    'NSBS-1248827-2017-08-22.csv', 'NSBS-1248828-2017-08-27.csv', 'NSBS-1248829-2017-08-22.csv',
-                    'NSBS-1248830.csv', 'NSBS-1248831-2017-08-22.csv', 'NSBS-1248832.csv', 'NSBS-1248833.csv',
-                    'NSBS-1248834-2017-08-27.csv', 'NSBS-1248835-2019-07-14.csv', 'NSBS-1248836-2019-07-14.csv',
-                    'NSBS-1248838-2017-08-22.csv', 'NSBS-1250978-2023-08-02.csv', 'NSBS-1250979-2019-09-06.csv',
-                    'NSBS-1250980-2022-08-29.csv', 'NSBS-1250981-2019-09-06.csv', 'NSBS-1250982-2017-08-25.csv',
-                    'NSBS-1250983-2022-08-23.csv', 'NSBS-1250984-2017-08-25.csv', 'NSBS-1250985-2022-08-23.csv',
-                    'NSBS-1250986-2017-08-25.csv', 'NSBS-1270572-2023-08-04.csv', 'NSBS-1287530-2019-09-06.csv',
-                    'NSBS-1287536-2019-09-06.csv', 'NSBS-1290429-2022-08-01.csv', 'NSBS-1290432-2022-08-02.csv',
-                    'NSBS-1300141-2024-08-14.csv', 'NSBS-1300142-2024-08-14.csv', 'NSBS-1300144-2024-08-14.csv',
-                    'NSBS-1393328-2021-08-05.csv', 'NSBS-1393329-2021-08-09.csv', 'NSBS-1393330-2021-08-05.csv',
-                    'NSBS-1393331-2021-08-09.csv', 'NSBS-1393332-2021-08-05.csv', 'NSBS-1393333-2021-08-09.csv',
-                    'NSBS-1393334-2021-08-08.csv', 'NSBS-1393335-2021-08-10.csv', 'NSBS-1393336-2021-08-08.csv',
-                    'NSBS-1393337-2021-08-09.csv', 'NSBS-1393338-2021-08-08.csv', 'NSBS-1393340-2021-08-10.csv',
-                    'NSBS-1393342-2021-08-10.csv', 'NSBS-411936.0-2022-08-01.csv', 'NSBS-ALI.csv',
-                    'NSBS-Alison.csv', 'NSBS-Alyssa.csv', 'NSBS-Art-2019-08-25.csv', 'NSBS-Bee-2019-08-25.csv',
-                    'NSBS-Betty.csv', 'NSBS-Big Momma.csv', 'NSBS-Blue Rodeo (Rick Mercer).csv', 'NSBS-Blueberry.csv',
-                    'NSBS-Bonkers.csv', 'NSBS-Brandy.csv', 'NSBS-Brendal.csv', 'NSBS-Brianna.csv',
-                    'NSBS-Byron-2019-08-25.csv', 'NSBS-CAITLIN.csv', 'NSBS-CAROLINA.csv', 'NSBS-Calypso.csv',
-                    'NSBS-Casey.csv', 'NSBS-Cordelia-2019-08-25.csv', 'NSBS-Daisy.csv', 'NSBS-Dash.csv',
-                    'NSBS-Duncan.csv', 'NSBS-ELVIRE.csv', 'NSBS-Eileen-2022-08-02.csv', 'NSBS-Elania-2019-08-12.csv',
-                    'NSBS-Elise-2024-08-08.csv', 'NSBS-Eva.csv', 'NSBS-Fiesty.csv', 'NSBS-Finnigan-14.csv',
-                    'NSBS-Finnigan.csv', 'NSBS-GABBY.csv', 'NSBS-GRIFFIN.csv', 'NSBS-Gwen-2022-08-03.csv',
-                    'NSBS-HUGH.csv', 'NSBS-Hayley.csv', 'NSBS-Haze-2023-08-15.csv', 'NSBS-Helga.csv',
-                    'NSBS-Hey Jude.csv', 'NSBS-Holli-2024-08-07.csv', 'NSBS-Hooker.csv', 'NSBS-Hops.csv',
-                    'NSBS-Iara-2019-08-12.csv', 'NSBS-Janina.csv', 'NSBS-Jen-2024-08-09.csv', 'NSBS-Juno-2024-08-13.csv',
-                    'NSBS-KRISTINA.csv', 'NSBS-Katelyn.csv', 'NSBS-Kaylee-2019-08-12.csv', 'NSBS-Keesh.csv',
-                    'NSBS-LORENZA.csv', 'NSBS-Leia.csv', 'NSBS-Level Best-2019-08-12.csv', 'NSBS-Lindsay.csv',
-                    'NSBS-Lips-2019-08-25.csv', 'NSBS-Lise.csv', 'NSBS-Lola.csv', 'NSBS-Lucy-14.csv',
-                    'NSBS-Lucy.csv', 'NSBS-Lula-2023-08-21.csv', 'NSBS-MOFFAT.csv', 'NSBS-Mackenzie-2019-08-25.csv',
-                    'NSBS-Marley.csv', 'NSBS-Meeko.csv', 'NSBS-Mick-2024-08-08.csv', 'NSBS-Mrs. F.csv',
-                    'NSBS-NAKIA.csv', 'NSBS-NICOLE.csv', 'NSBS-Nessie.csv', 'NSBS-Nikki.csv',
-                    'NSBS-Not so lucky.csv', 'NSBS-Nymeria-2023-08-21.csv', 'NSBS-OTBS-1-2021-08-23.csv',
-                    'NSBS-OTBS-2-2021-08-23.csv', 'NSBS-OTBS-2024-01-2024-08-19.csv', 'NSBS-OTBS-2024-02-2024-08-20.csv',
-                    'NSBS-OTBS-3-2021-08-23.csv', 'NSBS-OTBS-5-2022-08-24.csv', 'NSBS-OTBS-6-2022-08-24.csv',
-                    'NSBS-OTBS-7-2022-08-25.csv', 'NSBS-OTBS-8-2022-08-25.csv', 'NSBS-Ophelia.csv',
-                    'NSBS-PEYTON.csv', 'NSBS-Percy.csv', 'NSBS-Princess-2019-08-12.csv', 'NSBS-Quillie-2022-08-16.csv',
-                    'NSBS-Riley.csv', 'NSBS-Roseanne.csv', 'NSBS-Roxanne-2021-08-10.csv', 'NSBS-SARAH.csv',
-                    'NSBS-SWAANTJE.csv', 'NSBS-Sailor.csv', 'NSBS-Salty Dog.csv', 'NSBS-Sam-2019-08-25.csv',
-                    'NSBS-Scotch-2021-08-24.csv', 'NSBS-Scotty.csv', 'NSBS-Skylar.csv', 'NSBS-Sophie.csv',
-                    'NSBS-Spruce.csv', 'NSBS-Stitch-2023-08-21.csv', 'NSBS-Suzy Q.csv', 'NSBS-TINI.csv',
-                    'NSBS-TRACEY.csv', 'NSBS-Tail Slap.csv', 'NSBS-Taylor-2023-08-03.csv', 'NSBS-Tika.csv',
-                    'NSBS-Tiny Turner.csv', 'NSBS-Whitney-2022-08-03.csv', 'NSBS-Wryley.csv', 'NSBS-Xena.csv'
+                    'filtered_160424_2013_132346pnas_atn.csv',
+                    'filtered_160424_2014_141195pnas_atn.csv',
+                    'filtered_160424_2015_141261pnas_atn_filtered.csv',
+                    'filtered_160424_2015_141264pnas_atn.csv',
+                    'filtered_160424_2015_141268pnas_atn.csv',
+                    'filtered_160424_2015_141270pnas_atn.csv',
+                    'filtered_160424_2016_106744pnas_atn_filtered.csv',
+                    'filtered_160424_2016_106745pnas_atn_filtered.csv',
+                    'filtered_160424_2016_106746pnas_atn_filtered.csv',
+                    'filtered_160424_2016_106747pnas_atn_filtered.csv',
+                    'filtered_160424_2016_106748pnas_atn.csv',
+                    'filtered_160424_2016_141262pnas_atn_filtered.csv',
+                    'filtered_160424_2016_141263pnas_atn.csv',
+                    'filtered_160424_2016_141265pnas_atn.csv',
+                    'filtered_160424_2016_141266pnas_atn.csv',
+                    'filtered_160424_2016_165927pnas_atn.csv',
+                    'filtered_160424_2016_165928pnas_atn.csv'
                 ];
 
                 // Load all shark tracking files
                 const sharkPromises = sharkFiles.map(async (filename, index) => {
                     try {
-                        const response = await fetch(`data/blue-shark-gbif/${filename}`);
+                        // Update loading progress
+                        const progressEl = document.getElementById('loading-progress');
+                        if (progressEl) {
+                            progressEl.textContent = `Loading ${filename}... (${index + 1}/${sharkFiles.length})`;
+                        }
+                        
+                        const response = await fetch(`data/blue-shark-gps/${filename}`);
                         const csvText = await response.text();
                         const parsedData = Papa.parse(csvText, { header: true, skipEmptyLines: true });
                         
@@ -1280,7 +1598,8 @@
                                 sharkData[id].push({
                                     lat: lat,
                                     lon: lon,
-                                    date: date
+                                    date: date,
+                                    lc: row.lc
                                 });
                                 
                                 allBounds.push([lat, lon]);
@@ -1305,378 +1624,171 @@
                     sharkData[id].sort((a, b) => a.date - b.date);
                 });
 
-                console.log('Loaded data:', Object.keys(sharkData).length, 'unique sharks');
+                console.log('Loaded data:', Object.keys(sharkData).length, 'sharks');
+                console.log('Metadata:', Object.keys(sharkMetadata).length, 'entries');
                 
-                updateStats();
+                // updateStats();
                 createSharkLayers();
-                populateSharkList();
                 
                 // Initialize legend content
-                updateLegendContent();
+                // updateLegendContent();
                 
-                // Fit map to show all sharks on initial load
-                if (allBounds.length > 0) {
-                    const bounds = L.latLngBounds(allBounds);
-                    map.fitBounds(bounds.pad(0.1));
-                }
+                // Fit map to show all visible sharks on initial load
+                fitMapToVisibleSharks();
                 
             } catch (error) {
                 console.error('Error loading data:', error);
-                showNotification('Error loading shark data. Please check console for details.', 5000);
+                document.getElementById('shark-list').innerHTML = '<div style="color: red; padding: 1rem;">Error loading data. Please check that CSV files are in the data directory.</div>';
             }
         }
 
         // Update statistics
-        function updateStats() {
-            const totalSharks = Object.keys(sharkData).length;
-            const totalPoints = Object.values(sharkData).reduce((sum, track) => sum + track.length, 0);
+        // function updateStats() {
+        //     const totalSharks = Object.keys(sharkData).length;
+        //     const totalPoints = Object.values(sharkData).reduce((sum, track) => sum + track.length, 0);
             
-            let minDate = new Date();
-            let maxDate = new Date(0);
+        //     let minDate = new Date();
+        //     let maxDate = new Date(0);
             
-            Object.values(sharkData).forEach(track => {
-                track.forEach(point => {
-                    if (point.date < minDate) minDate = point.date;
-                    if (point.date > maxDate) maxDate = point.date;
-                });
-            });
+        //     Object.values(sharkData).forEach(track => {
+        //         track.forEach(point => {
+        //             if (point.date < minDate) minDate = point.date;
+        //             if (point.date > maxDate) maxDate = point.date;
+        //         });
+        //     });
 
-            document.getElementById('total-sharks').textContent = totalSharks;
-            document.getElementById('total-points').textContent = totalPoints.toLocaleString();
+        //     document.getElementById('total-sharks').textContent = totalSharks;
+        //     document.getElementById('total-points').textContent = totalPoints.toLocaleString();
             
-            const dateOptions = { year: 'numeric', month: 'short' };
-            document.getElementById('date-range').textContent = 
-                `${minDate.toLocaleDateString('en-US', dateOptions)} - ${maxDate.toLocaleDateString('en-US', dateOptions)}`;
-        }
+        //     const dateOptions = { year: 'numeric', month: 'short' };
+        //     document.getElementById('date-range').textContent = 
+        //         `${minDate.toLocaleDateString('en-US', dateOptions)} - ${maxDate.toLocaleDateString('en-US', dateOptions)}`;
+        // }
 
-        // Create map layers for each shark
+        // Create map layers for each shark - organize by month
         function createSharkLayers() {
-            let colorIndex = 0;
-            
+            // Group shark data points by month for each shark
             Object.keys(sharkData).forEach(sharkId => {
                 const track = sharkData[sharkId];
-                const color = colors[colorIndex % colors.length];
-                colorIndex++;
+                sharkMonthMarkers[sharkId] = {};
                 
-                const layerGroup = L.layerGroup();
-                
-                // Create track polyline
-                const latlngs = track.map(point => [point.lat, point.lon]);
-                const polyline = L.polyline(latlngs, {
-                    color: color,
-                    weight: 2,
-                    opacity: 0.7
-                });
-                
-                // Add start marker (deployment)
-                const startPoint = track[0];
-                const startMarker = L.circleMarker([startPoint.lat, startPoint.lon], {
-                    radius: 6,
-                    fillColor: '#e74c3c',
-                    color: '#fff',
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.9
-                });
-                
-                // Add end marker
-                const endPoint = track[track.length - 1];
-                const endMarker = L.circleMarker([endPoint.lat, endPoint.lon], {
-                    radius: 6,
-                    fillColor: '#27ae60',
-                    color: '#fff',
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.9
-                });
-
-                // Create popup content
-                const displayName = sharkId.replace('NSBS-', '');
-                const popupContent = `
-                    <div style="font-family: Arial, sans-serif;">
-                        <h4 style="margin: 0 0 10px 0; color: #2c3e50;">Shark: ${displayName}</h4>
-                        <p><strong>Species:</strong> Blue Shark (Prionace glauca)</p>
-                        <p><strong>Track Duration:</strong> ${Math.round((endPoint.date - startPoint.date) / (1000 * 60 * 60 * 24))} days</p>
-                        <p><strong>Total Points:</strong> ${track.length.toLocaleString()}</p>
-                        <p><strong>Distance Traveled:</strong> ~${calculateDistance(track).toFixed(0)} km</p>
-                        <p><strong>First Date:</strong> ${startPoint.date.toLocaleDateString()}</p>
-                        <p><strong>Last Date:</strong> ${endPoint.date.toLocaleDateString()}</p>
-                    </div>
-                `;
-                
-                polyline.bindPopup(popupContent);
-                startMarker.bindPopup(`<strong>Start Location</strong><br/>${popupContent}`);
-                endMarker.bindPopup(`<strong>Last Known Position</strong><br/>${popupContent}`);
-                
-                layerGroup.addLayer(polyline);
-                layerGroup.addLayer(startMarker);
-                layerGroup.addLayer(endMarker);
-                
-                sharkLayers[sharkId] = {
-                    layer: layerGroup,
-                    color: color
-                };
-                
-                layerGroup.addTo(map);
-            });
-        }
-
-        // Populate shark list in sidebar
-        function populateSharkList() {
-            const listContainer = document.getElementById('shark-list');
-            listContainer.innerHTML = '';
-            
-            // Sort sharks by ID
-            const sortedSharkIds = Object.keys(sharkData).sort();
-            
-            sortedSharkIds.forEach(sharkId => {
-                const track = sharkData[sharkId];
-                const sharkLayer = sharkLayers[sharkId];
-                
-                const item = document.createElement('div');
-                item.className = 'shark-item';
-                item.dataset.sharkId = sharkId;
-                
-                const duration = Math.round((track[track.length - 1].date - track[0].date) / (1000 * 60 * 60 * 24));
-                const displayName = sharkId.replace('NSBS-', '');
-                
-                item.innerHTML = `
-                    <div class="shark-id" style="color: ${sharkLayer.color};">
-                        🦈 ${displayName}
-                    </div>
-                    <div class="shark-details">
-                        <div><strong>Duration:</strong> ${duration} days</div>
-                        <div><strong>Points:</strong> ${track.length.toLocaleString()}</div>
-                        <div><strong>Start:</strong> ${track[0].date.toLocaleDateString()}</div>
-                    </div>
-                `;
-                
-                item.addEventListener('click', () => {
-                    // Highlight selected shark
-                    document.querySelectorAll('.shark-item').forEach(el => el.classList.remove('selected'));
-                    item.classList.add('selected');
+                // Group points by year-month
+                track.forEach(point => {
+                    const year = point.date.getFullYear();
+                    const month = point.date.getMonth() + 1; // 1-based month
+                    const monthKey = `${year}-${String(month).padStart(2, '0')}`;
                     
-                    selectedSharkId = sharkId;
-                    
-                    if (showOneMode) {
-                        // Show One mode: Hide all others, show only this shark
-                        Object.keys(sharkLayers).forEach(id => {
-                            const layer = sharkLayers[id].layer;
-                            if (id === sharkId) {
-                                if (!map.hasLayer(layer)) {
-                                    map.addLayer(layer);
-                                }
-                            } else {
-                                if (map.hasLayer(layer)) {
-                                    map.removeLayer(layer);
-                                }
-                            }
-                        });
+                    if (!sharkMonthMarkers[sharkId][monthKey]) {
+                        sharkMonthMarkers[sharkId][monthKey] = [];
                     }
+                    sharkMonthMarkers[sharkId][monthKey].push(point);
+                });
+            });
+            
+            // console.log(`Organized shark data by month for ${Object.keys(sharkData).length} sharks`);
+            
+            // Initialize the display for the first month
+            updateSharkMarkersForMonth(currentMonthIndex);
+        }
+        
+        // Update shark markers for specific month
+        function updateSharkMarkersForMonth(monthIndex) {
+            // Remove existing shark layers
+            Object.values(sharkLayers).forEach(sharkLayer => {
+                if (sharkLayer.layer) {
+                    map.removeLayer(sharkLayer.layer);
+                }
+            });
+            sharkLayers = {};
+            
+            // Get current month
+            const monthInfo = monthsList[monthIndex];
+            if (!monthInfo) return;
+            
+            const monthKey = monthInfo.label; // Format: YYYY-MM
+            // console.log(`Updating shark markers for ${monthKey}`);
+            
+            // For each shark, show ALL points if they have data in this month
+            Object.keys(sharkMonthMarkers).forEach((sharkId, index) => {
+                const monthData = sharkMonthMarkers[sharkId][monthKey];
+                
+                if (monthData && monthData.length > 0) {
+                    // Get metadata
+                    const metadata = sharkMetadata[sharkId] || {};
+                    const yearMatch = sharkId.match(/160424_(\d{4})/);
+                    const year = yearMatch ? yearMatch[1] : sharkId.match(/(\d{4})/)?.[1] || 'Unknown';
+                    const shortId = sharkId.replace('160424_', '').replace(`${year}_`, '').replace('pnas_atn', '').replace('_filtered', '');
                     
-                    // Zoom to selected shark
-                    const bounds = L.latLngBounds(track.map(point => [point.lat, point.lon]));
-                    map.fitBounds(bounds.pad(0.2));
+                    // Create layer group for this shark
+                    const layerGroup = L.layerGroup();
                     
-                    // Open popup
-                    sharkLayer.layer.eachLayer(layer => {
-                        if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
-                            layer.openPopup();
-                        }
+                    // Show ALL points for this month with shark emoji
+                    monthData.forEach(point => {
+                        // Create shark emoji marker
+                        const sharkIcon = L.divIcon({
+                            html: '🦈',
+                            className: 'shark-emoji-marker',
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 12],
+                            popupAnchor: [0, -12]
+                        });
+                        
+                        const marker = L.marker([point.lat, point.lon], {
+                            icon: sharkIcon
+                        });
+                        
+                        // Create popup
+                        const popupContent = `
+                            <div style="font-family: Arial, sans-serif;">
+                                <h4 style="margin: 0 0 10px 0; color: #2c3e50;">Shark ${shortId} (${year})</h4>
+                                <p><strong>Date:</strong> ${point.date.toLocaleDateString()}</p>
+                                <p><strong>Location:</strong> ${point.lat.toFixed(4)}°, ${point.lon.toFixed(4)}°</p>
+                                <p><strong>Species:</strong> ${metadata.species || 'Blue Shark (Prionace glauca)'}</p>
+                                <p><strong>Points this month:</strong> ${monthData.length}</p>
+                            </div>
+                        `;
+                        
+                        marker.bindPopup(popupContent);
+                        layerGroup.addLayer(marker);
                     });
-                });
-                
-                listContainer.appendChild(item);
-            });
-        }
-
-        // Old commented code removed
-        /*
-        OLD populateSharkList() {
-            const listContainer = document.getElementById('shark-list');
-            listContainer.innerHTML = '';
-            
-            // Sort sharks by deployment year and ID
-            const sortedSharkIds = Object.keys(sharkData).sort();
-            
-            sortedSharkIds.forEach(sharkId => {
-                const track = sharkData[sharkId];
-                const metadata = sharkMetadata[sharkId] || {};
-                const sharkLayer = sharkLayers[sharkId];
-                
-                const item = document.createElement('div');
-                item.className = 'shark-item';
-                item.dataset.sharkId = sharkId;
-                
-                const duration = Math.round((track[track.length - 1].date - track[0].date) / (1000 * 60 * 60 * 24));
-                
-                // Extract year and simplified ID from shark ID
-                // Match the year which comes after the initial 160424_ prefix
-                const yearMatch = sharkId.match(/160424_(\d{4})/);
-                const year = yearMatch ? yearMatch[1] : sharkId.match(/(\d{4})/)[1];
-                const shortId = sharkId.replace('160424_', '').replace(`${year}_`, '').replace('pnas_atn', '').replace('_filtered', '');
-                
-                item.innerHTML = `
-                    <div class="shark-id" style="color: ${sharkLayer.color};">
-                        🦈 Shark ${shortId} (${year})
-                    </div>
-                    <div class="shark-details">
-                        <div><strong>Length:</strong> ${metadata.length ? metadata.length + ' cm' : 'Unknown'}</div>
-                        <div><strong>Duration:</strong> ${duration} days</div>
-                        <div><strong>Points:</strong> ${track.length.toLocaleString()}</div>
-                        <div><strong>Status:</strong> ${metadata.endType || 'Unknown'}</div>
-                        <div><strong>Sex:</strong> ${metadata.sex || 'Unknown'}</div>
-                    </div>
-                    <button class="shark-visibility-toggle" data-shark-id="${sharkId}" title="Toggle visibility">
-                        ${sharkLayer.visible ? EYE_VISIBLE_ICON : EYE_HIDDEN_ICON}
-                    </button>
-                `;
-                
-                item.addEventListener('click', (e) => {
-                    // Don't trigger if clicking the toggle button
-                    if (e.target.closest('.shark-visibility-toggle')) {
-                        return;
-                    }
                     
-                    // Highlight selected shark
-                    document.querySelectorAll('.shark-item').forEach(el => el.classList.remove('selected'));
-                    item.classList.add('selected');
+                    sharkLayers[sharkId] = {
+                        layer: layerGroup,
+                        visible: true
+                    };
                     
-                    if (showOneMode) {
-                        // Show One mode: Enable time slider for this shark
-                        selectedSharkId = sharkId;
-                        currentEnvironmentalMonth = null; // Reset month tracking when selecting new shark
-                        document.getElementById('shark-list').style.opacity = '1';
-                        
-                        // Hide all other tracks
-                        Object.values(sharkLayers).forEach(shark => {
-                            if (shark.visible) {
-                                map.removeLayer(shark.layer);
-                                shark.visible = false;
-                            }
-                        });
-                        
-                        // Show time slider and initialize visualization
-                        showTimeSlider(sharkId);
-                        updateSharkVisualization();
-                        
-                        // Update legend content for show one mode
-                        updateLegendContent();
-                        
-                    } else {
-                        selectedSharkId = sharkId;
-                        // Normal mode: Show track and zoom
-                        const bounds = L.latLngBounds(track.map(point => [point.lat, point.lon]));
-                        map.fitBounds(bounds.pad(0.2));
-                        
-                        // Open popup for the shark
-                        sharkLayer.layer.eachLayer(layer => {
-                            if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
-                                layer.openPopup();
-                            }
-                        });
-                    }
-                });
-
-                // Add event listener for visibility toggle button
-                const toggleButton = item.querySelector('.shark-visibility-toggle');
-                toggleButton.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent shark selection
-                    
-                    const sharkLayer = sharkLayers[sharkId];
-                    if (sharkLayer.visible) {
-                        // Hide the shark
-                        map.removeLayer(sharkLayer.layer);
-                        sharkLayer.visible = false;
-                        toggleButton.innerHTML = EYE_HIDDEN_ICON;
-                    } else {
-                        // Show the shark
-                        map.addLayer(sharkLayer.layer);
-                        sharkLayer.visible = true;
-                        toggleButton.innerHTML = EYE_VISIBLE_ICON;
-                    }
-                    
-                    // Update legend content when visibility changes
-                    updateLegendContent();
-                });
-                
-                listContainer.appendChild(item);
+                    layerGroup.addTo(map);
+                }
             });
             
-            // Update visibility toggle buttons after populating the list
-            updateVisibilityToggleButtons();
+            const visibleSharks = Object.keys(sharkLayers).length;
+            // console.log(`Displaying ${visibleSharks} sharks with data in ${monthKey}`);
         }
 
-        // Function to update visibility toggle buttons based on current mode
-        function updateVisibilityToggleButtons() {
-            const toggleButtons = document.querySelectorAll('.shark-visibility-toggle');
-            const chlorophyllButton = document.getElementById('toggle-chlorophyll');
-            const sstButton = document.getElementById('toggle-sst');
-            const pocButton = document.getElementById('toggle-poc');
-            
-            if (showOneMode) {
-                // Hide all shark toggle buttons in Show One mode
-                toggleButtons.forEach(button => {
-                    button.classList.add('hidden');
-                });
-                
-                // Enable environmental layer buttons in Show One mode
-                if (chlorophyllButton) {
-                    chlorophyllButton.disabled = false;
-                    chlorophyllButton.style.opacity = '1';
-                }
-                if (sstButton) {
-                    sstButton.disabled = false;
-                    sstButton.style.opacity = '1';
-                }
-                if (pocButton) {
-                    pocButton.disabled = false;
-                    pocButton.style.opacity = '1';
-                }
-            } else {
-                // Show all shark toggle buttons in Show All/Hide All modes
-                toggleButtons.forEach(button => {
-                    button.classList.remove('hidden');
-                    const sharkId = button.dataset.sharkId;
-                    const sharkLayer = sharkLayers[sharkId];
-                    
-                    // Update icon based on visibility
-                    if (sharkLayer && sharkLayer.visible) {
-                        button.innerHTML = EYE_VISIBLE_ICON;
-                    } else {
-                        button.innerHTML = EYE_HIDDEN_ICON;
-                    }
-                });
-                
-                // Disable environmental layer buttons outside Show One mode
-                if (chlorophyllButton) {
-                    chlorophyllButton.disabled = true;
-                    chlorophyllButton.style.opacity = '0.5';
-                }
-                if (sstButton) {
-                    sstButton.disabled = true;
-                    sstButton.style.opacity = '0.5';
-                }
-                if (pocButton) {
-                    pocButton.disabled = true;
-                    pocButton.style.opacity = '0.5';
-                }
-            }
-        }
-        */
-
-        // Fit map to show all shark data
+        // Fit map to all currently visible sharks
         function fitMapToVisibleSharks() {
-            if (allBounds.length > 0) {
-                const bounds = L.latLngBounds(allBounds);
-                map.fitBounds(bounds.pad(0.1));
+            // Fit to all currently visible shark layers
+            const visibleSharkLayers = Object.values(sharkLayers).filter(s => s.visible);
+            if (visibleSharkLayers.length > 0) {
+                // Collect all lat/lng bounds from visible sharks
+                let allVisibleBounds = [];
+                Object.keys(sharkData).forEach(sharkId => {
+                    if (sharkLayers[sharkId] && sharkLayers[sharkId].visible) {
+                        const track = sharkData[sharkId];
+                        const trackLatLngs = track.map(point => [point.lat, point.lon]);
+                        allVisibleBounds = allVisibleBounds.concat(trackLatLngs);
+                    }
+                });
+                
+                if (allVisibleBounds.length > 0) {
+                    const bounds = L.latLngBounds(allVisibleBounds);
+                    map.fitBounds(bounds.pad(0.1));
+                }
             }
         }
 
         // Event listeners for controls
         function setupEventListeners() {
-            // Legend toggle
-            document.getElementById('legend').addEventListener('click', toggleLegend);
             
             // Menu toggle button
             document.getElementById('menu-toggle').addEventListener('click', () => {
@@ -1692,313 +1804,14 @@
                 }, 300);
             });
             
-            // Show All button
-            document.getElementById('show-all').addEventListener('click', () => {
-                showOneMode = false;
-                
-                // Show all sharks
-                Object.values(sharkLayers).forEach(shark => {
-                    if (!map.hasLayer(shark.layer)) {
-                        map.addLayer(shark.layer);
-                    }
-                });
-                
-                // Update button states
-                document.getElementById('show-all').classList.add('active');
-                document.getElementById('show-one').classList.remove('active');
-                
-                // Fit map to all sharks
-                fitMapToVisibleSharks();
-            });
-            
-            // Show One button
-            document.getElementById('show-one').addEventListener('click', () => {
-                showOneMode = true;
-                
-                // Update button states
-                document.getElementById('show-one').classList.add('active');
-                document.getElementById('show-all').classList.remove('active');
-                
-                // If a shark is already selected, show only that one
-                if (selectedSharkId && sharkLayers[selectedSharkId]) {
-                    Object.keys(sharkLayers).forEach(id => {
-                        const layer = sharkLayers[id].layer;
-                        if (id === selectedSharkId) {
-                            if (!map.hasLayer(layer)) {
-                                map.addLayer(layer);
-                            }
-                        } else {
-                            if (map.hasLayer(layer)) {
-                                map.removeLayer(layer);
-                            }
-                        }
-                    });
-                    
-                    // Zoom to selected shark
-                    const track = sharkData[selectedSharkId];
-                    const bounds = L.latLngBounds(track.map(point => [point.lat, point.lon]));
-                    map.fitBounds(bounds.pad(0.2));
-                } else {
-                    // Hide all sharks until one is selected
-                    Object.values(sharkLayers).forEach(shark => {
-                        if (map.hasLayer(shark.layer)) {
-                            map.removeLayer(shark.layer);
-                        }
-                    });
-                    showNotification('Click on a shark in the list below to view its track!');
-                }
-            });
-            
-            // MPA toggle event listener
-            document.getElementById('toggle-mpa').addEventListener('click', toggleMPALayer);
-        }
-        
-        // Dummy function left for compatibility (removing these functions)
-        function setupMapInteractionListeners() {
-            // No longer needed
-        }
-        
-        // Removed: show-all, hide-all, show-one, toggle-points, environmental layers,
-        // time slider, play controls, follow mode, etc.
-        
-        // Old setupEventListeners function removed - replaced above with minimal version
-        /*
-        OLD CODE REMOVED:
-            document.getElementById('show-all').addEventListener('click', () => {
-                showOneMode = false;
-                selectedSharkId = null;
-                hideTimeSlider();
-                
-                // Hide environmental layers when leaving Show One mode
-                if (chlorophyllLayer && map.hasLayer(chlorophyllLayer)) {
-                    map.removeLayer(chlorophyllLayer);
-                }
-                if (sstLayer && map.hasLayer(sstLayer)) {
-                    map.removeLayer(sstLayer);
-                }
-                if (pocLayer && map.hasLayer(pocLayer)) {
-                    map.removeLayer(pocLayer);
-                }
-                
-                // Reset environmental layer states and button appearances
-                showChlorophyll = false;
-                showSST = false;
-                showPOC = false;
-                currentEnvironmentalMonth = null; // Reset month tracking
-                const chlButton = document.getElementById('toggle-chlorophyll');
-                const sstButton = document.getElementById('toggle-sst');
-                const pocButton = document.getElementById('toggle-poc');
-                if (chlButton) {
-                    chlButton.classList.remove('active');
-                    chlButton.textContent = 'Chlorophyll';
-                }
-                if (sstButton) {
-                    sstButton.classList.remove('active');
-                    sstButton.textContent = 'Sea Surface Temp';
-                }
-                if (pocButton) {
-                    pocButton.classList.remove('active');
-                    pocButton.textContent = 'POC';
-                }
-                
-                // Hide color scales
-                document.getElementById('chl-scale').classList.remove('visible');
-                document.getElementById('sst-scale').classList.remove('visible', 'with-chl-scale');
-                document.getElementById('poc-scale').classList.remove('visible', 'with-chl-scale', 'with-sst-scale');
-                
-                Object.values(sharkLayers).forEach(shark => {
-                    if (!shark.visible) {
-                        map.addLayer(shark.layer);
-                        shark.visible = true;
-                    }
-                });
-                document.getElementById('show-all').classList.add('active');
-                document.getElementById('hide-all').classList.remove('active');
-                document.getElementById('show-one').classList.remove('active');
-                
-                // Reset shark list opacity
-                document.getElementById('shark-list').style.opacity = '1';
-                
-                // Update visibility toggle buttons
-                updateVisibilityToggleButtons();
-                
-                // Update legend content
-                updateLegendContent();
-
-                // Update max zoom
-                updateMaxZoom();
-            });
-            
-            document.getElementById('hide-all').addEventListener('click', () => {
-                Object.values(sharkLayers).forEach(shark => {
-                    if (shark.visible) {
-                        map.removeLayer(shark.layer);
-                        shark.visible = false;
-                    }
-                });
-                document.getElementById('hide-all').classList.add('active');
-                document.getElementById('show-all').classList.remove('active');
-                document.getElementById('show-one').classList.remove('active');
-                showOneMode = false;
-                hideTimeSlider();
-                
-                // Hide environmental layers when leaving Show One mode
-                if (chlorophyllLayer && map.hasLayer(chlorophyllLayer)) {
-                    map.removeLayer(chlorophyllLayer);
-                }
-                if (sstLayer && map.hasLayer(sstLayer)) {
-                    map.removeLayer(sstLayer);
-                }
-                if (pocLayer && map.hasLayer(pocLayer)) {
-                    map.removeLayer(pocLayer);
-                }
-                
-                // Reset environmental layer states and button appearances
-                showChlorophyll = false;
-                showSST = false;
-                showPOC = false;
-                currentEnvironmentalMonth = null; // Reset month tracking
-                const chlButton = document.getElementById('toggle-chlorophyll');
-                const sstButton = document.getElementById('toggle-sst');
-                const pocButton = document.getElementById('toggle-poc');
-                if (chlButton) {
-                    chlButton.classList.remove('active');
-                    chlButton.textContent = 'Chlorophyll';
-                }
-                if (sstButton) {
-                    sstButton.classList.remove('active');
-                    sstButton.textContent = 'Sea Surface Temp';
-                }
-                if (pocButton) {
-                    pocButton.classList.remove('active');
-                    pocButton.textContent = 'POC';
-                }
-                
-                // Hide color scales
-                document.getElementById('chl-scale').classList.remove('visible');
-                document.getElementById('sst-scale').classList.remove('visible', 'with-chl-scale');
-                document.getElementById('poc-scale').classList.remove('visible', 'with-chl-scale', 'with-sst-scale');
-                
-                // Update visibility toggle buttons
-                updateVisibilityToggleButtons();
-                
-                // Update legend content
-                updateLegendContent();
-
-                // Update max zoom
-                updateMaxZoom();
-            });
-            
-            document.getElementById('show-one').addEventListener('click', () => {
-                showOneMode = true;
-                // Hide all tracks first
-                Object.values(sharkLayers).forEach(shark => {
-                    if (shark.visible) {
-                        map.removeLayer(shark.layer);
-                        shark.visible = false;
-                    }
-                });
-                
-                // Update button states
-                document.getElementById('show-one').classList.add('active');
-                document.getElementById('show-all').classList.remove('active');
-                document.getElementById('hide-all').classList.remove('active');
-                
-                // Update visibility toggle buttons to hide them in Show One mode
-                updateVisibilityToggleButtons();
-                
-                // Update legend content
-                updateLegendContent();
-                
-                // If a shark was already selected, update the visualization
-                if (selectedSharkId && sharkData[selectedSharkId]) {
-                    // Reset month tracking for environmental layers
-                    currentEnvironmentalMonth = null;
-                    
-                    // Show time slider and update visualization
-                    showTimeSlider(selectedSharkId);
-                    updateSharkVisualization();
-                    
-                    // Update environmental layers if any are enabled
-                    updateEnvironmentalLayers();
-                    
-                    // Highlight the selected shark in the list
-                    document.querySelectorAll('.shark-item').forEach(item => {
-                        if (item.dataset.sharkId === selectedSharkId) {
-                            item.classList.add('selected');
-                        } else {
-                            item.classList.remove('selected');
-                        }
-                    });
-                } else {
-                    // Show instruction message only if no shark is selected
-                    showNotification('Click on a shark in the list below to view its track over time!');
-                }
-            });
-            
-            // Fit to Data button
-            document.getElementById('fit-bounds').addEventListener('click', () => {
-                // If in show one mode and a shark is selected, fit to that shark's complete track
-                if (showOneMode && selectedSharkId && sharkData[selectedSharkId]) {
-                    const track = sharkData[selectedSharkId];
-                    const allLatLngs = track.map(point => [point.lat, point.lon]);
-                    const bounds = L.latLngBounds(allLatLngs);
-                    map.fitBounds(bounds.pad(0.1));
-                } else {
-                    // Use the reusable function for fitting to visible sharks
-                    fitMapToVisibleSharks();
-                }
-            });
-            
-            document.getElementById('toggle-points').addEventListener('click', () => {
-                showPoints = !showPoints;
-                
-                // Update button appearance and text based on state
-                const toggleButton = document.getElementById('toggle-points');
-                if (showPoints) {
-                    toggleButton.classList.add('active');
-                    toggleButton.textContent = 'Hide Points';
-                } else {
-                    toggleButton.classList.remove('active');
-                    toggleButton.textContent = 'Show Points';
-                }
-                
-                if (showOneMode && selectedSharkId) {
-                    // In Show One mode, only update the current shark's visualization
-                    updateSharkVisualization();
-                } else {
-                    // In normal mode, recreate all layers with/without points
-                    Object.values(sharkLayers).forEach(shark => {
-                        map.removeLayer(shark.layer);
-                    });
-                    sharkLayers = {};
-                    createSharkLayers();
-                    // Repopulate shark list to restore event handlers
-                    populateSharkList();
-                }
-            });
-            
-            // MPA toggle event listener
-            document.getElementById('toggle-mpa').addEventListener('click', toggleMPALayer);
-            
-            // Environmental layer toggle event listeners
-            document.getElementById('toggle-chlorophyll').addEventListener('click', toggleChlorophyllLayer);
-            document.getElementById('toggle-sst').addEventListener('click', toggleSSTLayer);
-            document.getElementById('toggle-poc').addEventListener('click', togglePOCLayer);
-            
-            // Bottom time slider event listener
+            // Bottom time slider event listener - now controls months
             document.getElementById('bottom-time-slider').addEventListener('input', (e) => {
-                if (selectedSharkId && sharkData[selectedSharkId]) {
-                    const percentage = e.target.value / 100;
-                    const track = sharkData[selectedSharkId];
-                    currentTimeIndex = Math.floor((track.length - 1) * percentage);
-                    updateTimeSliderDisplay();
-                    updateSharkVisualization();
-                    
-                    // Pause animation when user manually changes slider
-                    if (isPlaying) {
-                        pauseAnimation();
-                    }
+                currentMonthIndex = parseInt(e.target.value);
+                updateMonthDisplay();
+                
+                // Pause animation when user manually changes slider
+                if (isPlaying) {
+                    pauseAnimation();
                 }
             });
             
@@ -2030,17 +1843,17 @@
             });
             
             // Follow button
-            document.getElementById('follow-button').addEventListener('click', (e) => {
-                followMode = !followMode;
-                const button = e.target;
-                if (followMode) {
-                    button.classList.add('active');
-                    button.textContent = '🦈 Following';
-                } else {
-                    button.classList.remove('active');
-                    button.textContent = '🦈 Follow';
-                }
-            });
+            // document.getElementById('follow-button').addEventListener('click', (e) => {
+            //     followMode = !followMode;
+            //     const button = e.target;
+            //     if (followMode) {
+            //         button.classList.add('active');
+            //         button.textContent = '🦈 Following';
+            //     } else {
+            //         button.classList.remove('active');
+            //         button.textContent = '🦈 Follow';
+            //     }
+            // });
             
             // Map dragging control for bottom time controls
             const bottomControls = document.getElementById('bottom-time-controls');
@@ -2055,44 +1868,9 @@
                 map.doubleClickZoom.enable();
                 map.scrollWheelZoom.enable();
             });
-            
-            // Scroll zoom toggle
-            document.getElementById('toggle-scroll-zoom').addEventListener('click', (e) => {
-                const button = e.target;
-                if (button.classList.contains('active')) {
-                    // Disable scroll zoom
-                    map.scrollWheelZoom.disable();
-                    button.classList.remove('active');
-                    showNotification('Scroll zoom disabled');
-                } else {
-                    // Enable scroll zoom
-                    map.scrollWheelZoom.enable();
-                    button.classList.add('active');
-                    showNotification('Scroll zoom enabled');
-                }
-            });
-            
-            // Initialize toggle points button state
-            const toggleButton = document.getElementById('toggle-points');
-            if (showPoints) {
-                toggleButton.classList.add('active');
-                toggleButton.textContent = 'Hide Points';
-            } else {
-                toggleButton.classList.remove('active');
-                toggleButton.textContent = 'Show Points';
-            }
-            
-            // Initialize environmental layer buttons to be disabled by default
-            const chlorophyllButton = document.getElementById('toggle-chlorophyll');
-            const sstButton = document.getElementById('toggle-sst');
-            if (chlorophyllButton) {
-                chlorophyllButton.disabled = true;
-                chlorophyllButton.style.opacity = '0.5';
-            }
-            if (sstButton) {
-                sstButton.disabled = true;
-                sstButton.style.opacity = '0.5';
-            }
+
+            // MPA toggle event listener
+            document.getElementById('toggle-mpa').addEventListener('click', toggleMPALayer);
             
             // Initialize time slider text color
             updateTimeSliderTextColor();
@@ -2113,95 +1891,17 @@
             map.on('dragstart', disableFollowMode);
         }
         
-        // Show time slider
-        function showTimeSlider(sharkId) {
-            const bottomContainer = document.getElementById('bottom-time-controls');
-            bottomContainer.classList.add('visible');
-            
-            const track = sharkData[sharkId];
-            const metadata = sharkMetadata[sharkId] || {};
-            // Match the year which comes after the initial 160424_ prefix
-            const yearMatch = sharkId.match(/160424_(\d{4})/);
-            const year = yearMatch ? yearMatch[1] : sharkId.match(/(\d{4})/)[1];
-            const shortId = sharkId.replace('160424_', '').replace(`${year}_`, '').replace('pnas_atn', '').replace('_filtered', '');
-            
-            // Update bottom controls (no need to check for elements since they're commented out)
-            // document.getElementById('bottom-control-title').textContent = `Shark ${shortId} (${year})`;
-            // document.getElementById('bottom-control-info').textContent = `${track.length} points • ${Math.round((track[track.length - 1].date - track[0].date) / (1000 * 60 * 60 * 24))} days`;
-            
-            // Set up time display
-            const startDate = track[0].date.toLocaleDateString();
-            const endDate = track[track.length - 1].date.toLocaleDateString();
-            
-            // Bottom time display
-            document.getElementById('bottom-start-time').textContent = startDate;
-            document.getElementById('bottom-end-time').textContent = endDate;
-            document.getElementById('bottom-current-time').textContent = endDate;
-            
-            // Set slider to end (100%)
-            document.getElementById('bottom-time-slider').value = 100;
-            currentTimeIndex = track.length - 1;
-            
-            // Move scale control up to avoid collision with time slider
-            const scaleControl = document.querySelector('.leaflet-control-scale');
-            if (scaleControl) {
-                scaleControl.style.bottom = '90px';
-                scaleControl.style.transition = 'bottom 0.3s ease';
-            }
-        }
+
         
-        // Hide time slider
-        function hideTimeSlider() {
-            const bottomContainer = document.getElementById('bottom-time-controls');
-            bottomContainer.classList.remove('visible');
-            
-            // Stop any playing animation
-            pauseAnimation();
-            
-            if (timeSliderLayer) {
-                map.removeLayer(timeSliderLayer);
-                timeSliderLayer = null;
-            }
-            
-            // Move scale control back to original position
-            const scaleControl = document.querySelector('.leaflet-control-scale');
-            if (scaleControl) {
-                scaleControl.style.bottom = '10px';
-                scaleControl.style.transition = 'bottom 0.3s ease';
-            }
-        }
-        
-        // Update time slider display
-        function updateTimeSliderDisplay() {
-            if (selectedSharkId && sharkData[selectedSharkId]) {
-                const track = sharkData[selectedSharkId];
-                const currentDate = track[currentTimeIndex].date.toLocaleDateString();
-                document.getElementById('bottom-current-time').textContent = currentDate;
-            }
-        }
-        
-        // Start animation
+        // Start animation - now animates through months
         function startAnimation() {
-            if (!selectedSharkId || !sharkData[selectedSharkId] || isPlaying) return;
-            
-            const track = sharkData[selectedSharkId];
+            if (isPlaying || monthsList.length === 0) return;
             
             // If we're at the end, reset to the beginning
-            if (currentTimeIndex >= track.length - 1) {
-                currentTimeIndex = 0;
-                // Update slider and display immediately
+            if (currentMonthIndex >= monthsList.length - 1) {
+                currentMonthIndex = 0;
                 document.getElementById('bottom-time-slider').value = 0;
-                updateTimeSliderDisplay();
-                updateSharkVisualization();
-            }
-            
-            // Close any open popups when animation starts
-            if (timeSliderLayer) {
-                timeSliderLayer.eachLayer(layer => {
-                    if (layer instanceof L.CircleMarker && layer.isPopupOpen()) {
-                        layer.closePopup();
-                    }
-                });
+                updateMonthDisplay();
             }
             
             isPlaying = true;
@@ -2211,21 +1911,19 @@
             const delay = playStepDelay / playSpeed;
             
             playInterval = setInterval(() => {
-                if (currentTimeIndex >= track.length - 1) {
+                if (currentMonthIndex >= monthsList.length - 1) {
                     // Reached the end, stop animation
                     pauseAnimation();
                     return;
-                } else {
-                    currentTimeIndex++;
                 }
                 
-                // Update slider position
-                const percentage = (currentTimeIndex / (track.length - 1)) * 100;
-                document.getElementById('bottom-time-slider').value = percentage;
+                currentMonthIndex++;
                 
-                // Update display and visualization
-                updateTimeSliderDisplay();
-                updateSharkVisualization();
+                // Update slider position
+                document.getElementById('bottom-time-slider').value = currentMonthIndex;
+                
+                // Update display
+                updateMonthDisplay();
                 
             }, delay);
         }
@@ -2242,142 +1940,8 @@
                 clearInterval(playInterval);
                 playInterval = null;
             }
-            
-            // Show current marker popup when animation is paused
-            setTimeout(() => {
-                if (currentMarker && currentMarker._map) {
-                    currentMarker.openPopup();
-                }
-            }, 100); // Small delay to ensure layer is fully rendered and added to map
         }
-        
-        // Update shark visualization based on time slider
-        function updateSharkVisualization() {
-            if (!selectedSharkId || !sharkData[selectedSharkId]) return;
-            
-            // Remove existing time slider layer
-            if (timeSliderLayer) {
-                map.removeLayer(timeSliderLayer);
-            }
-            
-            const track = sharkData[selectedSharkId];
-            const color = sharkLayers[selectedSharkId].color;
-            
-            timeSliderLayer = L.layerGroup();
-            
-            // Draw the complete track with two segments: past and future
-            const allLatLngs = track.map(point => [point.lat, point.lon]);
-            
-            if (track.length > 1) {
-                // Past segment (from start to current position) - full opacity
-                if (currentTimeIndex > 0) {
-                    const pastLatLngs = allLatLngs.slice(0, currentTimeIndex + 1);
-                    const pastPolyline = L.polyline(pastLatLngs, {
-                        color: color,
-                        weight: 4,
-                        opacity: 0.8
-                    });
-                    timeSliderLayer.addLayer(pastPolyline);
-                }
-                
-                // Future segment (from current position to end) - reduced opacity
-                if (currentTimeIndex < track.length - 1) {
-                    const futureLatLngs = allLatLngs.slice(currentTimeIndex);
-                    const futurePolyline = L.polyline(futureLatLngs, {
-                        color: color,
-                        weight: 4,
-                        opacity: 0.3
-                    });
-                    timeSliderLayer.addLayer(futurePolyline);
-                }
-            }
-            
-            // Add start marker (deployment location)
-            const startPoint = track[0];
-            const startMarker = L.circleMarker([startPoint.lat, startPoint.lon], {
-                radius: 10,
-                fillColor: '#e74c3c',
-                color: '#fff',
-                weight: 3,
-                opacity: 1,
-                fillOpacity: 0.9
-            });
-            startMarker.bindPopup(`<strong>Deployment Location</strong><br/>Date: ${startPoint.date.toLocaleDateString()}`);
-            timeSliderLayer.addLayer(startMarker);
-            
-            // Add end marker (final location)
-            const endPoint = track[track.length - 1];
-            const endMarker = L.circleMarker([endPoint.lat, endPoint.lon], {
-                radius: 8,
-                fillColor: '#27ae60',
-                color: '#fff',
-                weight: 2,
-                opacity: 0.6,
-                fillOpacity: 0.6
-            });
-            endMarker.bindPopup(`<strong>Final Location</strong><br/>Date: ${endPoint.date.toLocaleDateString()}`);
-            timeSliderLayer.addLayer(endMarker);
-            
-            // Add current position marker (shark icon)
-            const currentPoint = track[currentTimeIndex];
-            currentMarker = L.marker([currentPoint.lat, currentPoint.lon], {
-                icon: L.divIcon({
-                    html: '<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 24px; background: none !important; border: none !important; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); animation: shark-pulse 2s ease-in-out infinite;">🦈</div>',
-                    className: 'shark-icon',
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 15]
-                })
-            });
-            
-            // Calculate distance from start
-            const currentTrack = track.slice(0, currentTimeIndex + 1);
-            const distanceTraveled = calculateDistance(currentTrack);
-            
-            currentMarker.bindPopup(`
-                <strong>Current Position</strong><br/>
-                Date: ${currentPoint.date.toLocaleDateString()}<br/>
-                Day ${Math.round((currentPoint.date - startPoint.date) / (1000 * 60 * 60 * 24))} of tracking<br/>
-                Location: ${currentPoint.lat.toFixed(4)}, ${currentPoint.lon.toFixed(4)}<br/>
-                Quality: ${currentPoint.lc}<br/>
-                Distance traveled: ~${distanceTraveled.toFixed(0)} km<br/>
-                Progress: ${Math.round((currentTimeIndex / (track.length - 1)) * 100)}%
-            `);
-            timeSliderLayer.addLayer(currentMarker);
-            
-            // Add individual points if enabled
-            if (showPoints) {
-                track.forEach((point, index) => {
-                    // Past points: full opacity, Future points: reduced opacity
-                    const isPast = index <= currentTimeIndex;
-                    const baseOpacity = isPast ? 0.7 : 0.1;
-                    const pointMarker = L.circleMarker([point.lat, point.lon], {
-                        radius: isPast ? 3 : 2,
-                        fillColor: color,
-                        color: color,
-                        weight: 1,
-                        opacity: baseOpacity,
-                        fillOpacity: baseOpacity
-                    });
-                    pointMarker.bindPopup(`
-                        Date: ${point.date.toLocaleDateString()}<br/>
-                        Location: ${point.lat.toFixed(4)}, ${point.lon.toFixed(4)}<br/>
-                        Quality: ${point.lc}<br/>
-                        Status: ${isPast ? 'Past' : 'Future'}
-                    `);
-                    timeSliderLayer.addLayer(pointMarker);
-                });
-            }
-            
-            timeSliderLayer.addTo(map);
-            
-            // Center on current position when follow mode is enabled (no zoom change)
-            if (followMode) {
-                map.setView([currentPoint.lat, currentPoint.lon]);
-            }
-            
-            // Update environmental layers to match current timestamp
-            updateEnvironmentalLayers();
-        }
+
 
         // Filter sharks by year
         // function filterSharksByYear(year) {
@@ -2404,187 +1968,161 @@
         //     });
         // }
 
-        // Legend management functions (simplified)
-        function updateLegendContent() {
-            const legendContent = document.getElementById('legend-content');
+        // Legend management functions
+        // function updateLegendContent() {
+        //     const legendContent = document.getElementById('legend-content');
             
-            // Simplified legend - just show markers and MPA if visible
-            let content = `
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #e74c3c;"></div>
-                    <span class="legend-text">Start Location</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #27ae60;"></div>
-                    <span class="legend-text">End Location</span>
-                </div>
-            `;
-            
-            if (showMPA && mpaLayer) {
-                content += `
-                    <div class="legend-item">
-                        <div class="legend-color" style="background-color: #42a5f5; border: 1px solid #1e88e5;"></div>
-                        <span class="legend-text">Marine Protected Areas</span>
-                    </div>
-                `;
-            }
-            
-            const sharkCount = Object.keys(sharkData).length;
-            if (sharkCount > 0) {
-                content += `
-                    <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #ecf0f1;">
-                        <div class="legend-item">
-                            <span class="legend-text" style="color: #3498db; font-weight: bold;">${sharkCount} sharks displayed</span>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            legendContent.innerHTML = content;
-        }
-
-        // Removed old implementation
-        /*
-            if (showOneMode && selectedSharkId) {
-                // Show One mode - display current position and static markers
-                legendContent.innerHTML = `
-                    <div class="legend-item">
-                        <div class="legend-color" style="background-color: #e74c3c;"></div>
-                        <span class="legend-text">Deployment Location</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background-color: #27ae60;"></div>
-                        <span class="legend-text">Final Location</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-emoji">🦈</div>
-                        <span class="legend-text">Current Position</span>
-                    </div>
-                    ${showMPA && mpaLayer ? `
-                    <div class="legend-item">
-                        <div class="legend-color" style="background-color: #42a5f5; border: 1px solid #1e88e5;"></div>
-                        <span class="legend-text">Marine Protected Areas</span>
-                    </div>
-                    ` : ''}
-                    ${showChlorophyll && chlorophyllLayer ? `
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: linear-gradient(90deg, #000080 0%, #0066cc 25%, #00ccff 50%, #66ff66 75%, #ffff00 100%); opacity: 0.6;"></div>
-                        <span class="legend-text">Chlorophyll Concentration</span>
-                    </div>
-                    ` : ''}
-                    ${showSST && sstLayer ? `
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: linear-gradient(90deg, #000066 0%, #0033cc 25%, #ff3300 50%, #ff9900 75%, #ffcc00 100%); opacity: 0.6;"></div>
-                        <span class="legend-text">Sea Surface Temperature</span>
-                    </div>
-                    ` : ''}
-                `;
-            } else {
-                // Show All/Hide All mode - display visible sharks
-                // Use same sorting order as shark list
-                const sortedSharkIds = Object.keys(sharkData).sort();
-                const visibleSharks = sortedSharkIds.filter(sharkId => 
-                    sharkLayers[sharkId] && sharkLayers[sharkId].visible
-                );
+        //     if (showOneMode && selectedSharkId) {
+        //         // Show One mode - display current position and static markers
+        //         legendContent.innerHTML = `
+        //             <div class="legend-item">
+        //                 <div class="legend-color" style="background-color: #e74c3c;"></div>
+        //                 <span class="legend-text">Deployment Location</span>
+        //             </div>
+        //             <div class="legend-item">
+        //                 <div class="legend-color" style="background-color: #27ae60;"></div>
+        //                 <span class="legend-text">Final Location</span>
+        //             </div>
+        //             <div class="legend-item">
+        //                 <div class="legend-emoji">🦈</div>
+        //                 <span class="legend-text">Current Position</span>
+        //             </div>
+        //             ${showMPA && mpaLayer ? `
+        //             <div class="legend-item">
+        //                 <div class="legend-color" style="background-color: #42a5f5; border: 1px solid #1e88e5;"></div>
+        //                 <span class="legend-text">Marine Protected Areas</span>
+        //             </div>
+        //             ` : ''}
+        //             ${showChlorophyll && chlorophyllLayer ? `
+        //             <div class="legend-item">
+        //                 <div class="legend-color" style="background: linear-gradient(90deg, #000080 0%, #0066cc 25%, #00ccff 50%, #66ff66 75%, #ffff00 100%); opacity: 0.6;"></div>
+        //                 <span class="legend-text">Chlorophyll Concentration</span>
+        //             </div>
+        //             ` : ''}
+        //             ${showSST && sstLayer ? `
+        //             <div class="legend-item">
+        //                 <div class="legend-color" style="background: linear-gradient(90deg, #000066 0%, #0033cc 25%, #ff3300 50%, #ff9900 75%, #ffcc00 100%); opacity: 0.6;"></div>
+        //                 <span class="legend-text">Sea Surface Temperature</span>
+        //             </div>
+        //             ` : ''}
+        //             ${showPOC && pocLayer ? `
+        //             <div class="legend-item">
+        //                 <div class="legend-color" style="background: linear-gradient(90deg, #800080 0%, #9932cc 25%, #ba55d3 50%, #daa520 75%, #ffff00 100%); opacity: 0.6;"></div>
+        //                 <span class="legend-text">Particulate Organic Carbon</span>
+        //             </div>
+        //             ` : ''}
+        //         `;
+        //     } else {
+        //         // Show All/Hide All mode - display visible sharks
+        //         // Use same sorting order as shark list
+        //         const sortedSharkIds = Object.keys(sharkData).sort();
+        //         const visibleSharks = sortedSharkIds.filter(sharkId => 
+        //             sharkLayers[sharkId] && sharkLayers[sharkId].visible
+        //         );
                 
-                if (visibleSharks.length === 0) {
-                    legendContent.innerHTML = `
-                        <div class="legend-item">
-                            <span class="legend-text" style="color: #7f8c8d; font-style: italic;">No sharks visible</span>
-                        </div>
-                    `;
-                } else {
-                    let content = `
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: #e74c3c;"></div>
-                            <span class="legend-text">Deployment Location</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: #27ae60;"></div>
-                            <span class="legend-text">Last Known Position</span>
-                        </div>
-                        ${showMPA && mpaLayer ? `
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: #42a5f5; border: 1px solid #1e88e5;"></div>
-                            <span class="legend-text">Marine Protected Areas</span>
-                        </div>
-                        ` : ''}
-                        ${showChlorophyll && chlorophyllLayer ? `
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: linear-gradient(90deg, #000080 0%, #0066cc 25%, #00ccff 50%, #66ff66 75%, #ffff00 100%); opacity: 0.6;"></div>
-                            <span class="legend-text">Chlorophyll Concentration</span>
-                        </div>
-                        ` : ''}
-                        ${showSST && sstLayer ? `
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: linear-gradient(90deg, #000066 0%, #0033cc 25%, #ff3300 50%, #ff9900 75%, #ffcc00 100%); opacity: 0.6;"></div>
-                            <span class="legend-text">Sea Surface Temperature</span>
-                        </div>
-                        ` : ''}
-                    `;
+        //         if (visibleSharks.length === 0) {
+        //             legendContent.innerHTML = `
+        //                 <div class="legend-item">
+        //                     <span class="legend-text" style="color: #7f8c8d; font-style: italic;">No sharks visible</span>
+        //                 </div>
+        //             `;
+        //         } else {
+        //             let content = `
+        //                 <div class="legend-item">
+        //                     <div class="legend-color" style="background-color: #e74c3c;"></div>
+        //                     <span class="legend-text">Deployment Location</span>
+        //                 </div>
+        //                 <div class="legend-item">
+        //                     <div class="legend-color" style="background-color: #27ae60;"></div>
+        //                     <span class="legend-text">Last Known Position</span>
+        //                 </div>
+        //                 ${showMPA && mpaLayer ? `
+        //                 <div class="legend-item">
+        //                     <div class="legend-color" style="background-color: #42a5f5; border: 1px solid #1e88e5;"></div>
+        //                     <span class="legend-text">Marine Protected Areas</span>
+        //                 </div>
+        //                 ` : ''}
+        //                 ${showChlorophyll && chlorophyllLayer ? `
+        //                 <div class="legend-item">
+        //                     <div class="legend-color" style="background: linear-gradient(90deg, #000080 0%, #0066cc 25%, #00ccff 50%, #66ff66 75%, #ffff00 100%); opacity: 0.6;"></div>
+        //                     <span class="legend-text">Chlorophyll Concentration</span>
+        //                 </div>
+        //                 ` : ''}
+        //                 ${showSST && sstLayer ? `
+        //                 <div class="legend-item">
+        //                     <div class="legend-color" style="background: linear-gradient(90deg, #000066 0%, #0033cc 25%, #ff3300 50%, #ff9900 75%, #ffcc00 100%); opacity: 0.6;"></div>
+        //                     <span class="legend-text">Sea Surface Temperature</span>
+        //                 </div>
+        //                 ` : ''}
+        //                 ${showPOC && pocLayer ? `
+        //                 <div class="legend-item">
+        //                     <div class="legend-color" style="background: linear-gradient(90deg, #800080 0%, #9932cc 25%, #ba55d3 50%, #daa520 75%, #ffff00 100%); opacity: 0.6;"></div>
+        //                     <span class="legend-text">Particulate Organic Carbon</span>
+        //                 </div>
+        //                 ` : ''}
+        //             `;
                     
-                    // Calculate approximate height to determine if legend would overflow
-                    // Base height: ~60px for static items + header
-                    // Each shark item: ~22px (including margins)
-                    // Available space: roughly viewport height - 120px (for header) - 60px (legend position)
-                    const baseHeight = 80; // Static items + padding
-                    const itemHeight = 22; // Approximate height per shark item
-                    const availableHeight = window.innerHeight - 180; // Account for header and positioning
-                    const maxSharkItems = Math.floor((availableHeight - baseHeight) / itemHeight);
-                    // console.log('Available height for legend:', availableHeight, 'Max shark items:', maxSharkItems);
-                    // console.log('Visible sharks:', visibleSharks.length);
+        //             // Calculate approximate height to determine if legend would overflow
+        //             // Base height: ~60px for static items + header
+        //             // Each shark item: ~22px (including margins)
+        //             // Available space: roughly viewport height - 120px (for header) - 60px (legend position)
+        //             const baseHeight = 80; // Static items + padding
+        //             const itemHeight = 22; // Approximate height per shark item
+        //             const availableHeight = window.innerHeight - 180; // Account for header and positioning
+        //             const maxSharkItems = Math.floor((availableHeight - baseHeight) / itemHeight);
+        //             // console.log('Available height for legend:', availableHeight, 'Max shark items:', maxSharkItems);
+        //             // console.log('Visible sharks:', visibleSharks.length);
                     
-                    if (visibleSharks.length <= maxSharkItems) {
-                        // Show individual sharks if they fit without overflowing
-                        content += '<div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #ecf0f1;"><div class="legend-shark-list">';
-                        visibleSharks.forEach(sharkId => {
-                            const color = sharkLayers[sharkId].color;
-                            const yearMatch = sharkId.match(/160424_(\d{4})/);
-                            const year = yearMatch ? yearMatch[1] : sharkId.match(/(\d{4})/)[1];
-                            const shortId = sharkId.replace('160424_', '').replace(`${year}_`, '').replace('pnas_atn', '').replace('_filtered', '');
+        //             if (visibleSharks.length <= maxSharkItems) {
+        //                 // Show individual sharks if they fit without overflowing
+        //                 content += '<div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #ecf0f1;"><div class="legend-shark-list">';
+        //                 visibleSharks.forEach(sharkId => {
+        //                     const color = sharkLayers[sharkId].color;
+        //                     const yearMatch = sharkId.match(/160424_(\d{4})/);
+        //                     const year = yearMatch ? yearMatch[1] : sharkId.match(/(\d{4})/)[1];
+        //                     const shortId = sharkId.replace('160424_', '').replace(`${year}_`, '').replace('pnas_atn', '').replace('_filtered', '');
                             
-                            content += `
-                                <div class="legend-shark-item">
-                                    <svg width="20" height="12" style="margin-right: 8px; vertical-align: middle;">
-                                        <line x1="2" y1="6" x2="18" y2="6" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
-                                    </svg>
-                                    <span class="legend-text">Shark ${shortId} (${year})</span>
-                                </div>
-                            `;
-                        });
-                        content += '</div></div>';
-                    } else {
-                        // Show count if legend would overflow the map
-                        content += `
-                            <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #ecf0f1;">
-                                <div class="legend-item">
-                                    <span class="legend-text" style="color: #3498db; font-weight: bold;">${visibleSharks.length} sharks visible</span>
-                                </div>
-                            </div>
-                        `;
-                    }
+        //                     content += `
+        //                         <div class="legend-shark-item">
+        //                             <svg width="20" height="12" style="margin-right: 8px; vertical-align: middle;">
+        //                                 <line x1="2" y1="6" x2="18" y2="6" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+        //                             </svg>
+        //                             <span class="legend-text">Shark ${shortId} (${year})</span>
+        //                         </div>
+        //                     `;
+        //                 });
+        //                 content += '</div></div>';
+        //             } else {
+        //                 // Show count if legend would overflow the map
+        //                 content += `
+        //                     <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #ecf0f1;">
+        //                         <div class="legend-item">
+        //                             <span class="legend-text" style="color: #3498db; font-weight: bold;">${visibleSharks.length} sharks visible</span>
+        //                         </div>
+        //                     </div>
+        //                 `;
+        //             }
                     
-                    legendContent.innerHTML = content;
-                }
-            }
-        }
-        */
+        //             legendContent.innerHTML = content;
+        //         }
+        //     }
+        // }
         
-        function toggleLegend() {
-            const legend = document.getElementById('legend');
-            const toggle = legend.querySelector('.legend-toggle');
+        // function toggleLegend() {
+        //     const legend = document.getElementById('legend');
+        //     const toggle = legend.querySelector('.legend-toggle');
             
-            legend.classList.toggle('collapsed');
+        //     legend.classList.toggle('collapsed');
             
-            if (legend.classList.contains('collapsed')) {
-                toggle.textContent = '▶';
-                legend.querySelector('.legend-title').textContent = 'View Legend';
-            } else {
-                toggle.textContent = '▼';
-                legend.querySelector('.legend-title').textContent = 'Legend';
-                updateLegendContent(); // Refresh content when expanding
-            }
-        }
+        //     if (legend.classList.contains('collapsed')) {
+        //         toggle.textContent = '▶';
+        //         legend.querySelector('.legend-title').textContent = 'View Legend';
+        //     } else {
+        //         toggle.textContent = '▼';
+        //         legend.querySelector('.legend-title').textContent = 'Legend';
+        //         updateLegendContent(); // Refresh content when expanding
+        //     }
+        // }
 
         // Initialize everything
         document.addEventListener('DOMContentLoaded', () => {
