@@ -1991,6 +1991,17 @@
                     document.querySelectorAll('.shark-item').forEach(el => el.classList.remove('selected'));
                     item.classList.add('selected');
                     
+                    // Dismiss any notification when a shark is clicked
+                    const existingNotification = document.querySelector('.notification');
+                    if (existingNotification) {
+                        existingNotification.classList.add('fadeOut');
+                        setTimeout(() => {
+                            if (existingNotification.parentNode) {
+                                existingNotification.remove();
+                            }
+                        }, 300);
+                    }
+                    
                     if (showOneMode) {
                         // Show One mode: Enable time slider for this shark
                         selectedSharkId = sharkId;
@@ -2121,7 +2132,19 @@
 
         // Fit map to all currently visible sharks
         function fitMapToVisibleSharks() {
-            // Fit to all currently visible shark layers
+            // Special handling for Show One mode (Animation mode)
+            if (showOneMode && selectedSharkId && sharkData[selectedSharkId]) {
+                const track = sharkData[selectedSharkId];
+                const trackLatLngs = track.map(point => [point.lat, point.lon]);
+                
+                if (trackLatLngs.length > 0) {
+                    const bounds = L.latLngBounds(trackLatLngs);
+                    map.fitBounds(bounds.pad(0.2));
+                }
+                return;
+            }
+            
+            // Fit to all currently visible shark layers (Show All / Hide All mode)
             const visibleSharkLayers = Object.values(sharkLayers).filter(s => s.visible);
             if (visibleSharkLayers.length > 0) {
                 // Collect all lat/lng bounds from visible sharks
@@ -2161,6 +2184,17 @@
             });
             
             document.getElementById('show-all').addEventListener('click', () => {
+                // Dismiss any notification when Show all is clicked
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.classList.add('fadeOut');
+                    setTimeout(() => {
+                        if (existingNotification.parentNode) {
+                            existingNotification.remove();
+                        }
+                    }, 300);
+                }
+                
                 showOneMode = false;
                 selectedSharkId = null;
                 hideTimeSlider();
@@ -2226,6 +2260,17 @@
             });
             
             document.getElementById('hide-all').addEventListener('click', () => {
+                // Dismiss any notification when Hide all is clicked
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.classList.add('fadeOut');
+                    setTimeout(() => {
+                        if (existingNotification.parentNode) {
+                            existingNotification.remove();
+                        }
+                    }, 300);
+                }
+                
                 Object.values(sharkLayers).forEach(shark => {
                     if (shark.visible) {
                         map.removeLayer(shark.layer);
