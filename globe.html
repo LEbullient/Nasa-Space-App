@@ -573,7 +573,7 @@
 
 	<div class="container" id="container">
 		<!-- Menu toggle button -->
-		<button class="menu-toggle" id="menu-toggle" title="Toggle Sidebar">
+		<button class="menu-toggle" id="menu-toggle" title="Toggle Sidebar" style="display: none;">
 			<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
 				<path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/>
 			</svg>
@@ -586,16 +586,16 @@
 					<label>Display Mode</label>
 					<button id="show-all" class="active">Show All</button>
 					<button id="hide-all">Hide All</button>
-					<button id="show-one">Animate</button>
+					<button id="show-one">Animation</button>
 				</div>
 				
-				<div class="control-group">
+				<!-- <div class="control-group">
 					<label>View Controls</label>
 					<button id="fit-bounds">Fit Map</button>
 					<button id="toggle-points" class="active">Toggle Points</button>
 					<button id="reset-camera" style="display: none;">Reset Camera</button>
 					<button id="toggle-mouse-controls" class="active" style="display: none;">Disable Mouse</button>
-				</div>
+				</div> -->
 				
 			</div>
 			<h3>Tracked Sharks</h3>
@@ -1003,15 +1003,8 @@
 						hideAllSharks();
 						showTimeSlider(sharkId);
 						updateSharkVisualization();
-					} else {
-						// Fly to shark track
-						const track = sharkData[sharkId];
-						const positions = track.map(point => 
-							Cesium.Cartesian3.fromDegrees(point.lon, point.lat)
-						);
-						
-						viewer.flyTo(sharkEntities[sharkId].entities);
 					}
+					// Removed fly-to functionality - clicking no longer zooms to shark
 				});
 
 				// Add event listener for visibility toggle button
@@ -1373,71 +1366,71 @@
 			});
 			
 			// Fit to Data button
-			document.getElementById('fit-bounds').addEventListener('click', () => {
-				if (showOneMode && selectedSharkId && sharkData[selectedSharkId]) {
-					viewer.flyTo(sharkEntities[selectedSharkId].entities);
-				} else {
-					const visibleEntities = [];
-					Object.keys(sharkEntities).forEach(sharkId => {
-						if (sharkEntities[sharkId].visible) {
-							visibleEntities.push(...sharkEntities[sharkId].entities);
-						}
-					});
-					if (visibleEntities.length > 0) {
-						viewer.flyTo(visibleEntities);
-					}
-				}
-			});
+			// document.getElementById('fit-bounds').addEventListener('click', () => {
+			// 	if (showOneMode && selectedSharkId && sharkData[selectedSharkId]) {
+			// 		viewer.flyTo(sharkEntities[selectedSharkId].entities);
+			// 	} else {
+			// 		const visibleEntities = [];
+			// 		Object.keys(sharkEntities).forEach(sharkId => {
+			// 			if (sharkEntities[sharkId].visible) {
+			// 				visibleEntities.push(...sharkEntities[sharkId].entities);
+			// 			}
+			// 		});
+			// 		if (visibleEntities.length > 0) {
+			// 			viewer.flyTo(visibleEntities);
+			// 		}
+			// 	}
+			// });
 			
-			document.getElementById('toggle-points').addEventListener('click', () => {
-				showPoints = !showPoints;
+			// document.getElementById('toggle-points').addEventListener('click', () => {
+			// 	showPoints = !showPoints;
 				
-				const toggleButton = document.getElementById('toggle-points');
-				if (showPoints) {
-					toggleButton.classList.add('active');
-					toggleButton.textContent = 'Hide Points';
-				} else {
-					toggleButton.classList.remove('active');
-					toggleButton.textContent = 'Show Points';
-				}
+			// 	const toggleButton = document.getElementById('toggle-points');
+			// 	if (showPoints) {
+			// 		toggleButton.classList.add('active');
+			// 		toggleButton.textContent = 'Hide Points';
+			// 	} else {
+			// 		toggleButton.classList.remove('active');
+			// 		toggleButton.textContent = 'Show Points';
+			// 	}
 				
-				if (showOneMode && selectedSharkId) {
-					updateSharkVisualization();
-				} else {
-					// Recreate all entities with/without points
-					viewer.entities.removeAll();
-					sharkEntities = {};
-					createSharkEntities();
-					populateSharkList();
-				}
-			});
+			// 	if (showOneMode && selectedSharkId) {
+			// 		updateSharkVisualization();
+			// 	} else {
+			// 		// Recreate all entities with/without points
+			// 		viewer.entities.removeAll();
+			// 		sharkEntities = {};
+			// 		createSharkEntities();
+			// 		populateSharkList();
+			// 	}
+			// });
 
-			document.getElementById('reset-camera').addEventListener('click', () => {
-				viewer.camera.flyTo({
-					destination: Cesium.Cartesian3.fromDegrees(-40.0, 45.0, 15000000),
-				});
-			});
+			// document.getElementById('reset-camera').addEventListener('click', () => {
+			// 	viewer.camera.flyTo({
+			// 		destination: Cesium.Cartesian3.fromDegrees(-40.0, 45.0, 15000000),
+			// 	});
+			// });
 
-			document.getElementById('toggle-mouse-controls').addEventListener('click', (e) => {
-				const button = e.target;
-				if (button.classList.contains('active')) {
-					// Disable mouse controls
-					viewer.scene.screenSpaceCameraController.enableRotate = false;
-					viewer.scene.screenSpaceCameraController.enableTranslate = false;
-					viewer.scene.screenSpaceCameraController.enableZoom = false;
-					button.classList.remove('active');
-					button.textContent = 'Enable Mouse';
-					showNotification('Mouse navigation disabled');
-				} else {
-					// Enable mouse controls
-					viewer.scene.screenSpaceCameraController.enableRotate = true;
-					viewer.scene.screenSpaceCameraController.enableTranslate = true;
-					viewer.scene.screenSpaceCameraController.enableZoom = true;
-					button.classList.add('active');
-					button.textContent = 'Disable Mouse';
-					showNotification('Mouse navigation enabled');
-				}
-			});
+			// document.getElementById('toggle-mouse-controls').addEventListener('click', (e) => {
+			// 	const button = e.target;
+			// 	if (button.classList.contains('active')) {
+			// 		// Disable mouse controls
+			// 		viewer.scene.screenSpaceCameraController.enableRotate = false;
+			// 		viewer.scene.screenSpaceCameraController.enableTranslate = false;
+			// 		viewer.scene.screenSpaceCameraController.enableZoom = false;
+			// 		button.classList.remove('active');
+			// 		button.textContent = 'Enable Mouse';
+			// 		showNotification('Mouse navigation disabled');
+			// 	} else {
+			// 		// Enable mouse controls
+			// 		viewer.scene.screenSpaceCameraController.enableRotate = true;
+			// 		viewer.scene.screenSpaceCameraController.enableTranslate = true;
+			// 		viewer.scene.screenSpaceCameraController.enableZoom = true;
+			// 		button.classList.add('active');
+			// 		button.textContent = 'Disable Mouse';
+			// 		showNotification('Mouse navigation enabled');
+			// 	}
+			// });
 			
 			// Bottom time slider event listener
 			document.getElementById('bottom-time-slider').addEventListener('input', (e) => {
@@ -1492,14 +1485,14 @@
 			});
 
 			// Initialize toggle points button state
-			const toggleButton = document.getElementById('toggle-points');
-			if (showPoints) {
-				toggleButton.classList.add('active');
-				toggleButton.textContent = 'Hide Points';
-			} else {
-				toggleButton.classList.remove('active');
-				toggleButton.textContent = 'Show Points';
-			}
+			// const toggleButton = document.getElementById('toggle-points');
+			// if (showPoints) {
+			// 	toggleButton.classList.add('active');
+			// 	toggleButton.textContent = 'Hide Points';
+			// } else {
+			// 	toggleButton.classList.remove('active');
+			// 	toggleButton.textContent = 'Show Points';
+			// }
 		}
 
 		// Set up viewer interaction listeners
