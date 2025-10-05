@@ -134,7 +134,7 @@
         }
 
         .controls {
-            margin-bottom: 2rem;
+            margin-bottom: 0.75rem;
         }
 
         .control-group {
@@ -146,10 +146,11 @@
             margin-bottom: 0.5rem;
             font-weight: bold;
             color: #34495e;
+            font-size: 1.2rem;
         }
 
         .control-group button {
-            background-color: #3498db;
+            /* background-color: #3498db; */
             color: white;
             border: none;
             padding: 0.5rem 1rem;
@@ -159,9 +160,9 @@
             margin-bottom: 0.5rem;
         }
 
-        .control-group button:hover {
+        /* .control-group button:hover {
             background-color: #2980b9;
-        }
+        } */
 
         .control-group button.active {
             background-color: #27ae60;
@@ -175,6 +176,201 @@
 
         .control-group button:disabled:hover {
             background-color: #95a5a6;
+        }
+
+        /* Toggle switch styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #27ae60;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .toggle-switch input:disabled + .toggle-slider {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Help icon styles */
+        .help-icon {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            background: none;
+            border: none;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .help-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .help-icon svg {
+            fill: #3498db;
+        }
+
+        /* Popup/Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .modal-close:hover {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .modal-content p {
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        .env-layer-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .env-layer-item h3,
+        .env-layer-item h4 {
+            margin: 0;
+            flex-grow: 1;
+            font-size: 0.95em;
+            font-weight: 600;
+            min-width: 0; /* Allow text to shrink if needed */
+            line-height: 1.2;
+        }
+
+        /* Reduce space between Animation Mode and Environmental Layers */
+        .control-group + .control-group {
+            margin-top: 0.5rem;
+        }
+
+        /* Shark list header with visibility controls */
+        .shark-list-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .shark-list-header h3 {
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .visibility-icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .visibility-icon-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .visibility-icon-btn.active svg {
+            fill: #27ae60;
+        }
+
+        .visibility-icon-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: #7f8c8d;
+            transition: fill 0.2s;
         }
 
         /* Loading indicator styles */
@@ -881,18 +1077,62 @@
             </div>
 
             <div class="controls">
-                <h3>Map Controls</h3>
                 <div class="control-group">
                     <label>Display Mode</label>
-                    <button id="show-all" class="active">Show All</button>
-                    <button id="hide-all">Hide All</button>
-                    <button id="show-one">Animation</button>
+                    <div class="env-layer-item">
+                        <h4>Animation Mode</h4>
+                        <button class="help-icon" id="animation-info-icon" title="Learn more about Animation Mode">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px">
+                                <path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
+                            </svg>
+                        </button>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="show-one">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
                 <div class="control-group">
                     <label>Environmental Layers <br>(Only in Animation mode!)</label>
-                    <button id="toggle-chlorophyll">Chlorophyll</button>
-                    <button id="toggle-sst">Sea Surface Temp</button>
-                    <button id="toggle-poc">POC</button>
+                    
+                    <div class="env-layer-item">
+                        <h4>Chlorophyll</h4>
+                        <button class="help-icon" id="chl-info-icon" title="Learn more about Chlorophyll">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px">
+                                <path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
+                            </svg>
+                        </button>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-chlorophyll">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="env-layer-item">
+                        <h4>Sea Surface Temp</h4>
+                        <button class="help-icon" id="sst-info-icon" title="Learn more about SST">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px">
+                                <path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
+                            </svg>
+                        </button>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-sst">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="env-layer-item">
+                        <h4>POC</h4>
+                        <button class="help-icon" id="poc-info-icon" title="Learn more about POC">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px">
+                                <path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
+                            </svg>
+                        </button>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-poc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
                 <!-- <div class="control-group">
                     <label>Filter by Year:</label>
@@ -904,12 +1144,56 @@
                 </div> -->
             </div>
 
-            <h3>Tracked Sharks</h3>
+            <div class="shark-list-header">
+                <h3>Sharks</h3>
+                <button id="show-all" class="visibility-icon-btn active" title="Show All Sharks">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg>
+                </button>
+                <button id="hide-all" class="visibility-icon-btn" title="Hide All Sharks">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"/></svg>
+                </button>
+            </div>
             <div id="shark-list" class="shark-list">
                 <div class="loading">
                     <div>Loading shark data...</div>
                     <div id="loading-progress" style="font-size: 0.9em; margin-top: 0.5rem; color: #3498db;"></div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Animation Mode Info Modal -->
+        <div class="modal-overlay" id="animation-info-modal">
+            <div class="modal-content">
+                <button class="modal-close" id="animation-modal-close">&times;</button>
+                <h3>Animation Mode</h3>
+                <p>Animation Mode Description</p>
+            </div>
+        </div>
+
+        <!-- Chlorophyll Info Modal -->
+        <div class="modal-overlay" id="chl-info-modal">
+            <div class="modal-content">
+                <button class="modal-close" id="chl-modal-close">&times;</button>
+                <h3>Chlorophyll</h3>
+                <p>chl Description</p>
+            </div>
+        </div>
+
+        <!-- SST Info Modal -->
+        <div class="modal-overlay" id="sst-info-modal">
+            <div class="modal-content">
+                <button class="modal-close" id="sst-modal-close">&times;</button>
+                <h3>Sea Surface Temperature</h3>
+                <p>sst Description</p>
+            </div>
+        </div>
+
+        <!-- POC Info Modal -->
+        <div class="modal-overlay" id="poc-info-modal">
+            <div class="modal-content">
+                <button class="modal-close" id="poc-modal-close">&times;</button>
+                <h3>Particulate Organic Carbon (POC)</h3>
+                <p>poc Description</p>
             </div>
         </div>
 
@@ -1120,19 +1404,18 @@
 
         // Toggle Chlorophyll layer visibility
         function toggleChlorophyllLayer() {
-            const toggleButton = document.getElementById('toggle-chlorophyll');
+            const toggleCheckbox = document.getElementById('toggle-chlorophyll');
             const chlScale = document.getElementById('chl-scale');
             const sstScale = document.getElementById('sst-scale');
             const pocScale = document.getElementById('poc-scale');
             
-            if (showChlorophyll) {
+            showChlorophyll = toggleCheckbox.checked;
+            
+            if (!showChlorophyll) {
                 // Hide Chlorophyll layer
                 if (chlorophyllLayer && map.hasLayer(chlorophyllLayer)) {
                     map.removeLayer(chlorophyllLayer);
                 }
-                showChlorophyll = false;
-                toggleButton.classList.remove('active');
-                toggleButton.textContent = 'Chlorophyll';
                 
                 // Hide chlorophyll scale
                 chlScale.classList.remove('visible');
@@ -1153,9 +1436,6 @@
                 }
             } else {
                 // Show Chlorophyll layer
-                showChlorophyll = true;
-                toggleButton.classList.add('active');
-                toggleButton.textContent = 'Hide Chlorophyll';
                 
                 // Show chlorophyll scale
                 chlScale.classList.add('visible');
@@ -1188,19 +1468,18 @@
 
         // Toggle SST layer visibility
         function toggleSSTLayer() {
-            const toggleButton = document.getElementById('toggle-sst');
+            const toggleCheckbox = document.getElementById('toggle-sst');
             const chlScale = document.getElementById('chl-scale');
             const sstScale = document.getElementById('sst-scale');
             const pocScale = document.getElementById('poc-scale');
             
-            if (showSST) {
+            showSST = toggleCheckbox.checked;
+            
+            if (!showSST) {
                 // Hide SST layer
                 if (sstLayer && map.hasLayer(sstLayer)) {
                     map.removeLayer(sstLayer);
                 }
-                showSST = false;
-                toggleButton.classList.remove('active');
-                toggleButton.textContent = 'Sea Surface Temp';
                 
                 // Hide SST scale
                 sstScale.classList.remove('visible');
@@ -1217,9 +1496,6 @@
                 }
             } else {
                 // Show SST layer
-                showSST = true;
-                toggleButton.classList.add('active');
-                toggleButton.textContent = 'Hide SST';
                 
                 // Show SST scale
                 sstScale.classList.add('visible');
@@ -1251,19 +1527,18 @@
 
         // Toggle POC layer visibility
         function togglePOCLayer() {
-            const toggleButton = document.getElementById('toggle-poc');
+            const toggleCheckbox = document.getElementById('toggle-poc');
             const chlScale = document.getElementById('chl-scale');
             const sstScale = document.getElementById('sst-scale');
             const pocScale = document.getElementById('poc-scale');
             
-            if (showPOC) {
+            showPOC = toggleCheckbox.checked;
+            
+            if (!showPOC) {
                 // Hide POC layer
                 if (pocLayer && map.hasLayer(pocLayer)) {
                     map.removeLayer(pocLayer);
                 }
-                showPOC = false;
-                toggleButton.classList.remove('active');
-                toggleButton.textContent = 'POC';
                 
                 // Hide POC scale and adjust other scales
                 pocScale.classList.remove('visible');
@@ -1275,9 +1550,6 @@
                 }
             } else {
                 // Show POC layer
-                showPOC = true;
-                toggleButton.classList.add('active');
-                toggleButton.textContent = 'Hide POC';
                 
                 // Show POC scale and adjust positioning
                 pocScale.classList.add('visible');
@@ -1947,9 +2219,9 @@
         // Function to update visibility toggle buttons based on current mode
         function updateVisibilityToggleButtons() {
             const toggleButtons = document.querySelectorAll('.shark-visibility-toggle');
-            const chlorophyllButton = document.getElementById('toggle-chlorophyll');
-            const sstButton = document.getElementById('toggle-sst');
-            const pocButton = document.getElementById('toggle-poc');
+            const chlorophyllCheckbox = document.getElementById('toggle-chlorophyll');
+            const sstCheckbox = document.getElementById('toggle-sst');
+            const pocCheckbox = document.getElementById('toggle-poc');
             
             if (showOneMode) {
                 // Hide all shark toggle buttons in Show One mode
@@ -1957,21 +2229,21 @@
                     button.classList.add('hidden');
                 });
                 
-                // Enable environmental layer buttons in Show One mode
-                if (chlorophyllButton) {
-                    chlorophyllButton.disabled = false;
-                    chlorophyllButton.style.opacity = '1';
-                    chlorophyllButton.title = '';
+                // Enable environmental layer checkboxes in Show One mode
+                if (chlorophyllCheckbox) {
+                    chlorophyllCheckbox.disabled = false;
+                    chlorophyllCheckbox.parentElement.style.opacity = '1';
+                    chlorophyllCheckbox.parentElement.title = '';
                 }
-                if (sstButton) {
-                    sstButton.disabled = false;
-                    sstButton.style.opacity = '1';
-                    sstButton.title = '';
+                if (sstCheckbox) {
+                    sstCheckbox.disabled = false;
+                    sstCheckbox.parentElement.style.opacity = '1';
+                    sstCheckbox.parentElement.title = '';
                 }
-                if (pocButton) {
-                    pocButton.disabled = false;
-                    pocButton.style.opacity = '1';
-                    pocButton.title = '';
+                if (pocCheckbox) {
+                    pocCheckbox.disabled = false;
+                    pocCheckbox.parentElement.style.opacity = '1';
+                    pocCheckbox.parentElement.title = '';
                 }
             } else {
                 // Show all shark toggle buttons in Show All/Hide All modes
@@ -1988,21 +2260,21 @@
                     }
                 });
                 
-                // Disable environmental layer buttons outside Show One mode
-                if (chlorophyllButton) {
-                    chlorophyllButton.disabled = true;
-                    chlorophyllButton.style.opacity = '0.5';
-                    chlorophyllButton.title = 'Only in Animation Mode!';
+                // Disable environmental layer checkboxes outside Show One mode
+                if (chlorophyllCheckbox) {
+                    chlorophyllCheckbox.disabled = true;
+                    chlorophyllCheckbox.parentElement.style.opacity = '0.5';
+                    chlorophyllCheckbox.parentElement.title = 'Only in Animation Mode!';
                 }
-                if (sstButton) {
-                    sstButton.disabled = true;
-                    sstButton.style.opacity = '0.5';
-                    sstButton.title = 'Only in Animation Mode!';
+                if (sstCheckbox) {
+                    sstCheckbox.disabled = true;
+                    sstCheckbox.parentElement.style.opacity = '0.5';
+                    sstCheckbox.parentElement.title = 'Only in Animation Mode!';
                 }
-                if (pocButton) {
-                    pocButton.disabled = true;
-                    pocButton.style.opacity = '0.5';
-                    pocButton.title = 'Only in Animation Mode!';
+                if (pocCheckbox) {
+                    pocCheckbox.disabled = true;
+                    pocCheckbox.parentElement.style.opacity = '0.5';
+                    pocCheckbox.parentElement.title = 'Only in Animation Mode!';
                 }
             }
         }
@@ -2089,25 +2361,26 @@
                     map.removeLayer(pocLayer);
                 }
                 
-                // Reset environmental layer states and button appearances
+                // Reset environmental layer states and checkbox appearances
                 showChlorophyll = false;
                 showSST = false;
                 showPOC = false;
                 currentEnvironmentalMonth = null; // Reset month tracking
-                const chlButton = document.getElementById('toggle-chlorophyll');
-                const sstButton = document.getElementById('toggle-sst');
-                const pocButton = document.getElementById('toggle-poc');
-                if (chlButton) {
-                    chlButton.classList.remove('active');
-                    chlButton.textContent = 'Chlorophyll';
+                const chlCheckbox = document.getElementById('toggle-chlorophyll');
+                const sstCheckbox = document.getElementById('toggle-sst');
+                const pocCheckbox = document.getElementById('toggle-poc');
+                const showOneCheckbox = document.getElementById('show-one');
+                if (chlCheckbox) {
+                    chlCheckbox.checked = false;
                 }
-                if (sstButton) {
-                    sstButton.classList.remove('active');
-                    sstButton.textContent = 'Sea Surface Temp';
+                if (sstCheckbox) {
+                    sstCheckbox.checked = false;
                 }
-                if (pocButton) {
-                    pocButton.classList.remove('active');
-                    pocButton.textContent = 'POC';
+                if (pocCheckbox) {
+                    pocCheckbox.checked = false;
+                }
+                if (showOneCheckbox) {
+                    showOneCheckbox.checked = false;
                 }
                 
                 // Hide color scales
@@ -2123,7 +2396,6 @@
                 });
                 document.getElementById('show-all').classList.add('active');
                 document.getElementById('hide-all').classList.remove('active');
-                document.getElementById('show-one').classList.remove('active');
                 
                 // Reset shark list opacity
                 document.getElementById('shark-list').style.opacity = '1';
@@ -2158,7 +2430,6 @@
                 });
                 document.getElementById('hide-all').classList.add('active');
                 document.getElementById('show-all').classList.remove('active');
-                document.getElementById('show-one').classList.remove('active');
                 showOneMode = false;
                 hideTimeSlider();
                 
@@ -2173,25 +2444,26 @@
                     map.removeLayer(pocLayer);
                 }
                 
-                // Reset environmental layer states and button appearances
+                // Reset environmental layer states and checkbox appearances
                 showChlorophyll = false;
                 showSST = false;
                 showPOC = false;
                 currentEnvironmentalMonth = null; // Reset month tracking
-                const chlButton = document.getElementById('toggle-chlorophyll');
-                const sstButton = document.getElementById('toggle-sst');
-                const pocButton = document.getElementById('toggle-poc');
-                if (chlButton) {
-                    chlButton.classList.remove('active');
-                    chlButton.textContent = 'Chlorophyll';
+                const chlCheckbox = document.getElementById('toggle-chlorophyll');
+                const sstCheckbox = document.getElementById('toggle-sst');
+                const pocCheckbox = document.getElementById('toggle-poc');
+                const showOneCheckbox = document.getElementById('show-one');
+                if (chlCheckbox) {
+                    chlCheckbox.checked = false;
                 }
-                if (sstButton) {
-                    sstButton.classList.remove('active');
-                    sstButton.textContent = 'Sea Surface Temp';
+                if (sstCheckbox) {
+                    sstCheckbox.checked = false;
                 }
-                if (pocButton) {
-                    pocButton.classList.remove('active');
-                    pocButton.textContent = 'POC';
+                if (pocCheckbox) {
+                    pocCheckbox.checked = false;
+                }
+                if (showOneCheckbox) {
+                    showOneCheckbox.checked = false;
                 }
                 
                 // Hide color scales
@@ -2209,50 +2481,102 @@
                 updateMaxZoom();
             });
             
-            document.getElementById('show-one').addEventListener('click', () => {
-                showOneMode = true;
-                // Hide all tracks first
-                Object.values(sharkLayers).forEach(shark => {
-                    if (shark.visible) {
-                        map.removeLayer(shark.layer);
-                        shark.visible = false;
-                    }
-                });
+            document.getElementById('show-one').addEventListener('change', function() {
+                const isChecked = this.checked;
                 
-                // Update button states
-                document.getElementById('show-one').classList.add('active');
-                document.getElementById('show-all').classList.remove('active');
-                document.getElementById('hide-all').classList.remove('active');
-                
-                // Update visibility toggle buttons to hide them in Show One mode
-                updateVisibilityToggleButtons();
-                
-                // Update legend content
-                updateLegendContent();
-                
-                // If a shark was already selected, update the visualization
-                if (selectedSharkId && sharkData[selectedSharkId]) {
-                    // Reset month tracking for environmental layers
-                    currentEnvironmentalMonth = null;
-                    
-                    // Show time slider and update visualization
-                    showTimeSlider(selectedSharkId);
-                    updateSharkVisualization();
-                    
-                    // Update environmental layers if any are enabled
-                    updateEnvironmentalLayers();
-                    
-                    // Highlight the selected shark in the list
-                    document.querySelectorAll('.shark-item').forEach(item => {
-                        if (item.dataset.sharkId === selectedSharkId) {
-                            item.classList.add('selected');
-                        } else {
-                            item.classList.remove('selected');
+                if (isChecked) {
+                    // Enable Animation Mode
+                    showOneMode = true;
+                    // Hide all tracks first
+                    Object.values(sharkLayers).forEach(shark => {
+                        if (shark.visible) {
+                            map.removeLayer(shark.layer);
+                            shark.visible = false;
                         }
                     });
+                    
+                    // Update button states
+                    document.getElementById('show-all').classList.remove('active');
+                    document.getElementById('hide-all').classList.remove('active');
+                    
+                    // Update visibility toggle buttons to hide them in Show One mode
+                    updateVisibilityToggleButtons();
+                    
+                    // Update legend content
+                    updateLegendContent();
+                    
+                    // If a shark was already selected, update the visualization
+                    if (selectedSharkId && sharkData[selectedSharkId]) {
+                        // Reset month tracking for environmental layers
+                        currentEnvironmentalMonth = null;
+                        
+                        // Show time slider and update visualization
+                        showTimeSlider(selectedSharkId);
+                        updateSharkVisualization();
+                        
+                        // Update environmental layers if any are enabled
+                        updateEnvironmentalLayers();
+                        
+                        // Highlight the selected shark in the list
+                        document.querySelectorAll('.shark-item').forEach(item => {
+                            if (item.dataset.sharkId === selectedSharkId) {
+                                item.classList.add('selected');
+                            } else {
+                                item.classList.remove('selected');
+                            }
+                        });
+                    } else {
+                        // Show instruction message only if no shark is selected
+                        showNotification('Click on a shark in the list below to view its track over time!');
+                    }
                 } else {
-                    // Show instruction message only if no shark is selected
-                    showNotification('Click on a shark in the list below to view its track over time!');
+                    // Disable Animation Mode - return to Show All
+                    showOneMode = false;
+                    selectedSharkId = null;
+                    hideTimeSlider();
+                    
+                    // Hide environmental layers when leaving Show One mode
+                    if (chlorophyllLayer && map.hasLayer(chlorophyllLayer)) {
+                        map.removeLayer(chlorophyllLayer);
+                    }
+                    if (sstLayer && map.hasLayer(sstLayer)) {
+                        map.removeLayer(sstLayer);
+                    }
+                    if (pocLayer && map.hasLayer(pocLayer)) {
+                        map.removeLayer(pocLayer);
+                    }
+                    
+                    // Reset environmental layer states and checkbox appearances
+                    showChlorophyll = false;
+                    showSST = false;
+                    showPOC = false;
+                    currentEnvironmentalMonth = null;
+                    const chlCheckbox = document.getElementById('toggle-chlorophyll');
+                    const sstCheckbox = document.getElementById('toggle-sst');
+                    const pocCheckbox = document.getElementById('toggle-poc');
+                    if (chlCheckbox) chlCheckbox.checked = false;
+                    if (sstCheckbox) sstCheckbox.checked = false;
+                    if (pocCheckbox) pocCheckbox.checked = false;
+                    
+                    // Hide color scales
+                    document.getElementById('chl-scale').classList.remove('visible');
+                    document.getElementById('sst-scale').classList.remove('visible', 'with-chl-scale');
+                    document.getElementById('poc-scale').classList.remove('visible', 'with-chl-scale', 'with-sst-scale');
+                    
+                    // Show all sharks
+                    Object.values(sharkLayers).forEach(shark => {
+                        if (!shark.visible) {
+                            map.addLayer(shark.layer);
+                            shark.visible = true;
+                        }
+                    });
+                    
+                    document.getElementById('show-all').classList.add('active');
+                    document.getElementById('shark-list').style.opacity = '1';
+                    
+                    updateVisibilityToggleButtons();
+                    updateLegendContent();
+                    updateMaxZoom();
                 }
             });
             
@@ -2288,9 +2612,101 @@
             // document.getElementById('toggle-mpa').addEventListener('click', toggleMPALayer);
             
             // Environmental layer toggle event listeners
-            document.getElementById('toggle-chlorophyll').addEventListener('click', toggleChlorophyllLayer);
-            document.getElementById('toggle-sst').addEventListener('click', toggleSSTLayer);
-            document.getElementById('toggle-poc').addEventListener('click', togglePOCLayer);
+            document.getElementById('toggle-chlorophyll').addEventListener('change', toggleChlorophyllLayer);
+            document.getElementById('toggle-sst').addEventListener('change', toggleSSTLayer);
+            document.getElementById('toggle-poc').addEventListener('change', togglePOCLayer);
+            
+            // Animation Mode info button event listeners
+            const animationInfoIcon = document.getElementById('animation-info-icon');
+            const animationInfoModal = document.getElementById('animation-info-modal');
+            const animationModalClose = document.getElementById('animation-modal-close');
+            
+            animationInfoIcon.addEventListener('click', () => {
+                animationInfoModal.classList.add('active');
+            });
+            
+            animationModalClose.addEventListener('click', () => {
+                animationInfoModal.classList.remove('active');
+            });
+            
+            animationInfoModal.addEventListener('click', (e) => {
+                if (e.target === animationInfoModal) {
+                    animationInfoModal.classList.remove('active');
+                }
+            });
+            
+            // Environmental layer info button event listeners
+            const chlInfoIcon = document.getElementById('chl-info-icon');
+            const chlInfoModal = document.getElementById('chl-info-modal');
+            const chlModalClose = document.getElementById('chl-modal-close');
+            
+            chlInfoIcon.addEventListener('click', () => {
+                chlInfoModal.classList.add('active');
+            });
+            
+            chlModalClose.addEventListener('click', () => {
+                chlInfoModal.classList.remove('active');
+            });
+            
+            chlInfoModal.addEventListener('click', (e) => {
+                if (e.target === chlInfoModal) {
+                    chlInfoModal.classList.remove('active');
+                }
+            });
+            
+            const sstInfoIcon = document.getElementById('sst-info-icon');
+            const sstInfoModal = document.getElementById('sst-info-modal');
+            const sstModalClose = document.getElementById('sst-modal-close');
+            
+            sstInfoIcon.addEventListener('click', () => {
+                sstInfoModal.classList.add('active');
+            });
+            
+            sstModalClose.addEventListener('click', () => {
+                sstInfoModal.classList.remove('active');
+            });
+            
+            sstInfoModal.addEventListener('click', (e) => {
+                if (e.target === sstInfoModal) {
+                    sstInfoModal.classList.remove('active');
+                }
+            });
+            
+            const pocInfoIcon = document.getElementById('poc-info-icon');
+            const pocInfoModal = document.getElementById('poc-info-modal');
+            const pocModalClose = document.getElementById('poc-modal-close');
+            
+            pocInfoIcon.addEventListener('click', () => {
+                pocInfoModal.classList.add('active');
+            });
+            
+            pocModalClose.addEventListener('click', () => {
+                pocInfoModal.classList.remove('active');
+            });
+            
+            pocInfoModal.addEventListener('click', (e) => {
+                if (e.target === pocInfoModal) {
+                    pocInfoModal.classList.remove('active');
+                }
+            });
+            
+            // Close modals on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (animationInfoModal.classList.contains('active')) {
+                        animationInfoModal.classList.remove('active');
+                    }
+                    if (chlInfoModal.classList.contains('active')) {
+                        chlInfoModal.classList.remove('active');
+                    }
+                    if (sstInfoModal.classList.contains('active')) {
+                        sstInfoModal.classList.remove('active');
+                    }
+                    if (pocInfoModal.classList.contains('active')) {
+                        pocInfoModal.classList.remove('active');
+                    }
+                }
+            });
             
             // Bottom time slider event listener
             document.getElementById('bottom-time-slider').addEventListener('input', (e) => {
