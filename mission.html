@@ -18,13 +18,30 @@
       color: white;
       /* line-height: 1.6; */
       background: black;
-      overflow-x: hidden;
-    }
-
-	.header {
-		position: fixed;
-		top: 0;
-		left: 0;
+      overflow-x: hidden;  <section>
+    <p>Our Earth is unique among other planets because we have oceans. Covering around 70% of the planet's surface, the ocean regulates our climate, sustains ecosystems, and cradles the very origin of life.</p>
+    <div class="next-section-btn" onclick="scrollToNextSection(this)">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+        <path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/>
+      </svg>
+    </div>
+  </section>	.header {
+		positi  <section>
+    <p>Sharks, the ocean's apex predators, keep prey in balance, preserve biodiversity, and hold food webs together. If climate change alters sharks' behavior, the ecosystems might begin to unravel.</p>
+    <div class="next-section-btn" onclick="scrollToNextSection(this)">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+        <path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/>
+      </svg>
+    </div>
+  </section>d;
+		top:   <section>
+    <p>To our findings, many predicted hotspots fall outside today's marine protected areas (MPAs). With a global goal to protect 30% of the ocean by 2030, this system gives leaders the evidence they need — how much to protect, where to focus, and how to design connected, enforceable MPAs that can move with a changing sea.</p>
+    <div class="next-section-btn" onclick="scrollToNextSection(this)">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+        <path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/>
+      </svg>
+    </div>
+  </section>t: 0;
 		right: 0;
 		background: rgba(44, 62, 80, 0.95);
 		backdrop-filter: blur(10px);
@@ -117,6 +134,96 @@
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 	  line-height: 1.6;
+    }
+
+    /* Next section button */
+    .next-section-btn {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(5px);
+      z-index: 10;
+    }
+
+    .next-section-btn:hover {
+      background: rgba(255, 255, 255, 0.5);
+      border-color: rgba(255, 255, 255, 0.6);
+      transform: translateX(-50%) scale(1.1);
+    }
+
+    .next-section-btn:active {
+      background: rgba(52, 152, 219, 0.8);
+      border-color: rgba(52, 152, 219, 1);
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    .next-section-btn svg {
+      fill: rgba(255, 255, 255, 0.9);
+      transition: fill 0.3s ease;
+    }
+
+    .next-section-btn:hover svg {
+      fill: rgba(255, 255, 255, 1);
+    }
+
+    .next-section-btn:active svg {
+      fill: rgba(255, 255, 255, 1);
+    }
+
+    /* Sound icon below 5th tab */
+    .sound-icon {
+      position: fixed;
+      top: 80px;
+      right: 2rem;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: default;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(5px);
+      z-index: 999;
+      pointer-events: none;
+    }
+
+    .sound-icon svg {
+      fill: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Tooltip for sound icon */
+    .sound-icon::before {
+      content: "Sound On!!";
+      position: absolute;
+      bottom: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .sound-icon:hover::before {
+      opacity: 1;
     }
 
     .bg {
@@ -418,6 +525,13 @@
   </style>
 </head>
 <body>
+  <!-- Fixed sound icon on right edge -->
+  <div class="sound-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+      <path d="M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320ZM400-606l-86 86H200v80h114l86 86v-252ZM300-480Z"/>
+    </svg>
+  </div>
+
   <div class="header">
     <div class="header-content">
       <div class="header-title">
@@ -451,30 +565,65 @@
   <!-- Text sections -->
   <section>
     <p>Just 56 years ago, humankind took its first step onto the moon. From that distant vantage point, astronaut Neil Armstrong gazed back at our fragile blue planet, and called it <i>beautiful</i>.</p>
+    <div class="next-section-btn" onclick="scrollToNextSection(this)">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+        <path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/>
+      </svg>
+    </div>
   </section>
 
   <section>
     <p>Our Earth is unique among other planets because we have oceans. Covering around 70% of the planet’s surface, the ocean regulates our climate, sustains ecosystems, and cradles the very origin of life.</p>
+    <div class="next-section-btn" onclick="scrollToNextSection(this)">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+        <path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/>
+      </svg>
+    </div>
   </section>
 
   <section>
     <p>But climate change is happening.</p>
+    <div class="next-section-btn" onclick="scrollToNextSection(this)">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+        <path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/>
+      </svg>
+    </div>
   </section>
 
   <section>
     <p>Marine heatwaves intensify, currents rearrange, and food webs begin to fray. The rhythm of the ocean is changing.</p>
+    <div class="next-section-btn" onclick="scrollToNextSection(this)">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+        <path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/>
+      </svg>
+    </div>
   </section>
 
   <section>
     <p>Sharks, the ocean’s apex predators, keep prey in balance, preserve biodiversity, and hold food webs together. If climate change alters sharks' behavior, the ecosystems might begin to unravel.</p>
+    <div class="next-section-btn" onclick="scrollToNextSection(this)">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+        <path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/>
+      </svg>
+    </div>
   </section>
 
   <section>
     <p>Protection must be smart and targeted. Combining NASA satellite data with innovative bio-tag technology, we developed a model to predict where sharks forage and their seasonal hotspots.</p>
+    <div class="next-section-btn" onclick="scrollToNextSection(this)">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+        <path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/>
+      </svg>
+    </div>
   </section>
 
   <section>
     <p>To our findings, many predicted hotspots fall outside today’s marine protected areas (MPAs). With a global goal to protect 30% of the ocean by 2030, this system gives leaders the evidence they need — how much to protect, where to focus, and how to design connected, enforceable MPAs that can move with a changing sea.</p>
+    <div class="next-section-btn" onclick="scrollToNextSection(this)">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+        <path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/>
+      </svg>
+    </div>
   </section>
   
   <section>
@@ -651,6 +800,18 @@
       bgs.forEach((bg, i) => {
         bg.classList.toggle("active", i === index);
       });
+    }
+
+    // Scroll to next section function
+    function scrollToNextSection(button) {
+      const currentSection = button.closest('section');
+      const allSections = Array.from(sections);
+      const currentIndex = allSections.indexOf(currentSection);
+      
+      if (currentIndex < allSections.length - 1) {
+        const nextSection = allSections[currentIndex + 1];
+        nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
 
     window.addEventListener("scroll", () => {
