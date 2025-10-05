@@ -1507,12 +1507,12 @@
 
         // Function to update max zoom based on environmental layer visibility
         function updateMaxZoom() {
-            // If any environmental layer is visible, limit zoom to 6
+            // If any environmental layer is visible, limit zoom to 5
             if (showChlorophyll || showSST || showPOC) {
-                map.setMaxZoom(6);
-                // If current zoom is greater than 6, zoom out to 6
-                if (map.getZoom() > 6) {
-                    map.setZoom(6);
+                map.setMaxZoom(5);
+                // If current zoom is greater than 5, zoom out to 5 and show notification
+                if (map.getZoom() > 5) {
+                    map.setZoom(5);
                 }
             } else {
                 // No environmental layers, allow full zoom (20)
@@ -2852,6 +2852,12 @@
                         <span class="legend-text">Sea Surface Temperature</span>
                     </div>
                     ` : ''}
+                    ${showPOC && pocLayer ? `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: linear-gradient(90deg, #800080 0%, #9932cc 25%, #ba55d3 50%, #daa520 75%, #ffff00 100%); opacity: 0.6;"></div>
+                        <span class="legend-text">Particulate Organic Carbon</span>
+                    </div>
+                    ` : ''}
                 `;
             } else {
                 // Show All/Hide All mode - display visible sharks
@@ -2893,6 +2899,12 @@
                         <div class="legend-item">
                             <div class="legend-color" style="background: linear-gradient(90deg, #000066 0%, #0033cc 25%, #ff3300 50%, #ff9900 75%, #ffcc00 100%); opacity: 0.6;"></div>
                             <span class="legend-text">Sea Surface Temperature</span>
+                        </div>
+                        ` : ''}
+                        ${showPOC && pocLayer ? `
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: linear-gradient(90deg, #800080 0%, #9932cc 25%, #ba55d3 50%, #daa520 75%, #ffff00 100%); opacity: 0.6;"></div>
+                            <span class="legend-text">Particulate Organic Carbon</span>
                         </div>
                         ` : ''}
                     `;
