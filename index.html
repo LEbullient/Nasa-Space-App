@@ -520,6 +520,7 @@
         .bottom-time-slider-container {
             flex: 1;
             margin: 0 8px;
+            position: relative;
         }
 
         .bottom-time-slider {
@@ -530,6 +531,36 @@
             outline: none;
             cursor: pointer;
             transition: all 0.2s ease;
+        }
+
+        .slider-date-label {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: rgba(52, 152, 219, 0.95);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            white-space: nowrap;
+            pointer-events: none;
+            transform: translateX(-50%);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .slider-date-label::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid rgba(52, 152, 219, 0.95);
         }
 
         .bottom-time-slider::-webkit-slider-thumb {
@@ -941,10 +972,10 @@
                         ▶
                     </button>
                     <div class="bottom-time-slider-container">
+                        <div class="slider-date-label" id="slider-date-label">Current</div>
                         <input type="range" class="bottom-time-slider" id="bottom-time-slider" min="0" max="100" value="100">
                         <div class="time-labels">
                             <span id="bottom-start-time">Start</span>
-                            <span class="current-time-label" id="bottom-current-time">Current</span>
                             <span id="bottom-end-time">End</span>
                         </div>
                     </div>
@@ -1338,50 +1369,116 @@
 
                 // Update POC layer if it's enabled
                 if (showPOC) {
-                    // Remove old layer
-                    if (pocLayer && map.hasLayer(pocLayer)) {
-                        map.removeLayer(pocLayer);
-                    }
-                    // Create new layer with updated date
+                    // Create new layer with updated date, starting at 0 opacity
                     const pocTileUrl = `${baseUrl}/tiles/poc/${dateString}/{z}/{x}/{y}.png`;
-                    pocLayer = L.tileLayer(pocTileUrl, {
-                        opacity: 0.6,
+                    const newPocLayer = L.tileLayer(pocTileUrl, {
+                        opacity: 0,
                         attribution: 'Particulate Organic Carbon Data',
                         errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==' // Transparent 1x1 pixel
                     });
-                    map.addLayer(pocLayer);
+                    
+                    // Add new layer first (invisible)
+                    map.addLayer(newPocLayer);
+                    
+                    // Fade in new layer
+                    setTimeout(() => {
+                        newPocLayer.setOpacity(0.6);
+                    }, 50);
+                    
+                    // Fade out and remove old layer
+                    if (pocLayer) {
+                        const oldLayer = pocLayer;
+                        let opacity = 0.6;
+                        const fadeInterval = setInterval(() => {
+                            opacity -= 0.1;
+                            if (opacity <= 0) {
+                                clearInterval(fadeInterval);
+                                if (map.hasLayer(oldLayer)) {
+                                    map.removeLayer(oldLayer);
+                                }
+                            } else {
+                                oldLayer.setOpacity(opacity);
+                            }
+                        }, 30);
+                    }
+                    
+                    pocLayer = newPocLayer;
                 }
 
                 // Update SST layer if it's enabled
                 if (showSST) {
-                    // Remove old layer
-                    if (sstLayer && map.hasLayer(sstLayer)) {
-                        map.removeLayer(sstLayer);
-                    }
-                    // Create new layer with updated date
+                    // Create new layer with updated date, starting at 0 opacity
                     const sstTileUrl = `${baseUrl}/tiles/sst/${dateString}/{z}/{x}/{y}.png`;
-                    sstLayer = L.tileLayer(sstTileUrl, {
-                        opacity: 0.6,
+                    const newSstLayer = L.tileLayer(sstTileUrl, {
+                        opacity: 0,
                         attribution: 'Sea Surface Temperature Data',
                         errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==' // Transparent 1x1 pixel
                     });
-                    map.addLayer(sstLayer);
+                    
+                    // Add new layer first (invisible)
+                    map.addLayer(newSstLayer);
+                    
+                    // Fade in new layer
+                    setTimeout(() => {
+                        newSstLayer.setOpacity(0.6);
+                    }, 50);
+                    
+                    // Fade out and remove old layer
+                    if (sstLayer) {
+                        const oldLayer = sstLayer;
+                        let opacity = 0.6;
+                        const fadeInterval = setInterval(() => {
+                            opacity -= 0.1;
+                            if (opacity <= 0) {
+                                clearInterval(fadeInterval);
+                                if (map.hasLayer(oldLayer)) {
+                                    map.removeLayer(oldLayer);
+                                }
+                            } else {
+                                oldLayer.setOpacity(opacity);
+                            }
+                        }, 30);
+                    }
+                    
+                    sstLayer = newSstLayer;
                 }
                 
                 // Update Chlorophyll layer if it's enabled
                 if (showChlorophyll) {
-                    // Remove old layer
-                    if (chlorophyllLayer && map.hasLayer(chlorophyllLayer)) {
-                        map.removeLayer(chlorophyllLayer);
-                    }
-                    // Create new layer with updated date
+                    // Create new layer with updated date, starting at 0 opacity
                     const chlTileUrl = `${baseUrl}/tiles/chl/${dateString}/{z}/{x}/{y}.png`;
-                    chlorophyllLayer = L.tileLayer(chlTileUrl, {
-                        opacity: 0.6,
+                    const newChlorophyllLayer = L.tileLayer(chlTileUrl, {
+                        opacity: 0,
                         attribution: 'Chlorophyll Data',
                         errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==' // Transparent 1x1 pixel
                     });
-                    map.addLayer(chlorophyllLayer);
+                    
+                    // Add new layer first (invisible)
+                    map.addLayer(newChlorophyllLayer);
+                    
+                    // Fade in new layer
+                    setTimeout(() => {
+                        newChlorophyllLayer.setOpacity(0.6);
+                    }, 50);
+                    
+                    // Fade out and remove old layer
+                    if (chlorophyllLayer) {
+                        const oldLayer = chlorophyllLayer;
+                        let opacity = 0.6;
+                        const fadeInterval = setInterval(() => {
+                            opacity -= 0.1;
+                            if (opacity <= 0) {
+                                clearInterval(fadeInterval);
+                                if (map.hasLayer(oldLayer)) {
+                                    map.removeLayer(oldLayer);
+                                }
+                            } else {
+                                oldLayer.setOpacity(opacity);
+                            }
+                        }, 30);
+                    }
+                    
+                    chlorophyllLayer = newChlorophyllLayer;
                 }
                 
             } else {
@@ -1960,6 +2057,8 @@
                 // Trigger map resize after animation completes
                 setTimeout(() => {
                     map.invalidateSize();
+                    // Update slider label position after sidebar animation
+                    updateSliderLabelPosition();
                 }, 300);
             });
             
@@ -2327,11 +2426,13 @@
             // Bottom time display
             document.getElementById('bottom-start-time').textContent = startDate;
             document.getElementById('bottom-end-time').textContent = endDate;
-            document.getElementById('bottom-current-time').textContent = endDate;
             
             // Set slider to end (100%)
             document.getElementById('bottom-time-slider').value = 100;
             currentTimeIndex = track.length - 1;
+            
+            // Update floating label position
+            updateSliderLabelPosition();
             
             // Move scale control up to avoid collision with time slider
             const scaleControl = document.querySelector('.leaflet-control-scale');
@@ -2362,12 +2463,31 @@
             }
         }
         
+        // Update floating date label position
+        function updateSliderLabelPosition() {
+            const slider = document.getElementById('bottom-time-slider');
+            const label = document.getElementById('slider-date-label');
+            if (!slider || !label || !selectedSharkId || !sharkData[selectedSharkId]) return;
+            
+            const track = sharkData[selectedSharkId];
+            const currentDate = track[currentTimeIndex].date.toLocaleDateString();
+            label.textContent = currentDate;
+            
+            // Calculate position based on slider value
+            const percent = parseFloat(slider.value);
+            const sliderWidth = slider.offsetWidth;
+            
+            // Calculate exact position accounting for thumb size
+            const thumbWidth = 24; // Match CSS thumb width
+            const position = (percent / 100) * (sliderWidth - thumbWidth) + (thumbWidth / 2);
+            
+            label.style.left = `${position}px`;
+        }
+        
         // Update time slider display
         function updateTimeSliderDisplay() {
             if (selectedSharkId && sharkData[selectedSharkId]) {
-                const track = sharkData[selectedSharkId];
-                const currentDate = track[currentTimeIndex].date.toLocaleDateString();
-                document.getElementById('bottom-current-time').textContent = currentDate;
+                updateSliderLabelPosition();
             }
         }
         
@@ -2756,6 +2876,11 @@
             initMap();
             setupEventListeners();
             loadData();
+        });
+        
+        // Update slider label position on window resize
+        window.addEventListener('resize', () => {
+            updateSliderLabelPosition();
         });
     </script>
 </body>
