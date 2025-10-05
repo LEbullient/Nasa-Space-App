@@ -167,7 +167,7 @@
     /* Sound icon below 5th tab */
     .sound-icon {
       position: fixed;
-      top: 80px;
+      top: 120px;
       right: 2rem;
       width: 50px;
       height: 50px;
@@ -176,20 +176,35 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: default;
+      cursor: pointer;
       border: 2px solid rgba(255, 255, 255, 0.3);
       backdrop-filter: blur(5px);
       z-index: 999;
-      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .sound-icon:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .sound-icon.muted {
+      background: rgba(255, 100, 100, 0.2);
+      border-color: rgba(255, 100, 100, 0.4);
     }
 
     .sound-icon svg {
       fill: rgba(255, 255, 255, 0.8);
+      transition: fill 0.3s ease;
+    }
+
+    .sound-icon.muted svg {
+      fill: rgba(255, 100, 100, 0.9);
     }
 
     /* Tooltip for sound icon */
     .sound-icon::before {
-      content: "Sound On!!";
+      content: attr(data-tooltip);
       position: absolute;
       bottom: -35px;
       left: 50%;
@@ -508,10 +523,19 @@
   </style>
 </head>
 <body>
+  <!-- Background Music -->
+  <audio id="bgMusic" loop>
+    <source src="./audios/NASA_bgm.wav" type="audio/wav">
+    Your browser does not support the audio element.
+  </audio>
+
   <!-- Fixed sound icon on right edge -->
-  <div class="sound-icon">
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+  <div class="sound-icon" id="soundToggle" data-tooltip="Sound On!" onclick="toggleSound()">
+    <svg id="soundOnIcon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
       <path d="M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320ZM400-606l-86 86H200v80h114l86 86v-252ZM300-480Z"/>
+    </svg>
+    <svg id="soundOffIcon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" style="display: none;">
+      <path d="m616-320-56-56 104-104-104-104 56-56 104 104 104-104 56 56-104 104 104 104-56 56-104-104-104 104Zm-496-40v-240h160l200-200v640L280-360H120Zm280-246-86 86H200v80h114l86 86v-252ZM300-480Z"/>
     </svg>
   </div>
 
@@ -737,6 +761,8 @@
     const bgs = document.querySelectorAll(".bg");
     const sections = document.querySelectorAll("section");
     const header = document.querySelector(".header");
+    const bgMusic = document.getElementById('bgMusic');
+    const soundToggle = document.getElementById('soundToggle');
     
     // // Header auto-hide variables
     // let lastScrollY = window.scrollY;
@@ -797,11 +823,46 @@
       }
     }
 
+    // Toggle sound function
+    function toggleSound() {
+      const soundOnIcon = document.getElementById('soundOnIcon');
+      const soundOffIcon = document.getElementById('soundOffIcon');
+      
+      if (bgMusic.paused) {
+        bgMusic.play();
+        soundToggle.classList.remove('muted');
+        soundToggle.setAttribute('data-tooltip', 'Sound On!');
+        soundOnIcon.style.display = 'block';
+        soundOffIcon.style.display = 'none';
+      } else {
+        bgMusic.pause();
+        soundToggle.classList.add('muted');
+        soundToggle.setAttribute('data-tooltip', 'Sound Off');
+        soundOnIcon.style.display = 'none';
+        soundOffIcon.style.display = 'block';
+      }
+    }
+
+    // Auto-play music on load
+    window.addEventListener('load', () => {
+      checkVisibility();
+      const soundOnIcon = document.getElementById('soundOnIcon');
+      const soundOffIcon = document.getElementById('soundOffIcon');
+      
+      // Try to auto-play (may be blocked by browser policy)
+      bgMusic.play().catch(error => {
+        console.log('Auto-play was prevented. User interaction required.');
+        soundToggle.classList.add('muted');
+        soundToggle.setAttribute('data-tooltip', 'Click to Play');
+        soundOnIcon.style.display = 'none';
+        soundOffIcon.style.display = 'block';
+      });
+    });
+
     window.addEventListener("scroll", () => {
       checkVisibility();
       // requestHeaderUpdate();
     });
-    window.addEventListener("load", checkVisibility);
   </script>
 
   <!-- Footer Section -->
