@@ -147,7 +147,7 @@
         .detail-section {
             min-height: 100vh;
             background: linear-gradient(135deg, #1e3c72, #2a5298);
-            padding: 4rem 2rem;
+            padding: 6rem 2rem 4rem 2rem;
             color: white;
         }
         
@@ -223,6 +223,53 @@
             color: #64b5f6;
             font-weight: bold;
             font-size: 1.2rem;
+        }
+        
+        .tag-image {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .component-section {
+            margin-top: 3rem;
+        }
+        
+        .component-section h3 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #ffd700;
+        }
+        
+        .component-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #64b5f6;
+        }
+        
+        .component-item h4 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #64b5f6;
+        }
+        
+        .component-item h5 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-style: italic;
+            opacity: 0.9;
+        }
+        
+        .component-item p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 0.5rem;
         }
         
         .controls {
@@ -392,9 +439,11 @@
     <section class="detail-section" id="detailSection">
         <div class="detail-content">
             <div class="detail-header">
-                <h2>How Our Bio-Tag Works</h2>
+                <h2>SELF-POWERED Edge AI Shark Tag Pro</h2>
                 <p>Advanced tracking technology inspired by nature</p>
             </div>
+            
+            <img src="./images/tag_temp.png" alt="Shark Tag Temperature Sensor" class="tag-image">
             
             <div class="detail-viewer-container">
                 <div class="detail-viewer">
@@ -423,24 +472,42 @@
                 </div>
                 
                 <div class="detail-info">
-                    <h3>Remora-Inspired Design</h3>
-                    <p>Our bio-tag uses a biomimetic design inspired by the remora fish, which naturally attaches to sharks. This allows the tag to stay securely attached without interfering with the shark's natural swimming behavior.</p>
-                    
                     <h3>Key Features</h3>
-                    <ul>
-                        <li>GPS and satellite communication for real-time tracking</li>
-                        <li>Depth and temperature sensors for environmental data</li>
-                        <li>Long-lasting battery life (up to 2 years)</li>
-                        <li>Hydrodynamic shape for minimal drag</li>
-                        <li>Biodegradable release mechanism</li>
-                        <li>Solar panel for extended operations</li>
+                    <p>Unlike traditional shark tags, which often last no longer than a year, this biomimetic tag draws its energy directly from the motion of the shark — powered by advanced piezoelectric fibers. As long as the shark lives and swims, the tag endures, extending observation far beyond conventional limits.</p>
+                    <p>Traditional satellite tags struggle to return data in real time. But this new generation of shark tag does more. It can sense what these ocean giants are eating, and transmit that knowledge instantly back to researchers. For the first time, we gain not just glimpses, but a living, continuous stream of intelligence — enabling the creation of predictive models of marine behavior.</p>
+                </div>
+            </div>
+            
+            <div class="component-section">
+                <h3>Key Components Overview</h3>
+                
+                <div class="component-item">
+                    <h4>1. Piezo Fiber</h4>
+                    <h5>Motion to Energy -- Turning a shark's swim into power.</h5>
+                    <p>At the rear of the tag, slender piezoelectric fibers bend with the flow—like a remora's tail flexing in the current. Each tiny vibration becomes electricity. Unlike traditional tags that fade within a year, this biomimetic design feeds on motion: as long as the shark swims, the tag keeps working, extending our watch far beyond old limits.</p>
+                    <p>In tests on live fish, the harvester produced ~80 μW, enough to power up light a blue LED—proof that life in motion can power science.</p>
+                    <p>In comparison with battery tags, this approach can support longer studies and more data over time.</p>
+                </div>
+                
+                <div class="component-item">
+                    <h4>2. Suction Disc</h4>
+                    <h5>A Gentle Hold to the Shark -- Non-invasive Mount</h5>
+                    <p>Secure attachment, minimal drag, no piercing.</p>
+                    <p>Inspired by remoras and modern suction-cup wildlife tags, the mount grips the skin without injury. It rides quietly with the animal across long distances, staying low-profile to reduce drag—built to endure real ocean travel while keeping the host unharmed.</p>
+                </div>
+                
+                <div class="component-item">
+                    <h4>3. PreySense</h4>
+                    <h5>Revealing the Hunt</h5>
+                    <p>Sensors wake when a predator moves.</p>
+                    <p>A small network listens for the signs of feeding and switches on only when it matters:</p>
+                    <ul style="margin-left: 1.5rem; margin-top: 1rem;">
+                        <li style="margin-bottom: 0.5rem;"><strong>IMU / accelerometer:</strong> bursts of speed, rolls, lunges.</li>
+                        <li style="margin-bottom: 0.5rem;"><strong>Pressure sensor:</strong> depth changes before and after the strike.</li>
+                        <li style="margin-bottom: 0.5rem;"><strong>Magnetometer:</strong> heading and orientation for sensor fusion.</li>
+                        <li style="margin-bottom: 0.5rem;"><strong>Hydrophone (passive acoustics):</strong> the scatter of prey, jaw impacts, tearing sounds, social calls.</li>
                     </ul>
-                    
-                    <h3>Technical Specifications</h3>
-                    <p>Designed to withstand extreme ocean conditions including depths up to 1000 meters and temperatures from -2°C to 30°C. The tag transmits location data via satellite when the shark surfaces, allowing us to track migration patterns across thousands of miles.</p>
-                    
-                    <h3>Research Impact</h3>
-                    <p>These tracking devices help us understand blue shark migration patterns, feeding behaviors, and habitat preferences, contributing to better conservation strategies and marine ecosystem management.</p>
+                    <p style="margin-top: 1rem;">When these cues align, a miniature camera activates—capturing short, high-value clips around the feeding moment so we can tell what the shark is eating, not just where it swims.</p>
                 </div>
             </div>
         </div>
@@ -491,6 +558,15 @@
             heroControls.dampingFactor = 0.25;
             heroControls.screenSpacePanning = false;
             heroControls.maxPolarAngle = Math.PI;
+            // When the user starts interacting (dragging) we should stop auto-rotation
+            heroControls.addEventListener('start', function() {
+                heroAutoRotate = false;
+                const btn = document.getElementById('heroToggleRotation');
+                if (btn) {
+                    btn.textContent = 'Auto Rotate';
+                    btn.style.background = '#3498db';
+                }
+            });
             
             const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
             heroScene.add(ambientLight);
@@ -608,6 +684,15 @@
             detailControls.dampingFactor = 0.25;
             detailControls.screenSpacePanning = false;
             detailControls.maxPolarAngle = Math.PI;
+            // Stop detail auto-rotation when the user starts dragging
+            detailControls.addEventListener('start', function() {
+                detailAutoRotate = false;
+                const btn = document.getElementById('detailToggleRotation');
+                if (btn) {
+                    btn.textContent = 'Auto Rotate';
+                    btn.style.background = '#3498db';
+                }
+            });
             
             const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
             detailScene.add(ambientLight);
